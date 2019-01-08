@@ -13,7 +13,7 @@ namespace Tests
         {
             for (int b = byte.MinValue; b <= byte.MaxValue; b++) 
             {
-                TileType t = TileType.GetTileType((byte)b).Item1;
+                TileType t = TileType.GetTileType((Connection)b).Item1;
             }
         }
 

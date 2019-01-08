@@ -2,49 +2,48 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public enum TileEnum
-{
-    EMPTY = 0b00__0000_0000__0101_0101,
-    DEAD_END = 0b11__0000_0001__0101_0101
-}
-
-public static class TileEnumHelper
-{
-    public static (TileEnum, int) GetTileType(this TileEnum tile, byte adjacencyByte)
-    {
-        return (TileEnum.EMPTY, 0);
-    }
-}
-
+/// <summary>
+/// An implementation of 2 edge + 2 corner Wang tile set.
+/// See: http://www.cr31.co.uk/stagecast/wang/blob.html
+/// 
+/// In practice, each Section can be seen as having 8 connections (cardinal +
+/// diagonal directions). In this file, the convention is that a connection
+/// starts facing East, and additional connections are added counterclockwise.
+/// (i.e., the corner piece has two connections, so is represented as East and
+/// then North).
+/// </summary>
 public struct TileType 
 {
     // 0 connections
     /// <summary>
     /// Room with no connections.
     /// </summary>
-    public static TileType EMPTY = new TileType(1, 0b0000_0000, 0b0101_0101);
+    public static TileType EMPTY = new TileType(nameof(EMPTY), 1, 0b0000_0000);
 
     // 1 connection
-    public static TileType DEAD_END = new TileType(4, 0b0000_0001, 0b0101_0101);
+    /// <summary>
+    /// A one connection dead end hallway.
+    /// </summary>
+    public static TileType DEAD_END = new TileType(nameof(DEAD_END), 4, 0b0000_0001);
 
     // 2 connections
-    public static TileType CORNER_CORRIDOR = new TileType(4, 0b0000_0101, 0b0101_0111);
-    public static TileType CORNER_ROOM = new TileType(4, 0b0000_0111, 0b0101_0111);
-    public static TileType HALLWAY = new TileType(2, 0b_0001_0001, 0b0101_0101);
+    public static TileType CORNER_CORRIDOR = new TileType(nameof(CORNER_CORRIDOR), 4, 0b0000_0101);
+    public static TileType CORNER_ROOM = new TileType(nameof(CORNER_ROOM), 4, 0b0000_0111);
+    public static TileType HALLWAY = new TileType(nameof(HALLWAY), 2, 0b_0001_0001);
 
     // 3 connections
-    public static TileType T_CORRIDOR = new TileType(4, 0b0001_0101, 0b0101_1111);
-    public static TileType T_CORRIDOR_LEFT = new TileType(4, 0b0001_1101, 0b0101_1111);
-    public static TileType T_CORRIDOR_RIGHT = new TileType(4, 0b0001_0111, 0b0101_1111);
-    public static TileType T_ROOM = new TileType(4, 0b0001_1111, 0b0101_1111);
+    public static TileType T_CORRIDOR = new TileType(nameof(T_CORRIDOR), 4, 0b0001_0101);
+    public static TileType T_CORRIDOR_LEFT = new TileType(nameof(T_CORRIDOR_LEFT), 4, 0b0001_1101);
+    public static TileType T_CORRIDOR_RIGHT = new TileType(nameof(T_CORRIDOR_RIGHT), 4, 0b0001_0111);
+    public static TileType T_ROOM = new TileType(nameof(T_ROOM), 4, 0b0001_1111);
 
     // 4 connections
-    public static TileType CROSS_CORRIDOR = new TileType(1, 0b0101_0101, 0b1111_1111);
-    public static TileType CROSS_ROOM_CORNER = new TileType(4, 0b0101_0111, 0b1111_1111);
-    public static TileType CROSS_ROOM_WALL = new TileType(4, 0b0101_1111, 0b1111_1111);
-    public static TileType CROSS_ROOM_STRAIT = new TileType(2, 0b0111_0111, 0b1111_1111);
-    public static TileType CROSS_ROOM_L = new TileType(4, 0b0111_1111, 0b1111_1111);
-    public static TileType CROSS_ROOM_CENTER = new TileType(1, 0b1111_1111, 0b1111_1111);
+    public static TileType CROSS_CORRIDOR = new TileType(nameof(CROSS_CORRIDOR), 1, 0b0101_0101);
+    public static TileType CROSS_ROOM_CORNER = new TileType(nameof(CROSS_ROOM_CORNER), 4, 0b0101_0111);
+    public static TileType CROSS_ROOM_WALL = new TileType(nameof(CROSS_ROOM_WALL), 4, 0b0101_1111);
+    public static TileType CROSS_ROOM_STRAIT = new TileType(nameof(CROSS_ROOM_STRAIT), 2, 0b0111_0111);
+    public static TileType CROSS_ROOM_L = new TileType(nameof(CROSS_ROOM_L), 4, 0b0111_1111);
+    public static TileType CROSS_ROOM_CENTER = new TileType(nameof(CROSS_ROOM_CENTER), 1, 0b1111_1111);
 
     public static readonly TileType[] TypeList = {
         EMPTY,
@@ -63,6 +62,11 @@ public struct TileType
         CROSS_ROOM_L,
         CROSS_ROOM_CENTER
     };
+
+    public string Name
+    {
+        get; private set;
+    }
 
     /// <summary>
     /// How many rotational variants do we have?
@@ -87,24 +91,11 @@ public struct TileType
     /// </summary>
     private readonly byte tileBlueprint;
 
-    /// <summary>
-    /// Which adjacencies are important to determine which TileType a Section is.
-    /// Some adjacencies are "don't care"s, meaning they don't affect which type
-    /// the Section is.
-    /// 
-    /// TODO: note that the importance mask can be computed from the number of adjacent
-    /// cardinal connections. We always care about the bits 0, 2, 4, 6; and the first
-    /// 0, 1, 2, or 4 unused bits, based on how many "corners" we have. I.e.,
-    /// a corner piece has one corner, so we care about the first corner.
-    /// 
-    /// </summary>
-    private readonly byte importanceMask;
-
-    private TileType(int numRotations, byte blueprint, byte importance)
+    private TileType(string name, int numRotations, byte blueprint)
     {
+        this.Name = name;
         this.numRotations = numRotations;
         this.tileBlueprint = blueprint;
-        this.importanceMask = importance;
     }
 
     /// <summary>
@@ -124,7 +115,7 @@ public struct TileType
         return (byte)(shifted | overflow);
     }
 
-    public static (TileType, int) GetTileType(byte adjacencyByte) 
+    public static (TileType, int) GetTileType(Connection adjacentRooms, Connection allowedConnections = Connection.All) 
     {
         // Check every tile
         for (int i = 0; i < TypeList.Length; i++) 
@@ -133,11 +124,13 @@ public struct TileType
             for (int rotationNumber = 0; rotationNumber < TypeList[i].numRotations; rotationNumber++) 
             {
                 byte rotatedBlueprint = Rotate(TypeList[i].tileBlueprint, 2 * rotationNumber);
-                byte rotatedMask = Rotate(TypeList[i].importanceMask, 2 * rotationNumber);
 
-                // Mask to ignore adjacencies we don't care about. If what remains matches the current
-                // TileType's blueprint exactly, then we return the TileType and rotation.
-                if (((adjacencyByte & rotatedMask) ^ rotatedBlueprint) == 0) 
+                // allowedConnections tells us which neighbors we can ignore. We
+                // mask it here to determine which Wang tile to use.
+                // 
+                // If the resulting byte matches the current TileType, we return
+                // the TileType and rotation.
+                if ((((byte)adjacentRooms & (byte)allowedConnections) ^ rotatedBlueprint) == 0) 
                 {
                     return (TypeList[i], rotationNumber);
                 }
@@ -145,7 +138,7 @@ public struct TileType
         }
 
         // Fail if the byte is invalid. This shouldn't ever run.
-        throw new System.Exception("Failed to get tile type for byte: " + adjacencyByte);
+        throw new System.Exception("Failed to get tile type for connection type: " + adjacentRooms);
     }
 
     /// <summary>
@@ -164,7 +157,7 @@ public struct TileType
         }
 
         // This shouldn't be hit; you can't define any TileTypes outside the array.
-        throw new System.Exception("Failed to get index for tile type with blueprint: " + type.tileBlueprint + " and mask: " + type.importanceMask + ".");
+        throw new System.Exception("Failed to get index for tile type with blueprint: " + type.tileBlueprint + ".");
     }
 }
 
