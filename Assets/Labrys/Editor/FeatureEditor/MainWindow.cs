@@ -30,7 +30,7 @@ namespace Labrys.Editor.FeatureEditor
 			selectedTileStyle.normal.background = (Texture2D)EditorGUIUtility.Load ("builtin skins/darkskin/images/node1 on.png");
 			selectedTileStyle.border = new RectOffset (12, 12, 12, 12);
 
-			grid = new EditorGrid (this, 64, Color.black);
+			grid = new EditorGrid (this, 64, new Color(0.3f, 0.3f, 0.3f));
 		}
 
 		private void OnGUI()

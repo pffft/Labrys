@@ -15,6 +15,8 @@ namespace Labrys.Editor.FeatureEditor
 
 		public Rect bounds;
 		private Vector2 baseSize;
+
+		public Vector2Int position;
 		public string variant;
 		public Tile[] internalLinks;
 		public byte externalLinks;
