@@ -13,5 +13,4 @@ MonoBehaviour:
   m_Name: CrossRoomWall
   m_EditorClassIdentifier: 
   variant: default
-  prefab: {fileID: 0}
-  prefabString: Models/CrossRoomWall
+  prefab: {fileID: 100000, guid: ec69467449d0e4f31bc344a123ac209a, type: 3}

@@ -13,5 +13,4 @@ MonoBehaviour:
   m_Name: TRoom
   m_EditorClassIdentifier: 
   variant: default
-  prefab: {fileID: 0}
-  prefabString: Models/TRoom
+  prefab: {fileID: 100002, guid: f406051ee6f014dd7947a23cd5d37e5b, type: 3}

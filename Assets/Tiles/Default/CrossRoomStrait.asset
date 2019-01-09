@@ -13,5 +13,4 @@ MonoBehaviour:
   m_Name: CrossRoomStrait
   m_EditorClassIdentifier: 
   variant: default
-  prefab: {fileID: 0}
-  prefabString: Models/CrossRoomStrait
+  prefab: {fileID: 100000, guid: 141f29f5f207d4b97bc0fbdf48542b2c, type: 3}

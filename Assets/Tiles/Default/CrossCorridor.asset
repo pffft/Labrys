@@ -13,5 +13,4 @@ MonoBehaviour:
   m_Name: CrossCorridor
   m_EditorClassIdentifier: 
   variant: default
-  prefab: {fileID: 0}
-  prefabString: Models/CrossCorridor
+  prefab: {fileID: 100000, guid: 1c235148b88af4ab4912d0cd6574621f, type: 3}

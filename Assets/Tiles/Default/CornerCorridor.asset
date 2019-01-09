@@ -13,5 +13,4 @@ MonoBehaviour:
   m_Name: CornerCorridor
   m_EditorClassIdentifier: 
   variant: default
-  prefab: {fileID: 0}
-  prefabString: Models/CornerCorridor
+  prefab: {fileID: 100000, guid: de0e89f361db74427b19bd338c43a5dc, type: 3}

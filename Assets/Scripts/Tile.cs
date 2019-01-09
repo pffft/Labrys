@@ -27,10 +27,4 @@ public class Tile : ScriptableObject
     /// generator. Vice-versa for the string. Enforce this somehow.
     /// </summary>
     public GameObject prefab;
-
-    /// <summary>
-    /// The location of the prefab, used for autogenerating Tiles.
-    /// TODO: as above.
-    /// </summary>
-    public string prefabString;
 }

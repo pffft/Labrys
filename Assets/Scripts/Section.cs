@@ -24,6 +24,16 @@ public class Section
     /// </summary>
     public Tile tile;
 
+    public Section(Connection allowedConnections=Connection.All) 
+    {
+        this.allowedConnections = allowedConnections;
+    }
+
+    public bool CanConnect(Connection direction) 
+    {
+        return (allowedConnections & direction) == direction;
+    }
+
     public void RequestTile() 
     {
         (TileType type, int rotation) = TileType.GetTileType(adjacentRooms, allowedConnections);

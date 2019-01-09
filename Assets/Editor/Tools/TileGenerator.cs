@@ -11,7 +11,8 @@ public class TileGenerator : Editor
     {
         DrawDefaultInspector();
 
-        if (GUILayout.Button("Regenerate TileSet"))
+        // Compile a pile of tile files.
+        if (GUILayout.Button("Generate Tile Assets"))
         {
             char sep = Path.DirectorySeparatorChar;
             DirectoryInfo modelFolder = new DirectoryInfo(Application.dataPath + sep + "Models");
@@ -20,7 +21,7 @@ public class TileGenerator : Editor
             DirectoryInfo[] variantFolders = modelFolder.GetDirectories();
             for (int i = 0; i < variantFolders.Length; i++)
             {
-                string variantName = variantFolders[i].Name.ToLowerInvariant();
+                string variantName = variantFolders[i].Name;
 
                 // Go through each variant folder and extract all the models we recognize the name of.
                 FileInfo[] tileFiles = variantFolders[i].GetFiles();
@@ -44,11 +45,17 @@ public class TileGenerator : Editor
                     // Create the actual Tile object
                     Tile newTile = ScriptableObject.CreateInstance(typeof(Tile)) as Tile;
 
-                    GameObject prefab = AssetDatabase.LoadAssetAtPath<GameObject>("Models" + sep + tileModelName);
+                    string prefabLocation = "Assets/Models" + sep + variantName + sep + tileModelName + tileFiles[j].Extension;
+                    GameObject prefab = AssetDatabase.LoadAssetAtPath<GameObject>(prefabLocation);
+                    if (prefab == null) 
+                    {
+                        //Debug.LogWarning("Failed to load in prefab at location: \"" + prefabLocation + "\".");
+                        Debug.LogWarning($"Failed to load in prefab at location: \"{prefabLocation}\".");
+                        continue;
+                    }
                     newTile.prefab = prefab;
-                    newTile.prefabString = "Models" + sep + tileModelName;
                     newTile.type = type;
-                    newTile.variant = variantName;
+                    newTile.variant = variantName.ToLowerInvariant();
 
                     // Serialize the asset into the Tile folder
                     //if (!AssetDatabase.Contains(newTile))
@@ -61,15 +68,55 @@ public class TileGenerator : Editor
                     //TileSet.Add(new TileSet.VariantKey(type, variantName), newTile);
                 }
             }
+        }
 
+        if (GUILayout.Button("Generate TileSet")) 
+        {
+            GenerateTileSet();
+        }
+    }
 
-            //Debug.Log("Hello!");
-            //GameObject obj = AssetDatabase.LoadAssetAtPath<GameObject>("Assets/Models/Default/DeadEnd.obj");
+    public void GenerateTileSet() 
+    {
+        // Try to load the Tile assets from the Tile directory
+        char sep = Path.DirectorySeparatorChar;
+        DirectoryInfo modelFolder = new DirectoryInfo(Application.dataPath + sep + "Tiles");
 
+        // The directories here represent different variants.
+        DirectoryInfo[] variantFolders = modelFolder.GetDirectories();
 
+        for (int i = 0; i < variantFolders.Length; i++)
+        {
+            string variantName = variantFolders[i].Name.ToLowerInvariant();
 
-            //GameObject.Instantiate(obj);
-            //Debug.Log("Is object null?: " + (obj == null));
+            // Go through each variant folder and extract all the models we recognize the name of.
+            FileInfo[] tileFiles = variantFolders[i].GetFiles();
+            for (int j = 0; j < tileFiles.Length; j++)
+            {
+                // Ignore .meta files
+                if (tileFiles[j].Extension.Equals(".meta"))
+                {
+                    continue;
+                }
+
+                string tileFilePath = "Assets" + sep + "Tiles" + sep + variantName + sep + tileFiles[j].Name;
+                Tile tile = AssetDatabase.LoadAssetAtPath<Tile>(tileFilePath);
+                if (tile == null)
+                {
+                    Debug.LogWarning($"Failed to load in file \"{tileFilePath}\".");
+                    continue;
+                }
+
+                // Add the Tile file to the Tile pile.
+                if (GameManager.Instance != null)
+                {
+                    GameManager.Instance.TileSet.Add(tile);
+                }
+                else
+                {
+                    Debug.LogWarning("GameManager instance is null- can't yet add assets outside of play time");
+                }
+            }
         }
     }
 
