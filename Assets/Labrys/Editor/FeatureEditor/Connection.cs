@@ -13,7 +13,6 @@ namespace Labrys.Editor.FeatureEditor
 			members[0] = self;
 			members[1] = other;
 
-			self.SetLink(
 		}
 
 		public void Draw()
@@ -23,7 +22,7 @@ namespace Labrys.Editor.FeatureEditor
 
 		public bool HandleEvent(Event e)
 		{
-
+			return false;
 		}
 	}
 }
