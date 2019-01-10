@@ -19,24 +19,12 @@ namespace Labrys.Editor.FeatureEditor
 		public Vector2Int position;
 		public string variant;
 		public Tile[] internalLinks;
-		public byte externalLinks;
+		public int externalLinks;
 
-		public static Vector2 LinkDirectionToVector2(LinkDirection dir)
-		{
-			switch (dir)
-			{
-			case LinkDirection.Right:
-				return Vector2.right;
-			case LinkDirection.Up:
-				return Vector2.up;
-			case LinkDirection.Left:
-				return Vector2.left;
-			case LinkDirection.Down:
-				return Vector2.down;
-			default:
-				return Vector2.zero;
-			}
-		}
+		public Vector2Int Right => position + Vector2Int.right;
+		public Vector2Int Up => position + Vector2Int.up;
+		public Vector2Int Left => position + Vector2Int.left;
+		public Vector2Int Down => position + Vector2Int.down;
 
 		public Tile(Vector2 position, Vector2 size, GUIStyle defaultStyle, GUIStyle selectedStyle)
 		{
@@ -65,23 +53,6 @@ namespace Labrys.Editor.FeatureEditor
 		public void Draw()
 		{
 			GUI.Box (bounds, variant, style);
-			Rect connectorBox = new Rect (Vector2.zero, bounds.size / 8f);
-
-			//right
-			connectorBox.center = new Vector2(bounds.xMax - connectorBox.width * 2, bounds.y + bounds.height/2);
-			GUI.Box (connectorBox, "");
-
-			//up
-			connectorBox.center = new Vector2 (bounds.x, bounds.yMin);
-			GUI.Box (connectorBox, "");
-
-			//left
-			connectorBox.center = new Vector2 (bounds.xMin, bounds.y);
-			GUI.Box (connectorBox, "");
-
-			//down
-			connectorBox.center = new Vector2 (bounds.x, bounds.yMax);
-			GUI.Box (connectorBox, "");
 		}
 
 		public bool HandleEvent(Event e)

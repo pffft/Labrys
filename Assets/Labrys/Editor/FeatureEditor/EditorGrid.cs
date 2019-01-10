@@ -175,6 +175,15 @@ namespace Labrys.Editor.FeatureEditor
 			GUI.changed = true;
 		}
 
+		public Tile TryGetTile(Vector2Int position)
+		{
+			if(tiles.TryGetValue(position, out Tile t))
+			{
+				return t;
+			}
+			return null;
+		}
+
 		private void AlignTile(Tile t)
 		{
 			TryAlignTile (t);
