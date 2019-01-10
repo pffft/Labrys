@@ -13,5 +13,5 @@ MonoBehaviour:
   m_Name: CrossRoomCenter
   m_EditorClassIdentifier: 
   variant: default
-  prefab: {fileID: 0}
-  prefabString: Models/CrossRoomCenter
+  prefab: {fileID: 100000, guid: 5dcdec98dbbc64b909f9202c328bfc65, type: 3}
+  prefabString: 

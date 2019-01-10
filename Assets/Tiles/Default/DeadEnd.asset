@@ -13,5 +13,5 @@ MonoBehaviour:
   m_Name: DeadEnd
   m_EditorClassIdentifier: 
   variant: default
-  prefab: {fileID: 0}
-  prefabString: Models/DeadEnd
+  prefab: {fileID: 100000, guid: 94e6dd5894b5647cea9a7033988ec463, type: 3}
+  prefabString: 

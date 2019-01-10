@@ -13,5 +13,5 @@ MonoBehaviour:
   m_Name: Hallway
   m_EditorClassIdentifier: 
   variant: default
-  prefab: {fileID: 0}
-  prefabString: Models/Hallway
+  prefab: {fileID: 100002, guid: 1c0acdb1b1e9645cf971e36e571f70a1, type: 3}
+  prefabString: 

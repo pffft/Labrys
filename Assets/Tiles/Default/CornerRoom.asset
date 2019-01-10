@@ -13,5 +13,5 @@ MonoBehaviour:
   m_Name: CornerRoom
   m_EditorClassIdentifier: 
   variant: default
-  prefab: {fileID: 0}
-  prefabString: Models/CornerRoom
+  prefab: {fileID: 100000, guid: 434c5fcfbb22a4e99b453f74e0a1cca1, type: 3}
+  prefabString: 

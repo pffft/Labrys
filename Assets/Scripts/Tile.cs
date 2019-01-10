@@ -22,15 +22,7 @@ public class Tile : ScriptableObject
     public string variant = "none";
 
     /// <summary>
-    /// The actual physical model that represents this Tile.
-    /// TODO: The GameObject can be set in the inspector, but not in the
-    /// generator. Vice-versa for the string. Enforce this somehow.
+    /// The actual physical object that represents this Tile.
     /// </summary>
     public GameObject prefab;
-
-    /// <summary>
-    /// The location of the prefab, used for autogenerating Tiles.
-    /// TODO: as above.
-    /// </summary>
-    public string prefabString;
 }

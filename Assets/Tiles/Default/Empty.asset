@@ -13,5 +13,5 @@ MonoBehaviour:
   m_Name: Empty
   m_EditorClassIdentifier: 
   variant: default
-  prefab: {fileID: 0}
-  prefabString: Models/Empty
+  prefab: {fileID: 100000, guid: 22bb745315822427f93df7d424bd2be3, type: 3}
+  prefabString: 

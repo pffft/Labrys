@@ -20,7 +20,7 @@ public class TileGenerator : Editor
             DirectoryInfo[] variantFolders = modelFolder.GetDirectories();
             for (int i = 0; i < variantFolders.Length; i++)
             {
-                string variantName = variantFolders[i].Name.ToLowerInvariant();
+                string variantName = variantFolders[i].Name;
 
                 // Go through each variant folder and extract all the models we recognize the name of.
                 FileInfo[] tileFiles = variantFolders[i].GetFiles();
@@ -44,13 +44,20 @@ public class TileGenerator : Editor
                     // Create the actual Tile object
                     Tile newTile = ScriptableObject.CreateInstance(typeof(Tile)) as Tile;
 
-                    GameObject prefab = AssetDatabase.LoadAssetAtPath<GameObject>("Models" + sep + tileModelName);
-                    newTile.prefab = prefab;
-                    newTile.prefabString = "Models" + sep + tileModelName;
+                    //string prefabLocation = "Assets/Prefabs" + sep + variantName + sep + tileModelName + ".prefab";
+                    //GameObject prefab = AssetDatabase.LoadAssetAtPath<GameObject>(prefabLocation);
+                    GameObject model = AssetDatabase.LoadAssetAtPath<GameObject>("Assets/Models" + sep + variantName + sep + tileModelName + ".obj");
+                    if (model == null)
+                    {
+                        Debug.LogWarning("Couldn't load in prefab: " + model);
+                    }
+                    newTile.prefab = model;
+                    //newTile.prefabString = "Prefabs" + sep + tileModelName;
                     newTile.type = type;
-                    newTile.variant = variantName;
+                    newTile.variant = variantName.ToLowerInvariant();
 
                     // Serialize the asset into the Tile folder
+                    // TODO: Check if it already exists, and warn if overwriting.
                     //if (!AssetDatabase.Contains(newTile))
                     //{
                     AssetDatabase.CreateAsset(newTile, "Assets/Tiles" + sep + variantName + sep + tileModelName + ".asset");
@@ -58,18 +65,10 @@ public class TileGenerator : Editor
                     //}
 
                     // Add it to the database.
+                    // TODO
                     //TileSet.Add(new TileSet.VariantKey(type, variantName), newTile);
                 }
             }
-
-
-            //Debug.Log("Hello!");
-            //GameObject obj = AssetDatabase.LoadAssetAtPath<GameObject>("Assets/Models/Default/DeadEnd.obj");
-
-
-
-            //GameObject.Instantiate(obj);
-            //Debug.Log("Is object null?: " + (obj == null));
         }
     }
 

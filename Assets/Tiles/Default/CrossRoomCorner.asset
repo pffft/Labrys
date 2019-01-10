@@ -13,5 +13,5 @@ MonoBehaviour:
   m_Name: CrossRoomCorner
   m_EditorClassIdentifier: 
   variant: default
-  prefab: {fileID: 0}
-  prefabString: Models/CrossRoomCorner
+  prefab: {fileID: 100000, guid: 51c402c47fcfc41a9bb5f758481eac23, type: 3}
+  prefabString: 

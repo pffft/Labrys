@@ -5,6 +5,9 @@ using UnityEngine;
 public class Section
 {
 
+    public int x;
+    public int z;
+
     /// <summary>
     /// Which connections are allowed. If a connection is not allowed, and a
     /// room is physically adjacent, it will visually not connect.

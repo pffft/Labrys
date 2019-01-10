@@ -13,5 +13,5 @@ MonoBehaviour:
   m_Name: TCorridorLeft
   m_EditorClassIdentifier: 
   variant: default
-  prefab: {fileID: 0}
-  prefabString: Models/TCorridorLeft
+  prefab: {fileID: 100002, guid: a57894f2f79514caca5c36a83ec92761, type: 3}
+  prefabString: 
