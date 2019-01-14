@@ -12,5 +12,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 06e099c075c0f4c499f68f2688a6aac6, type: 3}
   m_Name: Hallway
   m_EditorClassIdentifier: 
+  type:
+    _numRotations: 2
+    _tileBlueprint: 17
+    _importanceMask: 85
   variant: default
   prefab: {fileID: 100002, guid: 1c0acdb1b1e9645cf971e36e571f70a1, type: 3}

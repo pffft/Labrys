@@ -12,5 +12,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 06e099c075c0f4c499f68f2688a6aac6, type: 3}
   m_Name: TCorridor
   m_EditorClassIdentifier: 
+  type:
+    _numRotations: 4
+    _tileBlueprint: 21
+    _importanceMask: 95
   variant: default
   prefab: {fileID: 100002, guid: c162264cf922a4e8d8f4832e73d09ec3, type: 3}

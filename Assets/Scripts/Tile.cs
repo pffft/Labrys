@@ -3,9 +3,10 @@ using System.Collections.Generic;
 using UnityEngine;
 
 /// <summary>
-/// An individual 1x1 grid element to be placed in the world.
+/// A physical, individual 1x1 grid element to be placed in the world.
 /// </summary>
 [CreateAssetMenu(fileName="NewTile", menuName="Labrys/RoomTile")]
+[System.Serializable]
 public class Tile : ScriptableObject
 {
     /// <summary>
@@ -23,8 +24,6 @@ public class Tile : ScriptableObject
 
     /// <summary>
     /// The actual physical model that represents this Tile.
-    /// TODO: The GameObject can be set in the inspector, but not in the
-    /// generator. Vice-versa for the string. Enforce this somehow.
     /// </summary>
     public GameObject prefab;
 }

@@ -12,5 +12,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 06e099c075c0f4c499f68f2688a6aac6, type: 3}
   m_Name: CrossRoomL
   m_EditorClassIdentifier: 
+  type:
+    _numRotations: 4
+    _tileBlueprint: 127
+    _importanceMask: 255
   variant: default
   prefab: {fileID: 100000, guid: 55d3907dde204442dac5ef337966c0ab, type: 3}

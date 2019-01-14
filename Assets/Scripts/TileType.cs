@@ -46,6 +46,9 @@ public struct TileType
     public static TileType CROSS_ROOM_L = new TileType(nameof(CROSS_ROOM_L), 4, 0b0111_1111, 0b1111_1111);
     public static TileType CROSS_ROOM_CENTER = new TileType(nameof(CROSS_ROOM_CENTER), 1, 0b1111_1111, 0b1111_1111);
 
+    // Used just for searching.
+    public static TileType ANY = new TileType("ANY", 0, 0, 0);
+
     public static readonly TileType[] TypeList = {
         EMPTY,
         DEAD_END,
@@ -64,16 +67,15 @@ public struct TileType
         CROSS_ROOM_CENTER
     };
 
-    public string Name
-    {
-        get; private set;
-    }
+    [SerializeField]
+    public string Name { get; private set; }
 
     /// <summary>
     /// How many rotational variants do we have?
     /// This will always be either 1, 2, or 4.
     /// </summary>
-    private readonly int numRotations;
+    [SerializeField]
+    private int numRotations;
 
     /// <summary>
     /// Defines the basic structure of this TileType. The structures are built
@@ -90,7 +92,8 @@ public struct TileType
     /// by the importance mask. If the result XOR this blueprint is equal to 0,
     /// then it is a match. This is checked against every rotational variant.
     /// </summary>
-    private readonly byte tileBlueprint;
+    [SerializeField]
+    private byte tileBlueprint;
 
     /// <summary>
     /// The importance mask. Encodes which rooms in the blueprint are required
@@ -100,7 +103,8 @@ public struct TileType
     /// know the diagonal between its connections to determine if it's a 
     /// corridor or a room piece.
     /// </summary>
-    private readonly byte importanceMask;
+    [SerializeField]
+    private byte importanceMask;
 
     private TileType(string name, int numRotations, byte blueprint, byte importanceMask)
     {

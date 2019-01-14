@@ -2,6 +2,12 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+/// <summary>
+/// A logical grid element. Stores information about which connections
+/// it can connect to, and contains a physical Tile element when the
+/// generation finishes.
+/// </summary>
+[System.Serializable]
 public class Section
 {
 
@@ -10,13 +16,6 @@ public class Section
     /// room is physically adjacent, it will visually not connect.
     /// </summary>
     public Connection allowedConnections = Connection.All;
-
-    /// <summary>
-    /// Which rooms we're physically adjacent to. At runtime, these should be
-    /// set for us. For example, if there is a Section North of us, then 
-    /// adjacentRooms should have its North flag set to true.
-    /// </summary>
-    public Connection adjacentRooms = Connection.None;
 
     /// <summary>
     /// A data structure which contains information on the physical model being
@@ -29,16 +28,16 @@ public class Section
         this.allowedConnections = allowedConnections;
     }
 
+    /// <summary>
+    /// Can this Section connect in the provided  directions?
+    /// 
+    /// If multiple directions are provided (i.e., Connection.All), this returns
+    /// true if all directions are valid. 
+    /// </summary>
+    /// <returns><c>true</c>, if we can connect <c>false</c> otherwise.</returns>
+    /// <param name="direction">Direction.</param>
     public bool CanConnect(Connection direction) 
     {
         return (allowedConnections & direction) == direction;
-    }
-
-    public void RequestTile() 
-    {
-        (TileType type, int rotation) = TileType.GetTileType(adjacentRooms, allowedConnections);
-
-        // Here, we would lookup a valid Tile in Tileset for the given TileType.
-        // TODO
     }
 }

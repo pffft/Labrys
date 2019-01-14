@@ -12,5 +12,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 06e099c075c0f4c499f68f2688a6aac6, type: 3}
   m_Name: CrossCorridor
   m_EditorClassIdentifier: 
+  type:
+    _numRotations: 1
+    _tileBlueprint: 85
+    _importanceMask: 255
   variant: default
   prefab: {fileID: 100000, guid: 1c235148b88af4ab4912d0cd6574621f, type: 3}

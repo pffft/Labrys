@@ -9,12 +9,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 06e099c075c0f4c499f68f2688a6aac6, type: 3}
-  m_Name: CornerCorridor
+  m_Script: {fileID: 11500000, guid: 89dc73ada49164df5ba52a84fa3ab507, type: 3}
+  m_Name: Test
   m_EditorClassIdentifier: 
-  type:
-    _numRotations: 4
-    _tileBlueprint: 5
-    _importanceMask: 87
-  variant: default
-  prefab: {fileID: 100000, guid: de0e89f361db74427b19bd338c43a5dc, type: 3}
+  AllTiles: []

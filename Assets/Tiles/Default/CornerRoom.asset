@@ -12,5 +12,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 06e099c075c0f4c499f68f2688a6aac6, type: 3}
   m_Name: CornerRoom
   m_EditorClassIdentifier: 
+  type:
+    _numRotations: 4
+    _tileBlueprint: 7
+    _importanceMask: 87
   variant: default
   prefab: {fileID: 100000, guid: 434c5fcfbb22a4e99b453f74e0a1cca1, type: 3}

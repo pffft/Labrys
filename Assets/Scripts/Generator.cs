@@ -7,6 +7,11 @@ public class Generator : MonoBehaviour
 
     private Dictionary<Vector2Int, Section> sectionGrid;
 
+    [SerializeField]
+    [Tooltip("The palatte of Tiles to use for generation purposes.")]
+    private TileSet tileSet = null;
+
+
     /// <summary>
     /// By how much we scale every single Tile when we are finished.
     /// </summary>
@@ -43,6 +48,11 @@ public class Generator : MonoBehaviour
 
     private void Start()
     {
+        if (tileSet == null) {
+            Debug.LogWarning("TileSet instance not set on Generator. Use the inspector to do so.");
+            tileSet = TileSet.LoadDefaultTileSet();
+        }
+
         sectionGrid = new Dictionary<Vector2Int, Section>();
 
         //// Dead-end
@@ -91,6 +101,9 @@ public class Generator : MonoBehaviour
         PlaceTiles();
     }
 
+    /// <summary>
+    /// Finds a Tile for every placed Section in the world. 
+    /// </summary>
     private void PlaceTiles()
     {
         //Debug.Log("Placing tiles!");
@@ -102,7 +115,7 @@ public class Generator : MonoBehaviour
             //Debug.Log($"For position {position}, have connections: {physicalAdjacencies}.");
 
             (TileType type, int rotation) = TileType.GetTileType(physicalAdjacencies, section.allowedConnections);
-            List<Tile> tileList = GameManager.Instance.TileSet.Get(new TileSet.VariantKey(type, "default"));
+            List<Tile> tileList = tileSet.Get(new TileSet.VariantKey(type, "default"));
             //Debug.Log("")
 
             if (tileList.Count == 0) 

@@ -12,5 +12,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 06e099c075c0f4c499f68f2688a6aac6, type: 3}
   m_Name: Empty
   m_EditorClassIdentifier: 
+  type:
+    _numRotations: 1
+    _tileBlueprint: 0
+    _importanceMask: 85
   variant: default
   prefab: {fileID: 100000, guid: 22bb745315822427f93df7d424bd2be3, type: 3}
