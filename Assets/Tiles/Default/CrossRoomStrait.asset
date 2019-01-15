@@ -13,8 +13,8 @@ MonoBehaviour:
   m_Name: CrossRoomStrait
   m_EditorClassIdentifier: 
   type:
-    _numRotations: 2
-    _tileBlueprint: 119
-    _importanceMask: 255
+    numRotations: 2
+    tileBlueprint: 119
+    importanceMask: 255
   variant: default
   prefab: {fileID: 100000, guid: 141f29f5f207d4b97bc0fbdf48542b2c, type: 3}

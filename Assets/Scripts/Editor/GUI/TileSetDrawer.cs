@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEditor;
 
-[CustomPropertyDrawer(typeof(TileSet))]
+//[CustomPropertyDrawer(typeof(TileSet))]
 public class TileSetDrawer : PropertyDrawer
 {
 

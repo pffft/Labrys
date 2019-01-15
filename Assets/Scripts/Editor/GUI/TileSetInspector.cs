@@ -13,6 +13,8 @@ public class TileSetInspector : Editor
     List<bool> variantVisibility;
     private int variantCount = -1;
 
+    bool addingVariant = false;
+
     private void OnEnable()
     {
         tileSetList = serializedObject.FindProperty("AllTiles");
@@ -20,8 +22,8 @@ public class TileSetInspector : Editor
 
     public override void OnInspectorGUI()
     {
-        TileSet tileSet = (TileSet)target; 
         serializedObject.Update();
+        TileSet tileSet = (TileSet)target;
 
         // Needed to plan out the whole UI
         string[] allVariants = tileSet.GetVariants();
@@ -73,6 +75,7 @@ public class TileSetInspector : Editor
                 {
                     EditorGUI.indentLevel++;
 
+
                     for (int j = 0; j < TileType.TypeList.Length; j++)
                     {
                         Tile foundTile = null;
@@ -87,16 +90,21 @@ public class TileSetInspector : Editor
 
                         if (foundTile != null)
                         {
-                            //SerializedObject serObj = new SerializedObject(foundTile);
-                            //EditorGUILayout.PropertyField(serObj.FindProperty("prefab"), new GUIContent(tiles[j].name));
-                            Tile blankTile = null;
-                            EditorGUILayout.ObjectField(blankTile, typeof(Tile), false);
+                            SerializedObject serObj = new SerializedObject(foundTile);
+                            EditorGUILayout.PropertyField(serObj.FindProperty("prefab"), new GUIContent(TileType.TypeList[j].Name));
                         }
                         else 
                         {
-                            Tile blankTile = null;
-                            EditorGUILayout.ObjectField(blankTile, typeof(Tile));
+                            //Tile blankTile = null;
+                            //EditorGUILayout.ObjectField(blankTile, typeof(Tile));
                             //EditorGUILayout.PropertyField(new SerializedProperty());
+                            Tile blankTile = null;
+                            blankTile = EditorGUILayout.ObjectField(new GUIContent(TileType.TypeList[j].Name), blankTile, typeof(Tile), false) as Tile;
+
+                            if (blankTile != null)
+                            {
+                                tileSet.Add(blankTile);
+                            }
                         }
                     }
 
@@ -104,7 +112,31 @@ public class TileSetInspector : Editor
                 }
             }
 
-            EditorGUILayout.LabelField("Test");
+            // New variant field
+            if (addingVariant)
+            {
+                string newName = EditorGUILayout.TextField("VariantName");
+                if (Event.current.type == EventType.KeyDown && Event.current.keyCode == KeyCode.Return) 
+                {
+                    addingVariant = false;
+
+                    Tile dummyTile = new Tile()
+                    {
+                        type = TileType.ANY,
+                        variant = newName,
+                        prefab = null
+                    };
+
+                    tileSet.Add(dummyTile);
+                }
+            }
+
+            // Button to toggle above field visibility
+            if (GUILayout.Button("Add new variant")) 
+            {
+                addingVariant = true;
+            }
+
             EditorGUI.indentLevel--;
         }
 

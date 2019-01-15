@@ -13,8 +13,8 @@ MonoBehaviour:
   m_Name: DeadEnd
   m_EditorClassIdentifier: 
   type:
-    _numRotations: 4
-    _tileBlueprint: 1
-    _importanceMask: 85
+    numRotations: 4
+    tileBlueprint: 1
+    importanceMask: 85
   variant: default
   prefab: {fileID: 100000, guid: 94e6dd5894b5647cea9a7033988ec463, type: 3}

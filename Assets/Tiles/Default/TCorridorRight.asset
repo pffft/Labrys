@@ -13,8 +13,8 @@ MonoBehaviour:
   m_Name: TCorridorRight
   m_EditorClassIdentifier: 
   type:
-    _numRotations: 4
-    _tileBlueprint: 23
-    _importanceMask: 95
+    numRotations: 4
+    tileBlueprint: 23
+    importanceMask: 95
   variant: default
   prefab: {fileID: 100002, guid: 24bce3ec1a02c4e09b343416c1ddaf06, type: 3}

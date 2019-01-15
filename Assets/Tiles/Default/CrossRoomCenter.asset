@@ -13,8 +13,8 @@ MonoBehaviour:
   m_Name: CrossRoomCenter
   m_EditorClassIdentifier: 
   type:
-    _numRotations: 1
-    _tileBlueprint: 255
-    _importanceMask: 255
+    numRotations: 1
+    tileBlueprint: 255
+    importanceMask: 255
   variant: default
   prefab: {fileID: 100000, guid: 5dcdec98dbbc64b909f9202c328bfc65, type: 3}

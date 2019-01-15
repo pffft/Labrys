@@ -86,16 +86,23 @@ public class Generator : MonoBehaviour
         //sectionGrid.Add(new Vector2Int(0, 2), new Section());
         //sectionGrid.Add(new Vector2Int(1, 2), new Section());
 
-        for (int i = 0; i < 2500; i++) 
-        {
-            Vector2Int position = Vector2Int.RoundToInt(25 * Random.insideUnitCircle);
-            if (sectionGrid.ContainsKey(position)) 
-            {
-                continue;
-            }
+        // Single + shape
+        sectionGrid.Add(new Vector2Int(-1, 0), new Section());
+        sectionGrid.Add(new Vector2Int(1, 0), new Section());
+        sectionGrid.Add(new Vector2Int(0, -1), new Section());
+        sectionGrid.Add(new Vector2Int(0, 1), new Section());
+        sectionGrid.Add(new Vector2Int(0, 0), new Section());
 
-            sectionGrid.Add(position, new Section());
-        }
+        //for (int i = 0; i < 2500; i++) 
+        //{
+        //    Vector2Int position = Vector2Int.RoundToInt(25 * Random.insideUnitCircle);
+        //    if (sectionGrid.ContainsKey(position)) 
+        //    {
+        //        continue;
+        //    }
+
+        //    sectionGrid.Add(position, new Section());
+        //}
 
 
         PlaceTiles();
@@ -115,7 +122,7 @@ public class Generator : MonoBehaviour
             //Debug.Log($"For position {position}, have connections: {physicalAdjacencies}.");
 
             (TileType type, int rotation) = TileType.GetTileType(physicalAdjacencies, section.allowedConnections);
-            List<Tile> tileList = tileSet.Get(new TileSet.VariantKey(type, "default"));
+            List<Tile> tileList = tileSet.Get(new TileSet.VariantKey(type, "frozen"));
             //Debug.Log("")
 
             if (tileList.Count == 0) 

@@ -13,8 +13,8 @@ MonoBehaviour:
   m_Name: CornerCorridor
   m_EditorClassIdentifier: 
   type:
-    _numRotations: 4
-    _tileBlueprint: 5
-    _importanceMask: 87
+    numRotations: 4
+    tileBlueprint: 5
+    importanceMask: 87
   variant: default
   prefab: {fileID: 100000, guid: de0e89f361db74427b19bd338c43a5dc, type: 3}

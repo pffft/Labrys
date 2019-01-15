@@ -13,8 +13,8 @@ MonoBehaviour:
   m_Name: CrossCorridor
   m_EditorClassIdentifier: 
   type:
-    _numRotations: 1
-    _tileBlueprint: 85
-    _importanceMask: 255
+    numRotations: 1
+    tileBlueprint: 85
+    importanceMask: 255
   variant: default
   prefab: {fileID: 100000, guid: 1c235148b88af4ab4912d0cd6574621f, type: 3}

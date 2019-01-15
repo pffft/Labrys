@@ -68,6 +68,7 @@ public class Feature
     /// <param name="rotation">Rotation.</param>
     public Feature Rotate(int rotation) 
     {
+
         Feature rotatedFeature = new Feature();
         // Transform every position (x, y) -> (y, -x) to rotate clockwise 90 degrees.
         foreach (KeyValuePair<Vector2Int, FeatureElement> pair in sections) 

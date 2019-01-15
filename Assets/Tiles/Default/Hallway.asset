@@ -13,8 +13,8 @@ MonoBehaviour:
   m_Name: Hallway
   m_EditorClassIdentifier: 
   type:
-    _numRotations: 2
-    _tileBlueprint: 17
-    _importanceMask: 85
+    numRotations: 2
+    tileBlueprint: 17
+    importanceMask: 85
   variant: default
   prefab: {fileID: 100002, guid: 1c0acdb1b1e9645cf971e36e571f70a1, type: 3}

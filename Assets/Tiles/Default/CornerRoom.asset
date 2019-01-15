@@ -13,8 +13,8 @@ MonoBehaviour:
   m_Name: CornerRoom
   m_EditorClassIdentifier: 
   type:
-    _numRotations: 4
-    _tileBlueprint: 7
-    _importanceMask: 87
+    numRotations: 4
+    tileBlueprint: 7
+    importanceMask: 87
   variant: default
   prefab: {fileID: 100000, guid: 434c5fcfbb22a4e99b453f74e0a1cca1, type: 3}

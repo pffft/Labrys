@@ -51,6 +51,23 @@ public class TileSet : ScriptableObject
                 toReturn.Add(AllTiles[i]);
             }
         }
+
+        // Try to get backup default set if no variant is found
+        if (toReturn.Count == 0)
+        {
+            VariantKey defaultKey = new VariantKey(key.tileType, "default");
+
+            for (int i = 0; i < AllTiles.Count; i++)
+            {
+                VariantKey tileKey = new VariantKey(AllTiles[i].type, AllTiles[i].variant);
+                //Debug.Log($"Checking tilekey with TileType {tileKey.tileType.Name} and variant \"{tileKey.variant}\".");
+                if (defaultKey.Matches(tileKey))
+                {
+                    toReturn.Add(AllTiles[i]);
+                }
+            }
+        }
+
         return toReturn;
     }
 
@@ -82,7 +99,7 @@ public class TileSet : ScriptableObject
 
         public bool Matches(VariantKey other)
         {
-            return MatchTileType(other) || MatchVariant(other);
+            return MatchTileType(other) && MatchVariant(other);
         }
 
         private bool MatchTileType(VariantKey other)

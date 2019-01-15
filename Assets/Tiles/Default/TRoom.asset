@@ -13,8 +13,8 @@ MonoBehaviour:
   m_Name: TRoom
   m_EditorClassIdentifier: 
   type:
-    _numRotations: 4
-    _tileBlueprint: 31
-    _importanceMask: 95
+    numRotations: 4
+    tileBlueprint: 31
+    importanceMask: 95
   variant: default
   prefab: {fileID: 100002, guid: f406051ee6f014dd7947a23cd5d37e5b, type: 3}

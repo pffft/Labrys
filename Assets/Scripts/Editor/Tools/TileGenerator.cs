@@ -21,6 +21,36 @@ public class TileGenerator : EditorWindow
         generator.Show();
     }
 
+    private void OnFocus()
+    {
+        Debug.Log("Tile generator focused");
+        Debug.Log($"TileSetName: {tileSetName}");
+        inputPath = EditorPrefs.GetString("Labrys.InputPath", "Assets/Models");
+        tilePath = EditorPrefs.GetString("Labrys.TilePath", "Assets/Tiles");
+        tileSetPath = EditorPrefs.GetString("Labrus.TileSetPath", "Assets/TileSets");
+        tileSetName = EditorPrefs.GetString("Labrus.TileSetName", "DefaultTileSet");
+    }
+
+    private void OnLostFocus()
+    {
+        Debug.Log("Tile generator lost focus");
+        Debug.Log($"TileSetName: {tileSetName}");
+        EditorPrefs.SetString("Labrys.InputPath", inputPath);
+        EditorPrefs.SetString("Labrys.TilePath", tilePath);
+        EditorPrefs.SetString("Labrys.TileSetPath", tileSetPath);
+        EditorPrefs.SetString("Labrys.TileSetName", tileSetName);
+    }
+
+    private void OnDestroy()
+    {
+        Debug.Log("Tile generator destroyed");
+        Debug.Log($"TileSetName: {tileSetName}");
+        EditorPrefs.SetString("Labrys.InputPath", inputPath);
+        EditorPrefs.SetString("Labrys.TilePath", tilePath);
+        EditorPrefs.SetString("Labrys.TileSetPath", tileSetPath);
+        EditorPrefs.SetString("Labrys.TileSetName", tileSetName);
+    }
+
     // The main GUI generator.
     private void OnGUI()
     {
@@ -32,7 +62,7 @@ public class TileGenerator : EditorWindow
             DirectoryInfo info = new DirectoryInfo(Application.dataPath + sep + "Models");
             if (info.Exists)
             {
-                inputPath = info.FullName;
+                inputPath = TrimFolderName(info.FullName);
             }
         }
 
@@ -42,7 +72,7 @@ public class TileGenerator : EditorWindow
             DirectoryInfo info = new DirectoryInfo(Application.dataPath + sep + "Tiles");
             if (info.Exists) 
             {
-                tilePath = info.FullName;
+                tilePath = TrimFolderName(info.FullName);
             }
         }
 
@@ -52,7 +82,7 @@ public class TileGenerator : EditorWindow
             DirectoryInfo info = new DirectoryInfo(Application.dataPath + sep + "TileSets");
             if (info.Exists)
             {
-                tileSetPath = info.FullName;
+                tileSetPath = TrimFolderName(info.FullName);
             }
         }
 
