@@ -5,25 +5,16 @@ namespace Labrys.Editor.FeatureEditor
 {
 	public class Connection
 	{
-		public Vector2Int Position { get; private set; }
-		public Vector2Int Direction { get; private set; }
+		public bool Open { get; private set; }
+		public bool External { get; private set; }
 
-		public static Vector2Int LinkDirectionToVector2Int(LinkDirection dir)
-		{
-			switch (dir)
-			{
-			case LinkDirection.Right:
-				return Vector2Int.right;
-			case LinkDirection.Up:
-				return Vector2Int.up;
-			case LinkDirection.Left:
-				return Vector2Int.left;
-			case LinkDirection.Down:
-				return Vector2Int.down;
-			default:
-				return Vector2Int.zero;
-			}
-		}
+		private Tile tile1, tile2;
+		public Vector2 DrawPosition => new Vector2(
+				(tile1.bounds.position.x + tile2.bounds.position.x) / 2f,
+				(tile1.bounds.position.y + tile2.bounds.position.y) / 2f);
+
+		public delegate void ConnectionAction(Connection t);
+		public event ConnectionAction removed;
 
 		public static bool operator ==(Connection left, Connection right)
 		{
@@ -35,35 +26,53 @@ namespace Labrys.Editor.FeatureEditor
 			return !left.Equals(right);
 		}
 
-		public Connection(Vector2Int postion, Vector2Int direction)
+		public Connection(Tile tile1, Tile tile2)
 		{
-			Position = postion;
-			Direction = direction;
+			this.tile1 = tile1;
+			this.tile2 = tile2;
+			Open = true;
 		}
 
 		public void Draw()
 		{
-
-			GUI.Box(new Rect(Position, new Vector2(1f, 1f)), "");
+			GUI.Box(new Rect(DrawPosition, new Vector2(1f, 1f)), "");
+			Handles.color = Open ? Color.green : Color.red;
 			Handles.BeginGUI();
-			Handles.DrawWireDisc(new Vector3(Position.x, Position.y), Vector3.forward, 1f);
+			Handles.DrawWireDisc(new Vector3(DrawPosition.x, DrawPosition.y), Vector3.forward, 1f);
 			Handles.EndGUI();
 		}
 
 		public bool HandleEvent(Event e)
 		{
+			switch(e.type)
+			{
+			case EventType.MouseDown:
+				if(e.button == 0)
+				{
+					//open connection
+					Open = true;
+					return true;
+				}
+				else if(e.button == 1)
+				{
+					//block connection
+					Open = false;
+					return true;
+				}
+				break;
+			}
 			return false;
 		}
 
 		public override bool Equals(object obj)
 		{
 			Connection other = (Connection)obj;
-			return Position == other.Position && Direction == other.Direction;
+			return DrawPosition == other.DrawPosition;;
 		}
 
 		public override int GetHashCode()
 		{
-			return base.GetHashCode();
+			return DrawPosition.GetHashCode();
 		}
 	}
 }

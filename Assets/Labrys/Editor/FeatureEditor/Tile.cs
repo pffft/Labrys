@@ -1,4 +1,5 @@
-﻿using UnityEditor;
+﻿using System.Collections.Generic;
+using UnityEditor;
 using UnityEngine;
 
 namespace Labrys.Editor.FeatureEditor
@@ -18,13 +19,15 @@ namespace Labrys.Editor.FeatureEditor
 
 		public Vector2Int position;
 		public string variant;
-		public Tile[] internalLinks;
-		public int externalLinks;
 
 		public Vector2Int Right => position + Vector2Int.right;
+		public Vector2Int UpRight => position + Vector2Int.up + Vector2Int.right;
 		public Vector2Int Up => position + Vector2Int.up;
+		public Vector2Int UpLeft => position + Vector2Int.up + Vector2Int.left;
 		public Vector2Int Left => position + Vector2Int.left;
+		public Vector2Int DownLeft => position + Vector2Int.down + Vector2Int.left;
 		public Vector2Int Down => position + Vector2Int.down;
+		public Vector2Int DownRight => position + Vector2Int.down + Vector2Int.right;
 
 		public Tile(Vector2 position, Vector2 size, GUIStyle defaultStyle, GUIStyle selectedStyle)
 		{
@@ -36,8 +39,6 @@ namespace Labrys.Editor.FeatureEditor
 			style = defaultStyle;
 
 			variant = "";
-			internalLinks = new Tile[4];
-			externalLinks = 0x0;
 		}
 
 		public void Drag(Vector2 dPos)
@@ -107,7 +108,6 @@ namespace Labrys.Editor.FeatureEditor
 					if (isSelected)
 					{
 						e.Use ();
-						ClearLinks ();
 						if (removed != null)
 							removed.Invoke (this);
 					}
@@ -121,45 +121,26 @@ namespace Labrys.Editor.FeatureEditor
 		{
 			GenericMenu menu = new GenericMenu ();
 			menu.AddItem (new GUIContent ("Remove tile"), false, () => {
-				ClearLinks ();
 				if (removed != null)
 					removed.Invoke (this);
 			});
 			menu.ShowAsContext ();
 		}
 
-		public bool SetLink(LinkDirection dir, Tile other)
+		public Vector2Int GetAdjPosition(LinkDirection direction)
 		{
-			if (other != null
-				&& (other.bounds.position - bounds.position).magnitude > bounds.width)
-				return false;
-
-			if (HasLink (dir) || other.HasLink ((LinkDirection)(((int)dir + 2) % 4)))
-				return false;
-
-			internalLinks[(int)dir] = other;
-			if (other != null)
-				other.internalLinks[((int)dir + 2) % 4] = this;
-
-			return true;
-		}
-
-		public bool HasLink(LinkDirection dir)
-		{
-			return internalLinks[(int)dir] == null || ((externalLinks & (1 << (int)dir)) != 0);
-		}
-
-		public bool RemoveLink(LinkDirection dir)
-		{
-			return SetLink (dir, null);
-		}
-
-		public void ClearLinks()
-		{
-			SetLink (LinkDirection.Right, null);
-			SetLink (LinkDirection.Up, null);
-			SetLink (LinkDirection.Left, null);
-			SetLink (LinkDirection.Down, null);
+			switch(direction)
+			{
+			case LinkDirection.Right: return Right;
+			case LinkDirection.UpRight: return UpRight;
+			case LinkDirection.Up: return Up;
+			case LinkDirection.UpLeft: return UpLeft;
+			case LinkDirection.Left: return Left;
+			case LinkDirection.DownLeft: return DownLeft;
+			case LinkDirection.Down: return Down;
+			case LinkDirection.DownRight: return DownRight;
+			default: return Vector2Int.zero;
+			}
 		}
 	}
 }
