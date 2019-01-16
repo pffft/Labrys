@@ -134,9 +134,6 @@ public class Generator : MonoBehaviour
             // variant to take (and add parameters for it)
             Tile chosenTile = tileList[0];
 
-            // Set the information in Section for reference
-            section.tile = chosenTile;
-
             Vector3 worldPosition = new Vector3(distanceScale * position.x, 0, distanceScale * position.y);
             Quaternion worldRotation = Quaternion.AngleAxis(90f * rotation, Vector3.up);
 

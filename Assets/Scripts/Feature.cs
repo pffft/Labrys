@@ -12,8 +12,9 @@ using UnityEngine;
 /// Boundary information (lowest/highest X/Y for normalization)
 /// 
 /// </summary>
+[CreateAssetMenu(fileName = "NewFeature", menuName = "Labrys/RoomFeature")]
 [System.Serializable]
-public class Feature 
+public class Feature : ScriptableObject
 {
     private struct FeatureElement 
     {
@@ -28,6 +29,12 @@ public class Feature
 
     public void Add(Vector2Int position, Section section, string variant = "default", Connection externalConnection = Connection.All) 
     {
+        // General validation
+        if (section == null)
+        {
+            throw new System.Exception("Cannot add null section.");
+        }
+
         Add(position, new FeatureElement
             {
                 section = section,

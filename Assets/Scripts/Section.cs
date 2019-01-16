@@ -6,6 +6,8 @@ using UnityEngine;
 /// A logical grid element. Stores information about which connections
 /// it can connect to, and contains a physical Tile element when the
 /// generation finishes.
+/// 
+/// TODO: this can probably be refactored out to just a Connection.
 /// </summary>
 [System.Serializable]
 public class Section
@@ -16,12 +18,6 @@ public class Section
     /// room is physically adjacent, it will visually not connect.
     /// </summary>
     public Connection allowedConnections = Connection.All;
-
-    /// <summary>
-    /// A data structure which contains information on the physical model being
-    /// placed at this location, as well as the derived adjacency information.
-    /// </summary>
-    public Tile tile;
 
     public Section(Connection allowedConnections=Connection.All) 
     {
