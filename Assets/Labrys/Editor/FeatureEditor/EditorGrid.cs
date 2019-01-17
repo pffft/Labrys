@@ -42,17 +42,19 @@ namespace Labrys.Editor.FeatureEditor
 			int xLineCount = Mathf.CeilToInt(hostWindow.position.width / scaledSpacing);
 			int yLineCount = Mathf.CeilToInt (hostWindow.position.height / scaledSpacing);
 
-			offset += drag;
 			Vector2 wrappedOffset = new Vector2 (
 				Mathf.Abs (offset.x) % scaledSpacing * Mathf.Sign (offset.x), 
 				Mathf.Abs (offset.y) % scaledSpacing * Mathf.Sign (offset.y));
 			Vector2Int linesOffset = ScreenToGridPos (offset);
-			Debug.Log (linesOffset); //DEBUG remove
 
 			Handles.BeginGUI ();
 			for (int i = 0; i < xLineCount + 1; i++)
 			{
-				Handles.color = i % 5 == linesOffset.x ? lineColor : lightLineColor;
+				int xGridLine = ScreenToGridPos(new Vector2(scaledSpacing * i + wrappedOffset.x, 0f)).x;
+				if (xGridLine % 10 == 0)
+					Handles.color = xGridLine == 0 ? Color.black : lineColor;
+				else
+					Handles.color = lightLineColor;
 				Handles.DrawLine (
 					new Vector2 (scaledSpacing * i, -scaledSpacing) + wrappedOffset, 
 					new Vector2 (scaledSpacing * i, hostWindow.position.height + scaledSpacing) + wrappedOffset);
@@ -60,7 +62,11 @@ namespace Labrys.Editor.FeatureEditor
 
 			for (int i = 0; i < yLineCount + 1; i++)
 			{
-				Handles.color = i % 5 == linesOffset.y ? lineColor : lightLineColor;
+				int yGridLine = ScreenToGridPos(new Vector2(0f, scaledSpacing * i + wrappedOffset.y)).y;
+				if (yGridLine % 10 == 0)
+					Handles.color = yGridLine == 0 ? Color.black : lineColor;
+				else
+					Handles.color = lightLineColor;
 				Handles.DrawLine (
 					new Vector2 (-scaledSpacing, scaledSpacing * i) + wrappedOffset, 
 					new Vector2 (hostWindow.position.width + scaledSpacing, scaledSpacing * i) + wrappedOffset);
@@ -106,7 +112,7 @@ namespace Labrys.Editor.FeatureEditor
 				//drag the grid and the tiles
 				if (e.button == 0)
 				{
-					OnDrag (e.delta);
+					Shift (e.delta);
 					guiChanged = true;
 				}
 				break;
@@ -120,12 +126,13 @@ namespace Labrys.Editor.FeatureEditor
 				break;
 			}
 
-			return guiChanged; ;
+			return guiChanged;
 		}
 
-		private void OnDrag(Vector2 dPos)
+		private void Shift(Vector2 dPos)
 		{
 			drag = dPos;
+			offset += drag;
 
 			if (tiles != null)
 			{
@@ -141,13 +148,18 @@ namespace Labrys.Editor.FeatureEditor
 			foreach (Tile t in tiles.Values)
 				t.bounds.position -= offset;
 			offset = Vector2.zero;
+
+			Shift(hostWindow.position.size / 2f);
 		}
 
 		public void Resize(float scale)
 		{
 			this.scale = scale;
 			foreach (Tile t in tiles.Values)
-				t.Resize (scale);
+			{
+				t.Resize(scale);
+				RealignTile(t);
+			}
 		}
 
 		public void CreateTile(Vector2 mousePos)
@@ -159,6 +171,7 @@ namespace Labrys.Editor.FeatureEditor
 
 			//if align is successful, then tile will be added
 			TryAlignTile (t);
+			t.Resize(scale);
 		}
 
 		public void RemoveTile(Tile t)
@@ -189,6 +202,11 @@ namespace Labrys.Editor.FeatureEditor
 			TryAlignTile (t);
 		}
 
+		/// <summary>
+		/// Attempt to place a tile in a grid coordinate based on its current visual position.
+		/// </summary>
+		/// <param name="t"></param>
+		/// <returns></returns>
 		private bool TryAlignTile(Tile t)
 		{
 			GUI.changed = true;
@@ -221,18 +239,31 @@ namespace Labrys.Editor.FeatureEditor
 			}
 		}
 
+		/// <summary>
+		/// Snap tile visual position to corresponding grid position.
+		/// </summary>
+		/// <param name="t"></param>
+		private void RealignTile(Tile t)
+		{
+			GUI.changed = true;
+			if(tiles.ContainsKey(t.position))
+			{
+				t.bounds.position = GridToScreenPos(t.position);
+			}
+		}
+
 		private Vector2Int ScreenToGridPos(Vector2 screenPos)
 		{
 			return new Vector2Int (
-				Mathf.RoundToInt ((screenPos.x - offset.x) / lineSpacing),
-				Mathf.RoundToInt ((screenPos.y - offset.y) / lineSpacing));
+				Mathf.RoundToInt ((screenPos.x - offset.x) / (lineSpacing * scale)),
+				Mathf.RoundToInt ((screenPos.y - offset.y) / (lineSpacing * scale)));
 		}
 
 		private Vector2 GridToScreenPos(Vector2Int gridPos)
 		{
 			return new Vector2 (
-				(gridPos.x * lineSpacing) + offset.x,
-				(gridPos.y * lineSpacing) + offset.y);
+				(gridPos.x * lineSpacing * scale) + offset.x,
+				(gridPos.y * lineSpacing * scale) + offset.y);
 		}
 
 		/// <summary>
