@@ -1,4 +1,5 @@
-﻿using UnityEditor;
+﻿using System.Collections.Generic;
+using UnityEditor;
 using UnityEngine;
 
 namespace Labrys.Editor.FeatureEditor
@@ -60,6 +61,12 @@ namespace Labrys.Editor.FeatureEditor
 				break;
 			}
 			return false;
+		}
+
+		public IEnumerable<Vector2Int> GetSubjectGridPositions()
+		{
+			List<Vector2Int> positions = new List<Vector2Int>();
+			if(Mathf.FloorToInt(Position.x) != Mathf.CeilToInt(Position.x))
 		}
 
 		public override bool Equals(object obj)
