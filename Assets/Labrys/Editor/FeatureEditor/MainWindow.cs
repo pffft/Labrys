@@ -24,13 +24,14 @@ namespace Labrys.Editor.FeatureEditor
 		{
 			defaultTileStyle = new GUIStyle ();
 			defaultTileStyle.normal.background = (Texture2D)EditorGUIUtility.Load ("builtin skins/darkskin/images/node1.png");
-			defaultTileStyle.border = new RectOffset (12, 12, 12, 12);
+			defaultTileStyle.border = new RectOffset (1, 1, 1, 1);
 
 			selectedTileStyle = new GUIStyle ();
 			selectedTileStyle.normal.background = (Texture2D)EditorGUIUtility.Load ("builtin skins/darkskin/images/node1 on.png");
-			selectedTileStyle.border = new RectOffset (12, 12, 12, 12);
+			selectedTileStyle.border = new RectOffset (1, 1, 1, 1);
 
-			grid = new EditorGrid (this, 64, new Color(0.3f, 0.3f, 0.3f));
+			grid = new EditorGrid (this, 64, new Color(0.4f, 0.4f, 0.4f));
+			grid.Recenter();
 		}
 
 		private void OnGUI()
@@ -58,9 +59,9 @@ namespace Labrys.Editor.FeatureEditor
 				break;
 			case EventType.ScrollWheel:
 				if (Mathf.Sign (e.delta.y) > 0)
-					grid.Resize (grid.scale * 2f);
+					grid.Resize (grid.scale / 1.1f);
 				else
-					grid.Resize (grid.scale / 2f);
+					grid.Resize (grid.scale * 1.1f);
 				Debug.Log (e.delta);
 				GUI.changed = true;
 				break;
