@@ -3,144 +3,150 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEditor;
 
-[CustomEditor(typeof(TileSet))]
-public class TileSetInspector : Editor
+namespace Labrys
 {
-
-    SerializedProperty tileSetList;
-
-    bool showPosition = true;
-    List<bool> variantVisibility;
-    private int variantCount = -1;
-
-    bool addingVariant = false;
-
-    private void OnEnable()
+    [CustomEditor(typeof(TileSet))]
+    public class TileSetInspector : Editor
     {
-        tileSetList = serializedObject.FindProperty("AllTiles");
-    }
 
-    public override void OnInspectorGUI()
-    {
-        serializedObject.Update();
-        TileSet tileSet = (TileSet)target;
+        SerializedProperty tileSetList;
 
-        // Needed to plan out the whole UI
-        string[] allVariants = tileSet.GetVariants();
+        bool showPosition = true;
+        List<bool> variantVisibility;
+        private int variantCount = -1;
 
-        // Ensure that the list of booleans matches the number of variants appropriately.
-        if (variantCount != allVariants.Length) 
+        bool addingVariant = false;
+
+        private void OnEnable()
         {
-            // Create new if we haven't already. 
-            if (variantCount == -1 || variantVisibility == null) {
-                variantVisibility = new List<bool>();
-            }
-
-            // Too small, so add some new entries (closed by default) 
-            if (variantCount < allVariants.Length)
-            {
-                for (int i = variantCount; i < allVariants.Length; i++)
-                {
-                    variantVisibility.Add(false);
-                }
-            } 
-            // Too big, so cut off the last elements without modifying previous
-            else
-            {
-                for (int i = variantCount; i > allVariants.Length; i--) 
-                {
-                    variantVisibility.RemoveAt(i);
-                }
-            }
-
-            // Update the size so we can resize next time
-            variantCount = allVariants.Length;
+            tileSetList = serializedObject.FindProperty("allTiles");
         }
 
-        showPosition = EditorGUILayout.Foldout(showPosition, "Tiles in dictionary");
-        if (showPosition)
+        public override void OnInspectorGUI()
         {
-            EditorGUI.indentLevel++;
+            serializedObject.Update();
+            TileSet tileSet = (TileSet)target;
 
-            // For each variant, create an entry
-            for (int i = 0; i < allVariants.Length; i++)
+            // Needed to plan out the whole UI
+            string[] allVariants = tileSet.GetVariants();
+
+            // Ensure that the list of booleans matches the number of variants appropriately.
+            if (variantCount != allVariants.Length)
             {
-
-                // Grab all Tile objects
-                List<Tile> tiles = tileSet.Get(new TileSet.VariantKey(TileType.ANY, allVariants[i]));
-                Debug.Log($"For variant {allVariants[i]}, found {tiles.Count} tiles.");
-
-                variantVisibility[i] = EditorGUILayout.Foldout(variantVisibility[i], $"Variant \"{allVariants[i]}\"");
-                if (variantVisibility[i])
+                // Create new if we haven't already. 
+                if (variantCount == -1 || variantVisibility == null)
                 {
-                    EditorGUI.indentLevel++;
+                    variantVisibility = new List<bool>();
+                }
 
-
-                    for (int j = 0; j < TileType.TypeList.Length; j++)
+                // Too small, so add some new entries (closed by default) 
+                if (variantCount < allVariants.Length)
+                {
+                    for (int i = variantCount; i < allVariants.Length; i++)
                     {
-                        Tile foundTile = null;
-                        foreach (Tile tile in tiles)
-                        {
-                            if (tile.type.Name.Equals(TileType.TypeList[j].Name))
-                            {
-                                foundTile = tile;
-                                break;
-                            }
-                        }
-
-                        if (foundTile != null)
-                        {
-                            SerializedObject serObj = new SerializedObject(foundTile);
-                            EditorGUILayout.PropertyField(serObj.FindProperty("prefab"), new GUIContent(TileType.TypeList[j].Name));
-                        }
-                        else 
-                        {
-                            //Tile blankTile = null;
-                            //EditorGUILayout.ObjectField(blankTile, typeof(Tile));
-                            //EditorGUILayout.PropertyField(new SerializedProperty());
-                            Tile blankTile = null;
-                            blankTile = EditorGUILayout.ObjectField(new GUIContent(TileType.TypeList[j].Name), blankTile, typeof(Tile), false) as Tile;
-
-                            if (blankTile != null)
-                            {
-                                tileSet.Add(blankTile);
-                            }
-                        }
+                        variantVisibility.Add(false);
                     }
-
-                    EditorGUI.indentLevel--;
                 }
-            }
-
-            // New variant field
-            if (addingVariant)
-            {
-                string newName = EditorGUILayout.TextField("VariantName");
-                if (Event.current.type == EventType.KeyDown && Event.current.keyCode == KeyCode.Return) 
+                // Too big, so cut off the last elements without modifying previous
+                else
                 {
-                    addingVariant = false;
-
-                    Tile dummyTile = new Tile()
+                    for (int i = variantCount; i > allVariants.Length; i--)
                     {
-                        type = TileType.ANY,
-                        variant = newName,
-                        prefab = null
-                    };
-
-                    tileSet.Add(dummyTile);
+                        variantVisibility.RemoveAt(i);
+                    }
                 }
+
+                // Update the size so we can resize next time
+                variantCount = allVariants.Length;
             }
 
-            // Button to toggle above field visibility
-            if (GUILayout.Button("Add new variant")) 
+            showPosition = EditorGUILayout.Foldout(showPosition, "Tiles in dictionary");
+            if (showPosition)
             {
-                addingVariant = true;
+                EditorGUI.indentLevel++;
+
+                Debug.Log($"Found {variantCount} variants.");
+
+                // For each variant, create an entry
+                for (int i = 0; i < allVariants.Length; i++)
+                {
+
+                    // Grab all Tile objects
+                    List<Tile> tiles = tileSet.Get(new TileSet.VariantKey(TileType.ANY, allVariants[i]));
+                    Debug.Log($"For variant {allVariants[i]}, found {tiles.Count} tiles.");
+
+                    variantVisibility[i] = EditorGUILayout.Foldout(variantVisibility[i], $"Variant \"{allVariants[i]}\"");
+                    if (variantVisibility[i])
+                    {
+                        EditorGUI.indentLevel++;
+
+
+                        for (int j = 0; j < TileType.TypeList.Length; j++)
+                        {
+                            Tile foundTile = null;
+                            foreach (Tile tile in tiles)
+                            {
+                                if (tile.type == TileType.TypeList[j])
+                                {
+                                    foundTile = tile;
+                                    break;
+                                }
+                            }
+
+                            if (foundTile != null)
+                            {
+                                SerializedObject serObj = new SerializedObject(foundTile);
+                                EditorGUILayout.PropertyField(serObj.FindProperty("prefab"), new GUIContent(TileType.TypeList[j].Name));
+                            }
+                            else
+                            {
+                                //Debug.Log($"Couldn't find a Tile for variant {allVariants[i]} and type {TileType.TypeList[j].Name}. Filling with blank space.");
+                                //Tile blankTile = null;
+                                //EditorGUILayout.ObjectField(blankTile, typeof(Tile));
+                                //EditorGUILayout.PropertyField(new SerializedProperty());
+                                Tile blankTile = null;
+                                blankTile = EditorGUILayout.ObjectField(new GUIContent(TileType.TypeList[j].Name), blankTile, typeof(Tile), false) as Tile;
+
+                                if (blankTile != null)
+                                {
+                                    tileSet.Add(blankTile);
+                                }
+                            }
+                        }
+
+                        EditorGUI.indentLevel--;
+                    }
+                }
+
+                // New variant field
+                if (addingVariant)
+                {
+                    string newName = EditorGUILayout.TextField("VariantName");
+                    if (Event.current.type == EventType.KeyDown && Event.current.keyCode == KeyCode.Return)
+                    {
+                        addingVariant = false;
+
+                        Tile dummyTile = new Tile()
+                        {
+                            type = TileType.ANY,
+                            variant = newName,
+                            prefab = null
+                        };
+
+                        tileSet.Add(dummyTile);
+                    }
+                }
+
+                // Button to toggle above field visibility
+                if (GUILayout.Button("Add new variant"))
+                {
+                    addingVariant = true;
+                }
+
+                EditorGUI.indentLevel--;
             }
 
-            EditorGUI.indentLevel--;
+            serializedObject.ApplyModifiedProperties();
         }
-
-        serializedObject.ApplyModifiedProperties();
     }
 }
-    

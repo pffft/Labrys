@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 89dc73ada49164df5ba52a84fa3ab507, type: 3}
   m_Name: DefaultTileSet
   m_EditorClassIdentifier: 
-  AllTiles:
+  allTiles:
   - {fileID: 11400000, guid: f12848bc1ea14462b81d1e6acd6417b2, type: 2}
   - {fileID: 11400000, guid: 57ce9e94f515c4c078eeef1edde1605f, type: 2}
   - {fileID: 11400000, guid: b5174207f84234034b76cc9cbea459a5, type: 2}

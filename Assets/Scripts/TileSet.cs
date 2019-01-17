@@ -2,141 +2,195 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-/// <summary>
-/// A database for looking up specific individual tiles.
-/// </summary>
-[CreateAssetMenu(fileName = "NewTileSet", menuName = "Labrys/TileSet")]
-[System.Serializable]
-public class TileSet : ScriptableObject
+namespace Labrys
 {
-    // Roughly a 2D array; TileType is the x axis, variant is the y axis.
-    // TODO: figure out how to index this. Also, Tiles will know their TileType and variant information.
-    [SerializeField]
-    private List<Tile> AllTiles = new List<Tile>();
-
-    public TileSet()
-    {
-        AllTiles = new List<Tile>();
-    }
-
     /// <summary>
-    /// Loads the default tile set from disk. The location is hard-coded.
+    /// A database for looking up specific individual tiles.
     /// </summary>
-    /// <returns>The default tile set.</returns>
-    public static TileSet LoadDefaultTileSet()
+    [CreateAssetMenu(fileName = "NewTileSet", menuName = "Labrys/TileSet")]
+    [System.Serializable]
+    public class TileSet : ScriptableObject, ISerializationCallbackReceiver
     {
-        TileSet set = UnityEditor.AssetDatabase.LoadAssetAtPath<TileSet>("Assets/TileSets/DefaultTileSet.asset");
-        if (set == null)
+        // Literally every tile, without an index. Used for fast returns of "all" queries.
+        // This gets serialized, and the index is rebuilt from this on load.
+        [SerializeField]
+        private List<Tile> allTiles;
+
+        // All tiles, sorted on their variants. Rebuilt on serialization.
+        private Dictionary<string, List<Tile>> tilesByVariant;
+
+        // All tiles, sorted on their TileTypes. Rebuilt on serialization.
+        private Dictionary<TileType, List<Tile>> tilesByTileType;
+
+        public TileSet()
         {
-            Debug.LogWarning("Failed to load default TileSet.");
+            allTiles = new List<Tile>();
+            tilesByVariant = new Dictionary<string, List<Tile>>();
+            tilesByTileType = new Dictionary<TileType, List<Tile>>();
         }
-        return set;
-    }
 
-    public void Add(Tile value) 
-    {
-        AllTiles.Add(value);
-    }
-
-    public List<Tile> Get(VariantKey key) 
-    {
-        //Debug.Log($"TileSet was requested TileType {key.tileType.Name} and variant \"{key.variant}\".");
-        List<Tile> toReturn = new List<Tile>();
-        for (int i = 0; i < AllTiles.Count; i++) 
+        /// <summary>
+        /// Loads the default tile set from disk. The location is hard-coded.
+        /// </summary>
+        /// <returns>The default tile set.</returns>
+        public static TileSet LoadDefaultTileSet()
         {
-            VariantKey tileKey = new VariantKey(AllTiles[i].type, AllTiles[i].variant);
-            //Debug.Log($"Checking tilekey with TileType {tileKey.tileType.Name} and variant \"{tileKey.variant}\".");
-            if (key.Matches(tileKey))
+            TileSet set = UnityEditor.AssetDatabase.LoadAssetAtPath<TileSet>("Assets/TileSets/DefaultTileSet.asset");
+            if (set == null)
             {
-                toReturn.Add(AllTiles[i]);
+                Debug.LogWarning("Failed to load default TileSet.");
             }
+            return set;
         }
 
-        // Try to get backup default set if no variant is found
-        if (toReturn.Count == 0)
+        // Adds the value to the overall storage.
+        public void Add(Tile value)
         {
-            VariantKey defaultKey = new VariantKey(key.tileType, "default");
+            allTiles.Add(value);
+            AddToIndex(value);
+        }
 
-            for (int i = 0; i < AllTiles.Count; i++)
+        // Used for serialization- indexes the value for faster lookup.
+        private void AddToIndex(Tile value)
+        {
+            Debug.Log($"Adding Tile with type {value.type.Name} and variant {value.variant} to index.");
+            if (tilesByVariant == null) 
             {
-                VariantKey tileKey = new VariantKey(AllTiles[i].type, AllTiles[i].variant);
-                //Debug.Log($"Checking tilekey with TileType {tileKey.tileType.Name} and variant \"{tileKey.variant}\".");
-                if (defaultKey.Matches(tileKey))
+                tilesByVariant = new Dictionary<string, List<Tile>>();
+            }
+
+            if (tilesByTileType == null)
+            {
+                tilesByTileType = new Dictionary<TileType, List<Tile>>();
+            }
+
+            if (!tilesByVariant.ContainsKey(value.variant))
+            {
+                tilesByVariant.Add(value.variant, new List<Tile>());
+            }
+
+            if (!tilesByTileType.ContainsKey(value.type))
+            {
+                tilesByTileType.Add(value.type, new List<Tile>());
+            }
+
+            tilesByVariant[value.variant].Add(value);
+            tilesByTileType[value.type].Add(value);
+        }
+
+        public List<Tile> Get(VariantKey key)
+        {
+            // If we don't care about the variant, search by TileType.
+            if (key.variant == null) 
+            {
+                // If we don't care about either, return all Tiles.
+                if (key.tileType == TileType.ANY)
                 {
-                    toReturn.Add(AllTiles[i]);
+                    return allTiles;
+                }
+
+                // Else we care about TileType, but not variant. Return all matching.
+                return tilesByTileType[key.tileType];
+            }
+
+            // We care about variant, but not TileType. Return all matching.
+            if (key.tileType == TileType.ANY)
+            {
+                return tilesByVariant[key.variant];
+            }
+
+            // Make sure we have the variant first.
+            if (tilesByVariant.ContainsKey(key.variant))
+            {
+                // If we do- in this case, we care about both. Search by variant first, since that leaves <=16 to iterate over.
+                // TODO if we store a HashSet, we can reduce linear factor from 16 to 1. But conversions from Set->List
+                // are expensive, if we need to return all tiles of a variant.
+                List<Tile> tiles = tilesByVariant[key.variant];
+                for (int i = 0; i < tiles.Count; i++)
+                {
+                    // When we find a matching TileType, return it.
+                    if (tiles[i].type == key.tileType)
+                    {
+                        return new List<Tile> { tiles[i] };
+                    }
                 }
             }
-        }
 
-        return toReturn;
-    }
-
-    public string[] GetVariants()
-    {
-        HashSet<string> variants = new HashSet<string>();
-
-        for (int i = 0; i < AllTiles.Count; i++) 
-        {
-            variants.Add(AllTiles[i].variant);
-        }
-
-        string[] toReturn = new string[variants.Count];
-        variants.CopyTo(toReturn);
-
-        return toReturn;
-    }
-
-    public struct VariantKey
-    {
-        public readonly TileType tileType;
-        public readonly string variant;
-
-        public VariantKey(TileType tileType, string variant) 
-        {
-            this.tileType = tileType;
-            this.variant = variant;
-        }
-
-        public bool Matches(VariantKey other)
-        {
-            return MatchTileType(other) && MatchVariant(other);
-        }
-
-        private bool MatchTileType(VariantKey other)
-        {
-            // The "ANY" TileType acts as a wildcard.
-            if (this.tileType.Equals(TileType.ANY) || other.tileType.Equals(TileType.ANY))
+            // Still haven't found it. Try to get default, if we haven't already.
+            if (!key.variant.Equals("default"))
             {
-                return true;
+                Debug.Log($"Failed to find requested key: {key}. Looking up fallback using default variant.");
+
+                List<Tile> tiles = tilesByVariant["default"];
+                for (int i = 0; i < tiles.Count; i++)
+                {
+                    if (tiles[i].type == key.tileType)
+                    {
+                        return new List<Tile> { tiles[i] };
+                    }
+                }
             }
 
-            if (this.tileType.Name.Equals(other.tileType.Name))
-            {
-                return true;
-            }
-
-            return false;
+            // Failed to find it.
+            Debug.Log($"Failed to find default variant for tiletype: {key.tileType.Name}.");
+            return new List<Tile>();
         }
 
-        private bool MatchVariant(VariantKey other)
+        // Returns an array of all the valid variants in this TileSet.
+        public string[] GetVariants()
         {
-            // null is a wildcard, so is always true
-            if (this.variant == null || other.variant == null)
+            if (tilesByVariant == null || (tilesByVariant.Count == 0 && allTiles.Count > 0))
             {
-                return true;
+                //Debug.Log("Doing long search for variants.");
+                //HashSet<string> strings = new HashSet<string>();
+                //for (int index = 0; index < allTiles.Count; index++)
+                //{
+                //    strings.Add(allTiles[index].variant);
+                //}
+                //string[] longToReturn = new string[strings.Count];
+                //strings.CopyTo(longToReturn);
+                //return longToReturn;
+                Debug.Log("Reindexing TileSet.");
+                OnAfterDeserialize();
             }
 
-            if (this.variant.Equals(other.variant))
+            string[] toReturn = new string[tilesByVariant.Keys.Count];
+            int i = 0;
+            foreach (string s in tilesByVariant.Keys)
             {
-                return true;
+                toReturn[i++] = s;
             }
 
-            return false;
+            return toReturn;
         }
 
-        public override int GetHashCode()
+        // Rebuild the index (dictionaries)
+        public void OnAfterDeserialize()
         {
-            return base.GetHashCode();
+            for (int i = 0; i < allTiles.Count; i++)
+            {
+                Debug.Log($"Deserializing tile from allTiles: {allTiles[i].type.Name} and variant {allTiles[i].variant}.");
+                AddToIndex(allTiles[i]);
+            }
+        }
+
+        // Ensure the dictionaries are cleared first- they're not serialized
+        public void OnBeforeSerialize()
+        {
+            tilesByVariant.Clear();
+            tilesByTileType.Clear();
+        }
+
+        public struct VariantKey
+        {
+            public TileType tileType;
+            public string variant;
+
+            public VariantKey(TileType tileType, string variant)
+            {
+                this.tileType = tileType;
+                this.variant = variant;
+            }
         }
     }
 }

@@ -3,24 +3,27 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEditor;
 
-//[CustomPropertyDrawer(typeof(TileSet))]
-public class TileSetDrawer : PropertyDrawer
+namespace Labrys
 {
-
-    bool showPosition = true;
-
-    // TODO add a custom drawer for TileSet. First need to make a TileSet asset.
-    public override void OnGUI(Rect position, SerializedProperty property, GUIContent label)
+    //[CustomPropertyDrawer(typeof(TileSet))]
+    public class TileSetDrawer : PropertyDrawer
     {
-        Debug.Log("Hello TileSet!");
-        EditorGUI.BeginProperty(position, label, property);
-        //base.OnGUI(position, property, label);
 
-        showPosition = EditorGUILayout.Foldout(showPosition, "Test");
-        if (showPosition) 
+        bool showPosition = true;
+
+        // TODO add a custom drawer for TileSet. First need to make a TileSet asset.
+        public override void OnGUI(Rect position, SerializedProperty property, GUIContent label)
         {
-            EditorGUILayout.LabelField("Test");
+            Debug.Log("Hello TileSet!");
+            EditorGUI.BeginProperty(position, label, property);
+            //base.OnGUI(position, property, label);
+
+            showPosition = EditorGUILayout.Foldout(showPosition, "Test");
+            if (showPosition)
+            {
+                EditorGUILayout.LabelField("Test");
+            }
+            EditorGUI.EndProperty();
         }
-        EditorGUI.EndProperty();
     }
 }

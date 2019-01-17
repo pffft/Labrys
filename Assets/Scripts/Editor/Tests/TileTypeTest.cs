@@ -4,6 +4,8 @@ using NUnit.Framework;
 using UnityEngine;
 using UnityEngine.TestTools;
 
+using Labrys;
+
 namespace Tests
 {
     public class TileTypeTest

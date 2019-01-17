@@ -2,10 +2,13 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class FeatureSelector
+namespace Labrys
 {
-    public Feature Select(List<Feature> features) 
+    public class FeatureSelector
     {
-        return null;
+        public Feature Select(List<Feature> features)
+        {
+            return null;
+        }
     }
 }

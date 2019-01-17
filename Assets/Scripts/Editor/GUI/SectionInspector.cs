@@ -2,20 +2,23 @@
 using UnityEditor;
 using UnityEditor.AnimatedValues;
 
-[CustomEditor(typeof(Section))]
-public class SectionInspector : Editor
+namespace Labrys
 {
-    public override void OnInspectorGUI()
+    [CustomEditor(typeof(Section))]
+    public class SectionInspector : Editor
     {
-        //Section room = target;
+        public override void OnInspectorGUI()
+        {
+            //Section room = target;
 
-        //EditorGUILayout.LabelField("normal");
-        //EditorGUILayout.LabelField(System.Convert.ToString(room.getAdjMask(), 2).PadLeft(16, '0'));
+            //EditorGUILayout.LabelField("normal");
+            //EditorGUILayout.LabelField(System.Convert.ToString(room.getAdjMask(), 2).PadLeft(16, '0'));
 
-        // TODO think about the design of this inspector a bit more.
-        // At a basic level, expose the static TileType values in a list (like how enums look)
-        // On a more complex level, have a more visual way to choose the TileType.
+            // TODO think about the design of this inspector a bit more.
+            // At a basic level, expose the static TileType values in a list (like how enums look)
+            // On a more complex level, have a more visual way to choose the TileType.
 
-        //room.allowedConnections = (Connection)EditorGUILayout.EnumFlagsField("Allowed connections", room.allowedConnections);
+            //room.allowedConnections = (Connection)EditorGUILayout.EnumFlagsField("Allowed connections", room.allowedConnections);
+        }
     }
 }

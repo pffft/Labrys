@@ -294,7 +294,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   tileSet: {fileID: 11400000, guid: 8df06f87c93494870831423d0903b7bd, type: 2}
   tileScale: 1
-  distanceScale: 16
+  distanceScale: 1
 --- !u!4 &1290433885
 Transform:
   m_ObjectHideFlags: 0
