@@ -6,8 +6,6 @@ namespace Labrys.Editor.FeatureEditor
 {
 	public class EditorGrid
 	{
-		private const float SQRT_2 = 1.41421f;
-
 		public float scale;
 		public float lineSpacing;
 		public Color lineColor;
@@ -17,6 +15,8 @@ namespace Labrys.Editor.FeatureEditor
 
 		private Dictionary<Vector2Int, Tile> tiles;
 		private Queue<MapUpdateOperation> staleTiles;
+
+		private Dictionary<Vector2, Connection> connections;
 
 		private MainWindow hostWindow;
 
@@ -31,6 +31,8 @@ namespace Labrys.Editor.FeatureEditor
 
 			tiles = new Dictionary<Vector2Int, Tile> ();
 			staleTiles = new Queue<MapUpdateOperation> ();
+
+			connections = new Dictionary<Vector2, Connection>();
 		}
 
 		public void Draw()
@@ -73,10 +75,11 @@ namespace Labrys.Editor.FeatureEditor
 			}
 			Handles.EndGUI ();
 
-			DrawTiles (wrappedOffset);
+			DrawTiles ();
+			DrawConnections();
 		}
 
-		private void DrawTiles(Vector2 offset)
+		private void DrawTiles()
 		{
 			if (tiles != null)
 			{
@@ -91,6 +94,15 @@ namespace Labrys.Editor.FeatureEditor
 			}
 		}
 
+		private void DrawConnections()
+		{
+			if (connections != null)
+			{
+				foreach (Connection c in connections.Values)
+					c.Draw();
+			}
+		}
+
 		public bool HandleEvent(Event e)
 		{
 			drag = Vector2.zero;
@@ -98,10 +110,18 @@ namespace Labrys.Editor.FeatureEditor
 			bool guiChanged = false;
 			if (tiles != null)
 			{
-				
 				foreach (Tile t in tiles.Values)
 				{
-					if (t.HandleEvent (e) && !guiChanged)
+					if (t.HandleEvent (e))
+						guiChanged = true;
+				}
+			}
+
+			if(connections != null)
+			{
+				foreach(Connection c in connections.Values)
+				{
+					if (c.HandleEvent(e))
 						guiChanged = true;
 				}
 			}
@@ -252,18 +272,48 @@ namespace Labrys.Editor.FeatureEditor
 			}
 		}
 
-		private Vector2Int ScreenToGridPos(Vector2 screenPos)
+		/// <summary>
+		/// Transforms a screen position to a grid position (1:1).
+		/// </summary>
+		/// <param name="screenPos"></param>
+		/// <returns></returns>
+		private Vector2 ScreenToGridSpace(Vector2 screenPos)
 		{
-			return new Vector2Int (
-				Mathf.RoundToInt ((screenPos.x - offset.x) / (lineSpacing * scale)),
-				Mathf.RoundToInt ((screenPos.y - offset.y) / (lineSpacing * scale)));
+			return new Vector2(
+				(screenPos.x - offset.x) / (lineSpacing * scale),
+				(screenPos.y - offset.y) / (lineSpacing * scale));
 		}
 
-		private Vector2 GridToScreenPos(Vector2Int gridPos)
+		/// <summary>
+		/// Transforms a screen position to a specific grid position that can be used to identify a tile (n:1).
+		/// </summary>
+		/// <param name="screenPos"></param>
+		/// <returns></returns>
+		private Vector2Int ScreenToGridPos(Vector2 screenPos)
 		{
-			return new Vector2 (
+			return Vector2Int.RoundToInt(ScreenToGridSpace(screenPos));
+		}
+
+		/// <summary>
+		/// Transforms a grid position into a corresponding screen position (1:1).
+		/// </summary>
+		/// <param name="gridPos"></param>
+		/// <returns></returns>
+		private Vector2 GridToScreenSpace(Vector2 gridPos)
+		{
+			return new Vector2(
 				(gridPos.x * lineSpacing * scale) + offset.x,
 				(gridPos.y * lineSpacing * scale) + offset.y);
+		}
+
+		/// <summary>
+		/// Same as GridToScreenSpace(Vector2), but takes a Vector2Int.
+		/// </summary>
+		/// <param name="gridPos"></param>
+		/// <returns></returns>
+		private Vector2 GridToScreenPos(Vector2Int gridPos)
+		{
+			return GridToScreenSpace(gridPos);
 		}
 
 		/// <summary>

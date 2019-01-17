@@ -62,7 +62,6 @@ namespace Labrys.Editor.FeatureEditor
 					grid.Resize (grid.scale / 1.1f);
 				else
 					grid.Resize (grid.scale * 1.1f);
-				Debug.Log (e.delta);
 				GUI.changed = true;
 				break;
 			case EventType.KeyDown:

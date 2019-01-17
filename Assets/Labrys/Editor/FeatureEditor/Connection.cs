@@ -8,10 +8,8 @@ namespace Labrys.Editor.FeatureEditor
 		public bool Open { get; private set; }
 		public bool External { get; private set; }
 
-		private Tile tile1, tile2;
-		public Vector2 DrawPosition => new Vector2(
-				(tile1.bounds.position.x + tile2.bounds.position.x) / 2f,
-				(tile1.bounds.position.y + tile2.bounds.position.y) / 2f);
+		public Vector2 Position { get; set; }
+		public Vector2 DrawPosition { get; set; }
 
 		public delegate void ConnectionAction(Connection t);
 		public event ConnectionAction removed;
@@ -26,11 +24,11 @@ namespace Labrys.Editor.FeatureEditor
 			return !left.Equals(right);
 		}
 
-		public Connection(Tile tile1, Tile tile2)
+		public Connection(Vector2 position)
 		{
-			this.tile1 = tile1;
-			this.tile2 = tile2;
+			Position = position;
 			Open = true;
+			External = false;
 		}
 
 		public void Draw()
@@ -67,12 +65,12 @@ namespace Labrys.Editor.FeatureEditor
 		public override bool Equals(object obj)
 		{
 			Connection other = (Connection)obj;
-			return DrawPosition == other.DrawPosition;;
+			return Position == other.Position;
 		}
 
 		public override int GetHashCode()
 		{
-			return DrawPosition.GetHashCode();
+			return Position.GetHashCode();
 		}
 	}
 }
