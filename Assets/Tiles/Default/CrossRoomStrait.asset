@@ -13,6 +13,7 @@ MonoBehaviour:
   m_Name: CrossRoomStrait
   m_EditorClassIdentifier: 
   type:
+    Name: CROSS_ROOM_STRAIT
     numRotations: 2
     tileBlueprint: 119
     importanceMask: 255

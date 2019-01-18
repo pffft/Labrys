@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Profiling;
 
 namespace Labrys
 {
@@ -89,78 +90,6 @@ namespace Labrys
              * Since connections and adjacencies are 1:1 if allowed, we're good.
              */
 
-            Connection physicalAdjacent2 = Connection.None;
-
-            // The adjacent positions, in order
-            Vector2Int[] offsets =
-            {
-                Vector2Int.right,
-                Vector2Int.right + Vector2Int.up,
-                Vector2Int.up,
-                Vector2Int.left + Vector2Int.up,
-                Vector2Int.left,
-                Vector2Int.left + Vector2Int.down,
-                Vector2Int.down,
-                Vector2Int.right + Vector2Int.down
-            };
-
-            // Build up a cache
-            // TODO This isn't checking every case. Diagonals need more checks.
-            Section[] adjacentSections = new Section[8];
-            for (int i = 0; i < 8; i++)
-            {
-                if (thisSection.CanConnect((Connection)(1 << i)))
-                {
-                    if (globalGrid.TryGetValue(position + offsets[i], out adjacentSections[i]))
-                    {
-                        int oppositeConnection = (i + 4) % 8;
-                        if (adjacentSections[i].CanConnect((Connection)(1 << oppositeConnection)))
-                        {
-                            physicalAdjacent2 |= (Connection)(1 << i);
-                        }
-                    }
-                }
-            }
-
-            // Check diagonal connections. At this point, we know we can connect in that direction,
-            // and there is a Section there that can connect back to us.
-            // TODO fix this, it's incomplete
-            for (int i = 1; i < 8; i += 2)
-            {
-                Connection diagonal = (Connection)(1 << i);
-                Connection ccw = (Connection)(1 << ((i + 1) % 8));
-                Connection cw = (Connection)(1 << (i - 1));
-
-                // Check if we can connect to the surrounding cardinal connections and
-                // if something's there.
-                if (!thisSection.CanConnect(ccw) || !thisSection.CanConnect(cw) || adjacentSections[i - 1] == null || adjacentSections[(i + 1) % 8] == null)
-                {
-                    physicalAdjacent2 &= ~(Connection)(1 << i);
-                    continue;
-                }
-
-                Connection ccw2 = (Connection)(1 << ((i + 1) % 8));
-                Connection cw2 = (Connection)(1 << ((i - 2) % 8));
-
-                // E.g., i = 1 == NE. (i + 1) is N, and one step CW is E. So, can N connect E?
-                // Second statement checks two steps CW, so SE. So, can N connect SE? 
-                if (!adjacentSections[(i + 1) % 8].CanConnect(cw) || !adjacentSections[(i + 1) % 8].CanConnect(cw2))
-                {
-                    physicalAdjacent2 &= ~(Connection)(1 << i);
-                    continue;
-                }
-
-                // Similarly, this asks can E connect N? And secondly, can E connect NW?
-                if (!adjacentSections[i - 1].CanConnect(ccw) || !adjacentSections[i - 1].CanConnect(ccw2))
-                {
-                    physicalAdjacent2 &= ~(Connection)(1 << i);
-                    continue;
-                }
-            }
-
-            return physicalAdjacent2;
-
-            /*
             // North
             if (thisSection.CanConnect(Connection.North))
             {
@@ -350,7 +279,271 @@ namespace Labrys
             }
 
             return physicalAdjacent;
-            */
+        }
+
+        // The adjacent positions, in order
+        private static Vector2Int[] adjacentOffsets =
+        {
+            Vector2Int.right,
+            Vector2Int.right + Vector2Int.up,
+            Vector2Int.up,
+            Vector2Int.left + Vector2Int.up,
+            Vector2Int.left,
+            Vector2Int.left + Vector2Int.down,
+            Vector2Int.down,
+            Vector2Int.right + Vector2Int.down
+        };
+
+        // All the connections, in counterclockwise order.
+        // More are added to prevent the need for modulo operators.
+        private static Connection[] connectionsOrdered =
+        {
+            Connection.East,
+            Connection.Northeast,
+            Connection.North,
+            Connection.Northwest,
+            Connection.West,
+            Connection.Southwest,
+            Connection.South,
+            Connection.Southeast,
+
+            Connection.East, // 8
+            Connection.Northeast,
+            Connection.North,
+            Connection.Northwest // 11
+        };
+        private static Section[] adjacentSections = new Section[8];
+        //private Dictionary<Vector2Int, Section> sectionCache = new Dictionary<Vector2Int, Section>(10);
+        //private static LinkedList<System.Tuple<Vector2Int, Section>> sectionCache = new LinkedList<System.Tuple<Vector2Int, Section>>();
+        private GridSectionCache sectionCache = new GridSectionCache(500);
+
+        private static Vector2Int positionPlusOffset;
+        private static Section[] TwoByTwoArea = new Section[4];
+
+        public Connection GetPhysicalAdjacencies2(Vector2Int position)
+        {
+            Connection physicalAdjacent2 = Connection.None;
+
+            Section thisSection = globalGrid[position];
+
+            Profiler.BeginSample("Basic checks");
+            // Build up a cache, do basic checks (sufficient for cardinal directions)
+            for (int i = 0; i < 8; i++)
+            {
+                if (thisSection.CanConnect(connectionsOrdered[i]))
+                {
+                    positionPlusOffset = position + adjacentOffsets[i];
+
+                    // Try to find the Section in the cache, first.
+                    //foreach ((Vector2Int cachePosition, Section cacheSection) in sectionCache)
+                    //foreach (System.Tuple<Vector2Int, Section> tuple in sectionCache)
+                    //{
+                    //    if (tuple.Item1 == positionPlusOffset)
+                    //    {
+                    //        adjacentSections[i] = tuple.Item2;
+                    //        goto found;
+                    //    }
+                    //}
+
+                    /*
+                    Section cacheSection = sectionCache.Get(positionPlusOffset);
+                    if (cacheSection != null)
+                    {
+                        Profiler.BeginSample("Cache hit");
+                        Profiler.EndSample();
+                        adjacentSections[i] = cacheSection;
+                    }
+                    // If we couldn't find it in the cache, look it up in the big dictionary.
+                    // adjacentSections[i] is set to the Section, or null if it couldn't be found.
+                    else if (globalGrid.TryGetValue(positionPlusOffset, out adjacentSections[i]))
+                    {
+                        // Update the cache (if we found something)
+                        //if (sectionCache.Count == 10)
+                        //{
+                        //    sectionCache.RemoveLast();
+                        //    sectionCache.AddFirst((positionPlusOffset, adjacentSections[i]));
+                        //}
+                        //else
+                        //{
+                        //    sectionCache.AddFirst((positionPlusOffset, adjacentSections[i]));
+                        //}
+                        sectionCache.Add(positionPlusOffset, adjacentSections[i]);
+                    }
+                    // Didn't find it in either cache or dictionary- continue.
+                    else
+                    {
+                        continue;
+                    }
+                    */
+
+                    Section foundSection = null;
+
+                    Profiler.BeginSample("Cache lookup");
+                    foundSection = sectionCache.Get(positionPlusOffset);
+                    Profiler.EndSample();
+
+                    if (foundSection != null)
+                    {
+                        Profiler.BeginSample("Cache hit");
+                        Profiler.EndSample();
+                    }
+                    else
+                    {
+                        Profiler.BeginSample("Cache miss - TryGetValue");
+                        if (globalGrid.TryGetValue(positionPlusOffset, out foundSection))
+                        {
+                            sectionCache.Add(positionPlusOffset, foundSection);
+                        }
+                        Profiler.EndSample();
+                    }
+
+                    if (foundSection == null)
+                    {
+                        Profiler.BeginSample("Section not found skip");
+                        Profiler.EndSample();
+                        continue;
+                    }
+
+                    adjacentSections[i] = foundSection;
+
+                    //continue;
+
+                    // If found, then do additional checks.
+                    //found: {
+                    //}
+
+                    Profiler.BeginSample("Section found postprocessing");
+                    // i + 4 is the opposite direction connection; e.g., N => S.
+                    if (adjacentSections[i].CanConnect(connectionsOrdered[i + 4]))
+                    {
+                        physicalAdjacent2 |= connectionsOrdered[i];
+                    }
+                    Profiler.EndSample();
+
+
+                }
+            }
+            Profiler.EndSample();
+            Profiler.BeginSample("Diagonal checks");
+
+            /*
+             * Check the diagonal connections. If they're false, then don't compute further-
+             * if they're true, then we need to do additional checks. Specifically, we only
+             * checked if there is something in the diagonal direction that we can connect
+             * to, and that it can connect back. We also need to see if the adjacent cardinal
+             * connections exist and can connect.
+             * 
+             * Check2x2 expects sections in this orientation:
+             * 
+             * 3-2
+             * 0-1
+             * 
+             * And returns true they are fully connected (i.e., following the diagonal rules).
+             */
+
+            if ((physicalAdjacent2 & Connection.Northeast) == Connection.Northeast)
+            {
+                TwoByTwoArea[0] = thisSection;
+                TwoByTwoArea[1] = adjacentSections[0];
+                TwoByTwoArea[2] = adjacentSections[1];
+                TwoByTwoArea[3] = adjacentSections[2];
+
+                if (!Check2x2(TwoByTwoArea))
+                {
+                    physicalAdjacent2 &= ~Connection.Northeast;
+                }
+            }
+
+            if ((physicalAdjacent2 & Connection.Northwest) == Connection.Northwest)
+            {
+                TwoByTwoArea[0] = adjacentSections[4];
+                TwoByTwoArea[1] = thisSection;
+                TwoByTwoArea[2] = adjacentSections[2];
+                TwoByTwoArea[3] = adjacentSections[3];
+
+                if (!Check2x2(TwoByTwoArea))
+                {
+                    physicalAdjacent2 &= ~Connection.Northwest;
+                }
+            }
+
+            if ((physicalAdjacent2 & Connection.Southwest) == Connection.Southwest)
+            {
+                TwoByTwoArea[0] = adjacentSections[5];
+                TwoByTwoArea[1] = adjacentSections[6];
+                TwoByTwoArea[2] = thisSection;
+                TwoByTwoArea[3] = adjacentSections[4];
+
+                if (!Check2x2(TwoByTwoArea))
+                {
+                    physicalAdjacent2 &= ~Connection.Southwest;
+                }
+            }
+
+            if ((physicalAdjacent2 & Connection.Southeast) == Connection.Southeast)
+            {
+                TwoByTwoArea[0] = adjacentSections[6];
+                TwoByTwoArea[1] = adjacentSections[7];
+                TwoByTwoArea[2] = adjacentSections[0];
+                TwoByTwoArea[3] = thisSection;
+
+                if (!Check2x2(TwoByTwoArea))
+                {
+                    physicalAdjacent2 &= ~Connection.Southeast;
+                }
+            }
+            Profiler.EndSample();
+
+            return physicalAdjacent2;
+        }
+        
+        private static readonly Connection[] connectionsToCheck =
+        {
+            Connection.East,
+            Connection.Northeast,
+            Connection.North,
+            Connection.North,
+            Connection.Northwest,
+            Connection.West,
+            Connection.West,
+            Connection.Southwest,
+            Connection.South,
+            Connection.South,
+            Connection.Southeast,
+            Connection.East
+        };
+
+        private bool Check2x2(Section[] sections) 
+        {
+            // Check none are null
+            for (int i = 0; i < 4; i++)
+            {
+                if (sections[i] == null)
+                {
+                    return false;
+                }
+            }
+
+            // We do 3 checks per each element of the 2x2 in the following pattern:
+            // 0, 1, 2, 2, 3, 4, 4, 5, 6, 6, 7, 0
+
+            for (int i = 0; i < 4; i++)
+            {
+                if (!sections[i].CanConnect(connectionsToCheck[(3 * i) + 0]))
+                {
+                    return false;
+                }
+                if (!sections[i].CanConnect(connectionsToCheck[(3 * i) + 1]))
+                {
+                    return false;
+                }
+                if (!sections[i].CanConnect(connectionsToCheck[(3 * i) + 2]))
+                {
+                    return false;
+                }
+            }
+
+            return true;
         }
     }
 }

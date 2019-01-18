@@ -13,6 +13,7 @@ MonoBehaviour:
   m_Name: Empty
   m_EditorClassIdentifier: 
   type:
+    Name: EMPTY
     numRotations: 1
     tileBlueprint: 0
     importanceMask: 85

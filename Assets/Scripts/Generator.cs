@@ -60,18 +60,18 @@ namespace Labrys
             //sectionGrid = new Dictionary<Vector2Int, Section>();
             grid = new Grid();
 
-            //// Dead-end
-            grid[new Vector2Int(-1, 0)] = new Section();
+            // Dead-end
+            //grid[new Vector2Int(-1, 0)] = new Section();
 
             //// Corner that can't connect to dead-end
-            grid[new Vector2Int(-1, 1)] = new Section(Connection.All & ~Connection.South);
-            grid[new Vector2Int(-1, 2)] = new Section();
+            //grid[new Vector2Int(-1, 1)] = new Section(Connection.All & ~Connection.South);
+            //grid[new Vector2Int(-1, 2)] = new Section();
 
-            //// 2x2 room (corner rooms)
-            grid[new Vector2Int(0, 0)] = new Section();
-            grid[new Vector2Int(1, 0)] = new Section();
-            grid[new Vector2Int(0, 1)] = new Section();
-            grid[new Vector2Int(1, 1)] = new Section();
+            // 2x2 room (corner rooms)
+            //grid[new Vector2Int(0, 0)] = new Section();
+            //grid[new Vector2Int(1, 0)] = new Section();
+            //grid[new Vector2Int(0, 1)] = new Section();
+            //grid[new Vector2Int(1, 1)] = new Section();
 
 
             // 2 wide + shape
@@ -108,13 +108,13 @@ namespace Labrys
             //}
 
             // Roughly 100k sections
-            //for (int i = 0; i < 317; i++)
-            //{
-            //    for (int j = 0; j < 317; j++) 
-            //    {
-            //        grid[new Vector2Int(i, j)] = new Section();
-            //    }
-            //}
+            for (int i = 0; i < 317; i++)
+            {
+                for (int j = 0; j < 317; j++) 
+                {
+                    grid[new Vector2Int(i, j)] = new Section();
+                }
+            }
             Profiler.EndSample();
 
             Profiler.BeginSample("Resolving tiles");
@@ -141,7 +141,7 @@ namespace Labrys
                 Profiler.EndSample();
 
                 Profiler.BeginSample("Getting physical adjacencies");
-                Connection physicalAdjacencies = grid.GetPhysicalAdjacencies(position);
+                Connection physicalAdjacencies = grid.GetPhysicalAdjacencies2(position);
                 Profiler.EndSample();
 
                 //Debug.Log($"For position {position}, have connections: {physicalAdjacencies}.");

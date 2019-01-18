@@ -70,7 +70,7 @@ namespace Labrys
     };
 
         [SerializeField]
-        public string Name { get; private set; }
+        public string Name;
 
         /// <summary>
         /// How many rotational variants do we have?

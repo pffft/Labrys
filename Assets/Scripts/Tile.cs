@@ -16,17 +16,25 @@ namespace Labrys
         /// </summary>
         // TODO: Make a custom inspector so that this shows up in the inspector. See SectionInspector.
         [Tooltip("The connection type.")]
+        [SerializeField]
         public TileType type;
 
         /// <summary>
         /// The variant of this Tile. This is used with the TileType to uniquely
         /// determine this Tile in TileSet.
         /// </summary>
+        [SerializeField]
         public string variant;
 
         /// <summary>
         /// The actual physical model that represents this Tile.
         /// </summary>
+        [SerializeField]
         public GameObject prefab;
+
+        public override string ToString()
+        {
+            return $"Tile type {type.Name}, variant {variant}, prefab {prefab.name}";
+        }
     }
 }

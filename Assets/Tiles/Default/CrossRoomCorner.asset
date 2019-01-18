@@ -13,6 +13,7 @@ MonoBehaviour:
   m_Name: CrossRoomCorner
   m_EditorClassIdentifier: 
   type:
+    Name: CROSS_ROOM_CORNER
     numRotations: 4
     tileBlueprint: 87
     importanceMask: 255

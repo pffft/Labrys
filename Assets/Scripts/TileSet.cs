@@ -24,9 +24,19 @@ namespace Labrys
 
         public TileSet()
         {
-            allTiles = new List<Tile>();
-            tilesByVariant = new Dictionary<string, List<Tile>>();
-            tilesByTileType = new Dictionary<TileType, List<Tile>>();
+            //tilesByVariant = new Dictionary<string, List<Tile>>();
+            //tilesByTileType = new Dictionary<TileType, List<Tile>>();
+
+            if (allTiles != null && allTiles.Count > 0)
+            {
+                //OnAfterDeserialize();
+            }
+            else
+            {
+                allTiles = new List<Tile>();
+            }
+
+
         }
 
         /// <summary>
@@ -39,6 +49,10 @@ namespace Labrys
             if (set == null)
             {
                 Debug.LogWarning("Failed to load default TileSet.");
+            }
+            else
+            {
+                set.OnAfterDeserialize();
             }
             return set;
         }
@@ -150,8 +164,9 @@ namespace Labrys
                 //string[] longToReturn = new string[strings.Count];
                 //strings.CopyTo(longToReturn);
                 //return longToReturn;
-                Debug.Log("Reindexing TileSet.");
-                OnAfterDeserialize();
+                //Debug.Log("Reindexing TileSet.");
+                return new string[0];
+                //OnAfterDeserialize();
             }
 
             string[] toReturn = new string[tilesByVariant.Keys.Count];
@@ -169,6 +184,10 @@ namespace Labrys
         {
             for (int i = 0; i < allTiles.Count; i++)
             {
+                if (allTiles[i] == null || allTiles[i].variant == null) 
+                {
+                    continue;
+                }
                 Debug.Log($"Deserializing tile from allTiles: {allTiles[i].type.Name} and variant {allTiles[i].variant}.");
                 AddToIndex(allTiles[i]);
             }
@@ -177,8 +196,8 @@ namespace Labrys
         // Ensure the dictionaries are cleared first- they're not serialized
         public void OnBeforeSerialize()
         {
-            tilesByVariant.Clear();
-            tilesByTileType.Clear();
+            //tilesByVariant.Clear();
+            //tilesByTileType.Clear();
         }
 
         public struct VariantKey

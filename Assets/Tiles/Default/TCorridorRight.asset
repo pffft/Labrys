@@ -13,6 +13,7 @@ MonoBehaviour:
   m_Name: TCorridorRight
   m_EditorClassIdentifier: 
   type:
+    Name: T_CORRIDOR_RIGHT
     numRotations: 4
     tileBlueprint: 23
     importanceMask: 95

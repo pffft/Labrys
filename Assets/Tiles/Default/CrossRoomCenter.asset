@@ -13,6 +13,7 @@ MonoBehaviour:
   m_Name: CrossRoomCenter
   m_EditorClassIdentifier: 
   type:
+    Name: CROSS_ROOM_CENTER
     numRotations: 1
     tileBlueprint: 255
     importanceMask: 255

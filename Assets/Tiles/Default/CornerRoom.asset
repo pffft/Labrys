@@ -13,6 +13,7 @@ MonoBehaviour:
   m_Name: CornerRoom
   m_EditorClassIdentifier: 
   type:
+    Name: CORNER_ROOM
     numRotations: 4
     tileBlueprint: 7
     importanceMask: 87
