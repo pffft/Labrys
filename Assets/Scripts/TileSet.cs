@@ -13,7 +13,7 @@ namespace Labrys
     {
         // Literally every tile, without an index. Used for fast returns of "all" queries.
         // This gets serialized, and the index is rebuilt from this on load.
-        [SerializeField]
+        //[SerializeField]
         private List<Tile> allTiles;
 
         // All tiles, sorted on their variants. Rebuilt on serialization.
