@@ -13,23 +13,11 @@ namespace Labrys.Editor.FeatureEditor
 			window.titleContent = new GUIContent ("Labrys Feature Editor");
 		}
 
-		
-		public GUIStyle defaultTileStyle;
-		public GUIStyle selectedTileStyle;
-
 		private Vector2 drag;
 		private EditorGrid grid;
 
 		private void OnEnable()
 		{
-			defaultTileStyle = new GUIStyle ();
-			defaultTileStyle.normal.background = (Texture2D)EditorGUIUtility.Load ("builtin skins/darkskin/images/node1.png");
-			defaultTileStyle.border = new RectOffset (1, 1, 1, 1);
-
-			selectedTileStyle = new GUIStyle ();
-			selectedTileStyle.normal.background = (Texture2D)EditorGUIUtility.Load ("builtin skins/darkskin/images/node1 on.png");
-			selectedTileStyle.border = new RectOffset (1, 1, 1, 1);
-
 			grid = new EditorGrid (this, 64, new Color(0.4f, 0.4f, 0.4f));
 			grid.Recenter();
 		}
@@ -56,13 +44,6 @@ namespace Labrys.Editor.FeatureEditor
 				{
 					HandleContextMenu (e.mousePosition);
 				}
-				break;
-			case EventType.ScrollWheel:
-				if (Mathf.Sign (e.delta.y) > 0)
-					grid.Resize (grid.scale / 1.1f);
-				else
-					grid.Resize (grid.scale * 1.1f);
-				GUI.changed = true;
 				break;
 			case EventType.KeyDown:
 				if (e.control)

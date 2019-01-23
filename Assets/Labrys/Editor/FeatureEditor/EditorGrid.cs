@@ -130,11 +130,18 @@ namespace Labrys.Editor.FeatureEditor
 			{
 			case EventType.MouseDrag:
 				//drag the grid and the tiles
-				if (e.button == 0)
+				if (e.button == 2)
 				{
 					Shift (e.delta);
 					guiChanged = true;
 				}
+				break;
+			case EventType.ScrollWheel:
+				if (Mathf.Sign(e.delta.y) > 0)
+					Resize(scale / 1.1f);
+				else
+					Resize(scale * 1.1f);
+				GUI.changed = true;
 				break;
 			case EventType.KeyDown:
 				//create a new tile
@@ -199,7 +206,7 @@ namespace Labrys.Editor.FeatureEditor
 
 		public void CreateTile(Vector2 mousePos)
 		{
-			Tile t = new Tile (mousePos, new Vector2 (lineSpacing, lineSpacing), hostWindow.defaultTileStyle, hostWindow.selectedTileStyle);
+			Tile t = new Tile (mousePos, new Vector2 (lineSpacing, lineSpacing));
 			t.removed += RemoveTile;
 			t.dragFinished += AlignTile;
 			t.position = ScreenToGridPos (mousePos);
@@ -220,6 +227,7 @@ namespace Labrys.Editor.FeatureEditor
 			staleTiles.Enqueue (new MapUpdateOperation ()
 			{
 				Action = (Tile sub) => {
+					TryRemoveConnections(sub);
 					tiles.Remove (sub.position);
 				},
 				Subject = t
@@ -264,32 +272,7 @@ namespace Labrys.Editor.FeatureEditor
 				staleTiles.Enqueue (new MapUpdateOperation ()
 				{
 					Action = (Tile sub) => {
-						if (tiles.ContainsKey(sub.position))
-						{
-							//check all connections are still valid
-							foreach (Vector2Int neighborPos in Tile.GetAllNeighborDirections())
-							{
-								Vector2 connectionPos = new Vector2(neighborPos.x / 2f, neighborPos.y / 2f) + sub.position;
-								if (connections.TryGetValue(connectionPos, out Connection connection))
-								{
-									bool hasNeighbor = false;
-									foreach(Vector2Int tilePos in connection.GetSubjectGridPositions())
-									{
-										if (tiles.ContainsKey(tilePos))
-										{
-											hasNeighbor = true;
-											break;
-										}
-									}
-
-									//remove connections that have no tile neightbors
-									if(!hasNeighbor)
-									{
-										connections.Remove(connectionPos);
-									}
-								}
-							}
-						}
+						TryRemoveConnections(sub);
 
 						//move tile
 						tiles.Remove(sub.position);
@@ -312,6 +295,36 @@ namespace Labrys.Editor.FeatureEditor
 				});
 
 				return true;
+			}
+		}
+
+		private void TryRemoveConnections(Tile t)
+		{
+			if (tiles.ContainsKey(t.position))
+			{
+				//check all connections are still valid
+				foreach (Vector2Int neighborPos in Tile.GetAllNeighborDirections())
+				{
+					Vector2 connectionPos = new Vector2(neighborPos.x / 2f, neighborPos.y / 2f) + t.position;
+					if (connections.TryGetValue(connectionPos, out Connection connection))
+					{
+						bool hasNeighbor = false;
+						foreach (Vector2Int tilePos in connection.GetSubjectGridPositions())
+						{
+							if (tiles.ContainsKey(tilePos))
+							{
+								hasNeighbor = true;
+								break;
+							}
+						}
+
+						//remove connections that have no tile neightbors
+						if (!hasNeighbor)
+						{
+							connections.Remove(connectionPos);
+						}
+					}
+				}
 			}
 		}
 
