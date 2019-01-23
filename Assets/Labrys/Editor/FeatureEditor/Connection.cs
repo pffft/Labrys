@@ -6,6 +6,8 @@ namespace Labrys.Editor.FeatureEditor
 {
 	public class Connection
 	{
+		private const float SIZE = 10f;
+
 		public bool Open { get; private set; }
 		public bool External { get; private set; }
 
@@ -49,28 +51,26 @@ namespace Labrys.Editor.FeatureEditor
 		{
 			Handles.color = Open ? Color.green : Color.red;
 			Handles.BeginGUI();
-			Handles.DrawWireDisc(new Vector3(DrawPosition.x, DrawPosition.y), Vector3.forward, scale * 10f);
+			Handles.DrawSolidDisc(new Vector3(DrawPosition.x, DrawPosition.y), Vector3.forward, scale * SIZE);
 			Handles.EndGUI();
 		}
 
 		public bool HandleEvent(Event e)
 		{
-			switch(e.type)
+			if (Vector2.Distance(e.mousePosition, DrawPosition) < scale * SIZE)
 			{
-			case EventType.MouseDown:
-				if(e.button == 0)
+				switch (e.type)
 				{
-					//open connection
-					Open = true;
-					return true;
+				case EventType.MouseDown:
+					if (e.button == 1)
+					{
+						//toggle connection
+						Open = !Open;
+						e.Use();
+						return true;
+					}
+					break;
 				}
-				else if(e.button == 1)
-				{
-					//block connection
-					Open = false;
-					return true;
-				}
-				break;
 			}
 			return false;
 		}

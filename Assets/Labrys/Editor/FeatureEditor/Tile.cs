@@ -6,7 +6,6 @@ namespace Labrys.Editor.FeatureEditor
 {
 	public class Tile
 	{
-		public GUIStyle style, defaultStyle, selectedStyle;
 		public bool isDragging;
 		public bool isSelected;
 
@@ -43,14 +42,11 @@ namespace Labrys.Editor.FeatureEditor
 			return all;
 		}
 
-		public Tile(Vector2 position, Vector2 size, GUIStyle defaultStyle, GUIStyle selectedStyle)
+		public Tile(Vector2 position, Vector2 size)
 		{
 			bounds = new Rect (position, size);
 			bounds.center = position;
 			baseSize = bounds.size;
-			this.defaultStyle = defaultStyle;
-			this.selectedStyle = selectedStyle;
-			style = defaultStyle;
 
 			variant = "";
 		}
@@ -67,7 +63,8 @@ namespace Labrys.Editor.FeatureEditor
 
 		public void Draw()
 		{
-			GUI.Box (bounds, variant, style);
+			GUI.color = isSelected ? Color.cyan : Color.white;
+			GUI.Box (bounds, variant);
 		}
 
 		public bool HandleEvent(Event e)
@@ -81,12 +78,10 @@ namespace Labrys.Editor.FeatureEditor
 					if (bounds.Contains (e.mousePosition))
 					{
 						isDragging = isSelected = true;
-						style = selectedStyle;
 					}
 					else
 					{
 						isSelected = false;
-						style = defaultStyle;
 					}
 					return true;
 				}
