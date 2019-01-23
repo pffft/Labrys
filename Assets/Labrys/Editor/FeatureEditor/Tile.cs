@@ -29,6 +29,20 @@ namespace Labrys.Editor.FeatureEditor
 		public Vector2Int Down => position + Vector2Int.down;
 		public Vector2Int DownRight => position + Vector2Int.down + Vector2Int.right;
 
+		public static Vector2Int[] GetAllNeighborDirections()
+		{
+			Vector2Int[] all = new Vector2Int[8];
+			all[0] = Vector2Int.right;
+			all[1] = Vector2Int.up + Vector2Int.right;
+			all[2] = Vector2Int.up;
+			all[3] = Vector2Int.up + Vector2Int.left;
+			all[4] = Vector2Int.left;
+			all[5] = Vector2Int.down + Vector2Int.left;
+			all[6] = Vector2Int.down;
+			all[7] = Vector2Int.down + Vector2Int.right;
+			return all;
+		}
+
 		public Tile(Vector2 position, Vector2 size, GUIStyle defaultStyle, GUIStyle selectedStyle)
 		{
 			bounds = new Rect (position, size);
@@ -41,7 +55,7 @@ namespace Labrys.Editor.FeatureEditor
 			variant = "";
 		}
 
-		public void Drag(Vector2 dPos)
+		public void Shift(Vector2 dPos)
 		{
 			bounds.position += dPos;
 		}
@@ -96,7 +110,7 @@ namespace Labrys.Editor.FeatureEditor
 				//perform drag
 				if (e.button == 0 && isDragging)
 				{
-					Drag (e.delta);
+					Shift (e.delta);
 					e.Use ();
 					return true;
 				}
@@ -141,6 +155,16 @@ namespace Labrys.Editor.FeatureEditor
 			case LinkDirection.DownRight: return DownRight;
 			default: return Vector2Int.zero;
 			}
+		}
+
+		public Vector2Int[] GetAllAdjPosition()
+		{
+			Vector2Int[] all = GetAllNeighborDirections();
+			for(int i = 0; i < 8; i++)
+			{
+				all[i] += position;
+			}
+			return all;
 		}
 	}
 }

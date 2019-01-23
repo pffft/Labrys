@@ -158,7 +158,15 @@ namespace Labrys.Editor.FeatureEditor
 			{
 				foreach (Tile t in tiles.Values)
 				{
-					t.Drag (dPos);
+					t.Shift (dPos);
+				}
+			}
+
+			if (connections != null)
+			{
+				foreach (Connection c in connections.Values)
+				{
+					c.Shift(dPos);
 				}
 			}
 		}
@@ -167,6 +175,8 @@ namespace Labrys.Editor.FeatureEditor
 		{
 			foreach (Tile t in tiles.Values)
 				t.bounds.position -= offset;
+			foreach (Connection c in connections.Values)
+				c.DrawPosition -= offset;
 			offset = Vector2.zero;
 
 			Shift(hostWindow.position.size / 2f);
@@ -180,6 +190,11 @@ namespace Labrys.Editor.FeatureEditor
 				t.Resize(scale);
 				RealignTile(t);
 			}
+			foreach (Connection c in connections.Values)
+			{
+				c.Resize(scale);
+				RealignConnection(c);
+			}
 		}
 
 		public void CreateTile(Vector2 mousePos)
@@ -188,10 +203,14 @@ namespace Labrys.Editor.FeatureEditor
 			t.removed += RemoveTile;
 			t.dragFinished += AlignTile;
 			t.position = ScreenToGridPos (mousePos);
+			t.Resize(scale);
 
 			//if align is successful, then tile will be added
-			TryAlignTile (t);
-			t.Resize(scale);
+			if(TryAlignTile (t))
+			{
+				
+			}
+			
 		}
 
 		public void RemoveTile(Tile t)
@@ -240,17 +259,54 @@ namespace Labrys.Editor.FeatureEditor
 			else
 			{
 				//space is valid, move tile
-				Vector2Int oldGridPos = t.position;
-				t.position = newGridPos;
-				t.bounds.position = GridToScreenPos (newGridPos);
-
 				//TryAlignTile gets called in the tile update loop, where we can't make modifications to the contents of the dictionary.
 				//queue up an operation for after the loop is done to re-orient the tile  in the dictionary.
 				staleTiles.Enqueue (new MapUpdateOperation ()
 				{
 					Action = (Tile sub) => {
-						tiles.Remove (oldGridPos);
+						if (tiles.ContainsKey(sub.position))
+						{
+							//check all connections are still valid
+							foreach (Vector2Int neighborPos in Tile.GetAllNeighborDirections())
+							{
+								Vector2 connectionPos = new Vector2(neighborPos.x / 2f, neighborPos.y / 2f) + sub.position;
+								if (connections.TryGetValue(connectionPos, out Connection connection))
+								{
+									bool hasNeighbor = false;
+									foreach(Vector2Int tilePos in connection.GetSubjectGridPositions())
+									{
+										if (tiles.ContainsKey(tilePos))
+										{
+											hasNeighbor = true;
+											break;
+										}
+									}
+
+									//remove connections that have no tile neightbors
+									if(!hasNeighbor)
+									{
+										connections.Remove(connectionPos);
+									}
+								}
+							}
+						}
+
+						//move tile
+						tiles.Remove(sub.position);
+						sub.position = newGridPos;
+						sub.bounds.position = GridToScreenPos(newGridPos);
 						tiles.Add (sub.position, sub);
+
+						//add new connections in new position
+						foreach (Vector2Int neighborPos in Tile.GetAllNeighborDirections())
+						{
+							Vector2 connectionPos = new Vector2(neighborPos.x / 2f, neighborPos.y / 2f) + sub.position;
+							if (!connections.ContainsKey(connectionPos))
+							{
+								Debug.Log(connectionPos);
+								connections.Add(connectionPos, new Connection(connectionPos, GridToScreenSpace(connectionPos + new Vector2(0.5f, 0.5f))));
+							}
+						}
 					},
 					Subject = t
 				});
@@ -269,6 +325,15 @@ namespace Labrys.Editor.FeatureEditor
 			if(tiles.ContainsKey(t.position))
 			{
 				t.bounds.position = GridToScreenPos(t.position);
+			}
+		}
+
+		private void RealignConnection(Connection c)
+		{
+			GUI.changed = true;
+			if (connections.ContainsKey(c.Position))
+			{
+				c.DrawPosition = GridToScreenSpace(c.Position + new Vector2(0.5f, 0.5f));
 			}
 		}
 
@@ -291,7 +356,8 @@ namespace Labrys.Editor.FeatureEditor
 		/// <returns></returns>
 		private Vector2Int ScreenToGridPos(Vector2 screenPos)
 		{
-			return Vector2Int.RoundToInt(ScreenToGridSpace(screenPos));
+			Vector2 gridSpacePos = ScreenToGridSpace(screenPos);
+			return new Vector2Int(Mathf.RoundToInt(gridSpacePos.x), Mathf.RoundToInt(gridSpacePos.y));
 		}
 
 		/// <summary>

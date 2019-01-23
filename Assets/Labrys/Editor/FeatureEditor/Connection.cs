@@ -12,6 +12,8 @@ namespace Labrys.Editor.FeatureEditor
 		public Vector2 Position { get; set; }
 		public Vector2 DrawPosition { get; set; }
 
+		private float scale;
+
 		public delegate void ConnectionAction(Connection t);
 		public event ConnectionAction removed;
 
@@ -25,19 +27,29 @@ namespace Labrys.Editor.FeatureEditor
 			return !left.Equals(right);
 		}
 
-		public Connection(Vector2 position)
+		public Connection(Vector2 position, Vector2 drawPosition)
 		{
 			Position = position;
+			DrawPosition = drawPosition;
 			Open = true;
 			External = false;
 		}
 
+		public void Shift(Vector2 dPos)
+		{
+			DrawPosition += dPos;
+		}
+
+		public void Resize(float scale)
+		{
+			this.scale = scale;
+		}
+
 		public void Draw()
 		{
-			GUI.Box(new Rect(DrawPosition, new Vector2(1f, 1f)), "");
 			Handles.color = Open ? Color.green : Color.red;
 			Handles.BeginGUI();
-			Handles.DrawWireDisc(new Vector3(DrawPosition.x, DrawPosition.y), Vector3.forward, 1f);
+			Handles.DrawWireDisc(new Vector3(DrawPosition.x, DrawPosition.y), Vector3.forward, scale * 10f);
 			Handles.EndGUI();
 		}
 
@@ -65,8 +77,19 @@ namespace Labrys.Editor.FeatureEditor
 
 		public IEnumerable<Vector2Int> GetSubjectGridPositions()
 		{
-			List<Vector2Int> positions = new List<Vector2Int>();
-			if(Mathf.FloorToInt(Position.x) != Mathf.CeilToInt(Position.x))
+			HashSet<Vector2Int> uniquePositions = new HashSet<Vector2Int>();
+
+			int lowerX = Mathf.FloorToInt(Position.x), upperX = Mathf.FloorToInt(Position.x + 0.5f);
+			int lowerY = Mathf.FloorToInt(Position.y), upperY = Mathf.FloorToInt(Position.y + 0.5f);
+
+			uniquePositions.Add(new Vector2Int(lowerX, lowerY));
+			uniquePositions.Add(new Vector2Int(lowerY, upperY));
+			uniquePositions.Add(new Vector2Int(upperX, lowerY));
+			uniquePositions.Add(new Vector2Int(upperX, upperY));
+
+			Vector2Int[] finalPositions = new Vector2Int[uniquePositions.Count];
+			uniquePositions.CopyTo(finalPositions);
+			return finalPositions;
 		}
 
 		public override bool Equals(object obj)
