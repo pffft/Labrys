@@ -6,9 +6,11 @@ namespace Labrys.Editor.FeatureEditor
 {
 	public class EditorGrid
 	{
-		public float scale;
-		public float lineSpacing;
-		public Color lineColor;
+		private static EditorGrid instance;
+
+		public float scale = 1f;
+		public float lineSpacing = 64f;
+		public Color lineColor = new Color(0.4f, 0.4f, 0.4f);
 
 		private Vector2 offset;
 		private Vector2 drag;
@@ -18,14 +20,20 @@ namespace Labrys.Editor.FeatureEditor
 
 		private Dictionary<Vector2, Connection> connections;
 
-		private MainWindow hostWindow;
+		public Rect viewport;
 
-		public EditorGrid(MainWindow host, float lineSpacing, Color lineColor)
+		public static EditorGrid GetInstance()
 		{
-			hostWindow = host;
-			this.lineSpacing = lineSpacing;
-			this.lineColor = lineColor;
-			scale = 1f;
+			if(instance == null)
+			{
+				instance = new EditorGrid();
+			}
+			return instance;
+		}
+
+		public EditorGrid()
+		{
+			viewport = new Rect();
 
 			offset = Vector2.zero;
 
@@ -41,8 +49,8 @@ namespace Labrys.Editor.FeatureEditor
 
 			float scaledSpacing = lineSpacing * scale;
 
-			int xLineCount = Mathf.CeilToInt(hostWindow.position.width / scaledSpacing);
-			int yLineCount = Mathf.CeilToInt (hostWindow.position.height / scaledSpacing);
+			int xLineCount = Mathf.CeilToInt(viewport.width / scaledSpacing);
+			int yLineCount = Mathf.CeilToInt (viewport.height / scaledSpacing);
 
 			Vector2 wrappedOffset = new Vector2 (
 				Mathf.Abs (offset.x) % scaledSpacing * Mathf.Sign (offset.x), 
@@ -59,7 +67,7 @@ namespace Labrys.Editor.FeatureEditor
 					Handles.color = lightLineColor;
 				Handles.DrawLine (
 					new Vector2 (scaledSpacing * i, -scaledSpacing) + wrappedOffset, 
-					new Vector2 (scaledSpacing * i, hostWindow.position.height + scaledSpacing) + wrappedOffset);
+					new Vector2 (scaledSpacing * i, viewport.height + scaledSpacing) + wrappedOffset);
 			}
 
 			for (int i = 0; i < yLineCount + 1; i++)
@@ -71,7 +79,7 @@ namespace Labrys.Editor.FeatureEditor
 					Handles.color = lightLineColor;
 				Handles.DrawLine (
 					new Vector2 (-scaledSpacing, scaledSpacing * i) + wrappedOffset, 
-					new Vector2 (hostWindow.position.width + scaledSpacing, scaledSpacing * i) + wrappedOffset);
+					new Vector2 (viewport.width + scaledSpacing, scaledSpacing * i) + wrappedOffset);
 			}
 			Handles.EndGUI ();
 
@@ -186,7 +194,7 @@ namespace Labrys.Editor.FeatureEditor
 				c.DrawPosition -= offset;
 			offset = Vector2.zero;
 
-			Shift(hostWindow.position.size / 2f);
+			Shift(viewport.size / 2f);
 		}
 
 		public void Resize(float scale)
@@ -355,7 +363,7 @@ namespace Labrys.Editor.FeatureEditor
 		/// </summary>
 		/// <param name="screenPos"></param>
 		/// <returns></returns>
-		private Vector2 ScreenToGridSpace(Vector2 screenPos)
+		public Vector2 ScreenToGridSpace(Vector2 screenPos)
 		{
 			return new Vector2(
 				(screenPos.x - offset.x) / (lineSpacing * scale),
@@ -367,7 +375,7 @@ namespace Labrys.Editor.FeatureEditor
 		/// </summary>
 		/// <param name="screenPos"></param>
 		/// <returns></returns>
-		private Vector2Int ScreenToGridPos(Vector2 screenPos)
+		public Vector2Int ScreenToGridPos(Vector2 screenPos)
 		{
 			Vector2 gridSpacePos = ScreenToGridSpace(screenPos);
 			return new Vector2Int(Mathf.RoundToInt(gridSpacePos.x), Mathf.RoundToInt(gridSpacePos.y));
@@ -378,7 +386,7 @@ namespace Labrys.Editor.FeatureEditor
 		/// </summary>
 		/// <param name="gridPos"></param>
 		/// <returns></returns>
-		private Vector2 GridToScreenSpace(Vector2 gridPos)
+		public Vector2 GridToScreenSpace(Vector2 gridPos)
 		{
 			return new Vector2(
 				(gridPos.x * lineSpacing * scale) + offset.x,
@@ -390,7 +398,7 @@ namespace Labrys.Editor.FeatureEditor
 		/// </summary>
 		/// <param name="gridPos"></param>
 		/// <returns></returns>
-		private Vector2 GridToScreenPos(Vector2Int gridPos)
+		public Vector2 GridToScreenPos(Vector2Int gridPos)
 		{
 			return GridToScreenSpace(gridPos);
 		}

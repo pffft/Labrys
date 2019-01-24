@@ -1,5 +1,4 @@
-﻿using System.Collections.Generic;
-using UnityEditor;
+﻿using UnityEditor;
 using UnityEngine;
 
 namespace Labrys.Editor.FeatureEditor
@@ -18,7 +17,8 @@ namespace Labrys.Editor.FeatureEditor
 
 		private void OnEnable()
 		{
-			grid = new EditorGrid (this, 64, new Color(0.4f, 0.4f, 0.4f));
+			EditorGrid grid = EditorGrid.GetInstance();
+			grid.viewport = position;
 			grid.Recenter();
 		}
 

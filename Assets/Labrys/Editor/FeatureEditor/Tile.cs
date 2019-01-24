@@ -1,17 +1,15 @@
-﻿using System.Collections.Generic;
-using UnityEditor;
+﻿using UnityEditor;
 using UnityEngine;
 
 namespace Labrys.Editor.FeatureEditor
 {
-	public class Tile
+	public class Tile : GridObject
 	{
+		public event GridObjectAction removed;
+		public event GridObjectAction dragFinished;
+
 		public bool isDragging;
 		public bool isSelected;
-
-		public delegate void TileAction(Tile t);
-		public event TileAction removed;
-		public event TileAction dragFinished;
 
 		public Rect bounds;
 		private Vector2 baseSize;
@@ -61,13 +59,13 @@ namespace Labrys.Editor.FeatureEditor
 			bounds.size = baseSize * scale;
 		}
 
-		public void Draw()
+		public override void Draw()
 		{
 			GUI.color = isSelected ? Color.cyan : Color.white;
 			GUI.Box (bounds, variant);
 		}
 
-		public bool HandleEvent(Event e)
+		public override bool HandleEvent(Event e)
 		{
 			switch (e.type)
 			{
@@ -97,8 +95,7 @@ namespace Labrys.Editor.FeatureEditor
 				if (isDragging)
 				{
 					isDragging = false;
-					if (dragFinished != null)
-						dragFinished.Invoke (this);
+					dragFinished?.Invoke(this);
 				}
 				break;
 			case EventType.MouseDrag:
@@ -117,8 +114,7 @@ namespace Labrys.Editor.FeatureEditor
 					if (isSelected)
 					{
 						e.Use ();
-						if (removed != null)
-							removed.Invoke (this);
+						removed?.Invoke (this);
 					}
 				}
 				break;
