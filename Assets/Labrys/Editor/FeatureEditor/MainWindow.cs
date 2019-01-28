@@ -1,4 +1,6 @@
-﻿using UnityEditor;
+﻿using Labrys.Editor.FeatureEditor.Commands;
+using Labrys.Editor.FeatureEditor.Tools;
+using UnityEditor;
 using UnityEngine;
 
 namespace Labrys.Editor.FeatureEditor
@@ -11,6 +13,8 @@ namespace Labrys.Editor.FeatureEditor
 			MainWindow window = GetWindow<MainWindow> ();
 			window.titleContent = new GUIContent ("Labrys Feature Editor");
 		}
+
+		private SelectionTool selectTool = new SelectionTool();
 
 		private void OnEnable()
 		{
@@ -53,13 +57,20 @@ namespace Labrys.Editor.FeatureEditor
 				viewMenu.ShowAsContext();
 			}
 
+			selectTool.Draw();
+
 			if (GUI.changed)
 				Repaint ();
 		}
 
 		private void HandleEvent(Event e)
 		{
-			GUI.changed = EditorGrid.GetInstance().HandleEvent (e);
+			if (EditorGrid.GetInstance().HandleEvent(e))
+				GUI.changed = true;
+
+			//TODO remove debug test
+			if (selectTool.HandleEvent(e))
+				GUI.changed = true;
 
 			switch (e.type)
 			{

@@ -5,6 +5,8 @@ namespace Labrys.Editor.FeatureEditor
 {
 	public class Tile : GridObject
 	{
+		private static Color selectedColor = new Color(0.5f, 0.5f, 0.8f);
+
 		public event Action removed;
 		public event Action dragFinished;
 
@@ -15,6 +17,7 @@ namespace Labrys.Editor.FeatureEditor
 		private Vector2 baseSize;
 		private Vector2 dDrag;
 
+		[PropertyField(Name = "Variant")]
 		public string Variant { get; set; }
 
 		public Vector2Int Right => GridPosition + Vector2Int.right;
@@ -54,8 +57,10 @@ namespace Labrys.Editor.FeatureEditor
 			bounds.position = ScreenPosition;
 			bounds.center = ScreenPosition;
 			bounds.size = baseSize * Scale * 0.9f;
-			GUI.color = IsSelected ? Color.cyan : Color.white;
+			Color temp = GUI.color;
+			GUI.color = IsSelected ? selectedColor : Color.white;
 			GUI.Box (bounds, "");
+			GUI.color = temp;
 		}
 
 		public override bool HandleEvent(Event e)
