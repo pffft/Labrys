@@ -7,11 +7,11 @@ namespace Labrys.Editor.FeatureEditor
 	public class Connection : GridObject
 	{
 		private const float SIZE = 10f;
+		private static Color openColor = new Color(0f, 0.8f, 0f);
+		private static Color closedColor = new Color(0.9f, 0f, 0f);
 
 		public bool Open { get; private set; }
 		public bool External { get; private set; }
-
-		public event Action removed;
 
 		public Connection(Vector2Int position)
 		{
@@ -22,7 +22,7 @@ namespace Labrys.Editor.FeatureEditor
 
 		public override void Draw()
 		{
-			Handles.color = Open ? Color.green : Color.red;
+			Handles.color = Open ? openColor : closedColor;
 			Handles.BeginGUI();
 			Handles.DrawSolidDisc(new Vector3(ScreenPosition.x, ScreenPosition.y), Vector3.forward, Scale * SIZE);
 			Handles.EndGUI();
@@ -64,6 +64,8 @@ namespace Labrys.Editor.FeatureEditor
 
 			Vector2Int[] finalPositions = new Vector2Int[uniquePositions.Count];
 			uniquePositions.CopyTo(finalPositions);
+			foreach (Vector2Int v in finalPositions) //DEBUG
+				Debug.Log(v); //DEBUG
 			return finalPositions;
 		}
 	}

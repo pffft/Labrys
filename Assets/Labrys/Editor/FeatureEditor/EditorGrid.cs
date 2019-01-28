@@ -204,8 +204,8 @@ namespace Labrys.Editor.FeatureEditor
 				staleObjects.Enqueue(new GridUpdateOperation()
 				{
 					Action = (GridObject sub) => {
-						TryRemoveConnections(t);
 						tiles.Remove(sub.GridPosition);
+						TryRemoveConnections(t);
 					},
 					Subject = t
 				});
@@ -248,22 +248,21 @@ namespace Labrys.Editor.FeatureEditor
 			{
 				//space is valid, move tile
 				//TryAlignTile gets called in the tile update loop, where we can't make modifications to the contents of the dictionary.
-				//queue up an operation for after the loop is done to re-orient the tile  in the dictionary.
+				//queue up an operation for after the loop is done to re-orient the tile in the dictionary.
 				staleObjects.Enqueue (new GridUpdateOperation ()
 				{
 					Action = (GridObject sub) => {
 						Tile subTile = (Tile)sub;
-						TryRemoveConnections(subTile);
-
+						
 						//move tile
 						tiles.Remove(subTile.GridPosition);
+						TryRemoveConnections(subTile);
 						subTile.GridPosition = newGridPos;
 						tiles.Add (subTile.GridPosition, subTile);
 
 						//add new connections in new position
-						foreach (Vector2Int neighborPos in Tile.GetAllNeighborDirections())
+						foreach (Vector2Int connectionPos in subTile.GetAllAdjPosition())
 						{
-							Vector2Int connectionPos = neighborPos + subTile.GridPosition;
 							if (!connections.ContainsKey(connectionPos))
 							{
 								connections.Add(connectionPos, new Connection(connectionPos));
@@ -279,32 +278,28 @@ namespace Labrys.Editor.FeatureEditor
 
 		private void TryRemoveConnections(Tile t)
 		{
-			if (connections.ContainsKey(t.GridPosition))
+			//check all connections are still valid
+			foreach (Vector2Int connectionPos in t.GetAllAdjPosition())
 			{
-				//check all connections are still valid
-				foreach (Vector2Int neighborPos in Tile.GetAllNeighborDirections())
+				if (connections.TryGetValue(connectionPos, out GridObject go))
 				{
-					Vector2Int connectionPos = neighborPos + t.GridPosition;
-					if (connections.TryGetValue(connectionPos, out GridObject go))
+					if (typeof(Connection) == go.GetType())
 					{
-						if (typeof(Connection) == go.GetType())
+						Connection connection = (Connection)go;
+						bool hasNeighbor = false;
+						foreach (Vector2Int tilePos in connection.GetSubjectGridPositions())
 						{
-							Connection connection = (Connection)go;
-							bool hasNeighbor = false;
-							foreach (Vector2Int tilePos in connection.GetSubjectGridPositions())
+							if (tiles.ContainsKey(tilePos))
 							{
-								if (tiles.ContainsKey(tilePos))
-								{
-									hasNeighbor = true;
-									break;
-								}
+								hasNeighbor = true;
+								break;
 							}
+						}
 
-							//remove connections that have no tile neightbors
-							if (!hasNeighbor)
-							{
-								connections.Remove(connectionPos);
-							}
+						//remove connections that have no tile neightbors
+						if (!hasNeighbor)
+						{
+							connections.Remove(connectionPos);
 						}
 					}
 				}
