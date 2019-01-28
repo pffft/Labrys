@@ -76,6 +76,6 @@ namespace Labrys.Editor.FeatureEditor
 			return GridPosition.GetHashCode();
 		}
 
-		public delegate void GridObjectAction(GridObject t);
+		public delegate void Action(GridObject t);
 	}
 }
