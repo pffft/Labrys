@@ -13,20 +13,19 @@ namespace Labrys.Editor.FeatureEditor
 		}
 
 		private Vector2 drag;
-		private EditorGrid grid;
 
 		private void OnEnable()
 		{
-			EditorGrid grid = EditorGrid.GetInstance();
-			grid.viewport = position;
-			grid.Recenter();
+			EditorGrid.GetInstance().viewport = position;
+			EditorGrid.GetInstance().Recenter();
 		}
 
 		private void OnGUI()
 		{
+			EditorGrid.GetInstance().viewport = position;
 			HandleEvent (Event.current);
 
-			grid.Draw ();
+			EditorGrid.GetInstance().Draw ();
 
 			if (GUI.changed)
 				Repaint ();
@@ -34,7 +33,7 @@ namespace Labrys.Editor.FeatureEditor
 
 		private void HandleEvent(Event e)
 		{
-			GUI.changed = grid.HandleEvent (e);
+			GUI.changed = EditorGrid.GetInstance().HandleEvent (e);
 
 			switch (e.type)
 			{
@@ -66,9 +65,9 @@ namespace Labrys.Editor.FeatureEditor
 		private void HandleContextMenu(Vector2 mousePos)
 		{
 			GenericMenu menu = new GenericMenu ();
-			menu.AddItem(new GUIContent("Recenter view"), false, () => { grid.Recenter (); });
+			menu.AddItem(new GUIContent("Recenter view"), false, () => { EditorGrid.GetInstance().Recenter (); });
 			menu.AddSeparator ("");
-			menu.AddItem(new GUIContent("Add tile"), false, () => grid.CreateTile(mousePos));
+			menu.AddItem(new GUIContent("Add tile"), false, () => EditorGrid.GetInstance().CreateTile(mousePos));
 			menu.ShowAsContext ();
 		}
 	}

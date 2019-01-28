@@ -5,26 +5,26 @@ namespace Labrys.Editor.FeatureEditor
 {
 	public class Tile : GridObject
 	{
-		public event GridObjectAction removed;
-		public event GridObjectAction dragFinished;
+		public event Action removed;
+		public event Action dragFinished;
 
-		public bool isDragging;
-		public bool isSelected;
+		public bool IsDragging { get; set; }
+		public bool IsSelected { get; set; }
 
-		public Rect bounds;
+		private Rect bounds;
 		private Vector2 baseSize;
+		private Vector2 dDrag;
 
-		public Vector2Int position;
-		public string variant;
+		public string Variant { get; set; }
 
-		public Vector2Int Right => position + Vector2Int.right;
-		public Vector2Int UpRight => position + Vector2Int.up + Vector2Int.right;
-		public Vector2Int Up => position + Vector2Int.up;
-		public Vector2Int UpLeft => position + Vector2Int.up + Vector2Int.left;
-		public Vector2Int Left => position + Vector2Int.left;
-		public Vector2Int DownLeft => position + Vector2Int.down + Vector2Int.left;
-		public Vector2Int Down => position + Vector2Int.down;
-		public Vector2Int DownRight => position + Vector2Int.down + Vector2Int.right;
+		public Vector2Int Right => GridPosition + Vector2Int.right;
+		public Vector2Int UpRight => GridPosition + Vector2Int.up + Vector2Int.right;
+		public Vector2Int Up => GridPosition + Vector2Int.up;
+		public Vector2Int UpLeft => GridPosition + Vector2Int.up + Vector2Int.left;
+		public Vector2Int Left => GridPosition + Vector2Int.left;
+		public Vector2Int DownLeft => GridPosition + Vector2Int.down + Vector2Int.left;
+		public Vector2Int Down => GridPosition + Vector2Int.down;
+		public Vector2Int DownRight => GridPosition + Vector2Int.down + Vector2Int.right;
 
 		public static Vector2Int[] GetAllNeighborDirections()
 		{
@@ -46,23 +46,16 @@ namespace Labrys.Editor.FeatureEditor
 			bounds.center = position;
 			baseSize = bounds.size;
 
-			variant = "";
-		}
-
-		public void Shift(Vector2 dPos)
-		{
-			bounds.position += dPos;
-		}
-
-		public void Resize(float scale)
-		{
-			bounds.size = baseSize * scale;
+			Variant = "";
 		}
 
 		public override void Draw()
 		{
-			GUI.color = isSelected ? Color.cyan : Color.white;
-			GUI.Box (bounds, variant);
+			bounds.position = ScreenPosition;
+			bounds.center = ScreenPosition;
+			bounds.size = baseSize * Scale * 0.9f;
+			GUI.color = IsSelected ? Color.cyan : Color.white;
+			GUI.Box (bounds, "");
 		}
 
 		public override bool HandleEvent(Event e)
@@ -75,16 +68,16 @@ namespace Labrys.Editor.FeatureEditor
 				{
 					if (bounds.Contains (e.mousePosition))
 					{
-						isDragging = isSelected = true;
+						IsDragging = IsSelected = true;
 					}
 					else
 					{
-						isSelected = false;
+						IsSelected = false;
 					}
 					return true;
 				}
 				//open tile-specific context menu
-				else if (e.button == 1 && isSelected && bounds.Contains (e.mousePosition))
+				else if (e.button == 1 && IsSelected && bounds.Contains (e.mousePosition))
 				{
 					HandleContextMenu ();
 					e.Use ();
@@ -92,17 +85,20 @@ namespace Labrys.Editor.FeatureEditor
 				break;
 			case EventType.MouseUp:
 				//stop dragging
-				if (isDragging)
+				if (IsDragging)
 				{
-					isDragging = false;
+					IsDragging = false;
 					dragFinished?.Invoke(this);
+					RevertShift();
+					return true;
 				}
 				break;
 			case EventType.MouseDrag:
 				//perform drag
-				if (e.button == 0 && isDragging)
+				if (e.button == 0 && IsDragging)
 				{
-					Shift (e.delta);
+					ApplyShift (e.delta);
+					dDrag += e.delta;
 					e.Use ();
 					return true;
 				}
@@ -111,7 +107,7 @@ namespace Labrys.Editor.FeatureEditor
 				//delete selected tile with Delete or Backspace
 				if (e.keyCode == KeyCode.Delete || e.keyCode == KeyCode.Backspace)
 				{
-					if (isSelected)
+					if (IsSelected)
 					{
 						e.Use ();
 						removed?.Invoke (this);
@@ -120,6 +116,12 @@ namespace Labrys.Editor.FeatureEditor
 				break;
 			}
 			return false;
+		}
+
+		public void RevertDrag()
+		{
+			ApplyShift(-dDrag);
+			dDrag = Vector2.zero;
 		}
 
 		private void HandleContextMenu()
@@ -153,7 +155,7 @@ namespace Labrys.Editor.FeatureEditor
 			Vector2Int[] all = GetAllNeighborDirections();
 			for(int i = 0; i < 8; i++)
 			{
-				all[i] += position;
+				all[i] += GridPosition;
 			}
 			return all;
 		}

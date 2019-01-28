@@ -11,7 +11,7 @@ namespace Labrys.Editor.FeatureEditor
 		public bool Open { get; private set; }
 		public bool External { get; private set; }
 
-		public event GridObjectAction removed;
+		public event Action removed;
 
 		public Connection(Vector2Int position)
 		{
@@ -52,8 +52,10 @@ namespace Labrys.Editor.FeatureEditor
 		{
 			HashSet<Vector2Int> uniquePositions = new HashSet<Vector2Int>();
 
-			int lowerX = Mathf.FloorToInt(GridPosition.x), upperX = Mathf.FloorToInt(GridPosition.x + 0.5f);
-			int lowerY = Mathf.FloorToInt(GridPosition.y), upperY = Mathf.FloorToInt(GridPosition.y + 0.5f);
+			int lowerX = Mathf.FloorToInt((GridPosition.x / EditorGrid.GRID_DENSITY)) * (int)EditorGrid.GRID_DENSITY;
+			int upperX = Mathf.FloorToInt((GridPosition.x / EditorGrid.GRID_DENSITY) + 0.5f) * (int)EditorGrid.GRID_DENSITY;
+			int lowerY = Mathf.FloorToInt((GridPosition.y / EditorGrid.GRID_DENSITY)) * (int)EditorGrid.GRID_DENSITY;
+			int upperY = Mathf.FloorToInt((GridPosition.y / EditorGrid.GRID_DENSITY) + 0.5f) * (int)EditorGrid.GRID_DENSITY;
 
 			uniquePositions.Add(new Vector2Int(lowerX, lowerY));
 			uniquePositions.Add(new Vector2Int(lowerY, upperY));
