@@ -7,6 +7,7 @@ namespace Labrys.Editor.FeatureEditor.Tools
 	public class SelectionTool : Tool
 	{
 		private Rect selectionRect;
+		private bool isDragging;
 
 		public SelectionTool()
 		{
