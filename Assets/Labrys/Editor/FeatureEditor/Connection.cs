@@ -11,6 +11,7 @@ namespace Labrys.Editor.FeatureEditor
 		private static Color closedColor = new Color(0.9f, 0f, 0f);
 
 		public bool Open { get; private set; }
+		public bool Enabled { get; set; }
 		public bool External { get; private set; }
 
 		public Connection(Vector2Int position)
@@ -22,10 +23,13 @@ namespace Labrys.Editor.FeatureEditor
 
 		public override void Draw()
 		{
-			Handles.color = Open ? openColor : closedColor;
-			Handles.BeginGUI();
-			Handles.DrawSolidDisc(new Vector3(ScreenPosition.x, ScreenPosition.y), Vector3.forward, Scale * SIZE);
-			Handles.EndGUI();
+			if (Enabled)
+			{
+				Handles.color = Open ? openColor : closedColor;
+				Handles.BeginGUI();
+				Handles.DrawSolidDisc(new Vector3(ScreenPosition.x, ScreenPosition.y), Vector3.forward, Scale * SIZE);
+				Handles.EndGUI();
+			}
 		}
 
 		public override bool HandleEvent(Event e)
@@ -48,7 +52,28 @@ namespace Labrys.Editor.FeatureEditor
 			return false;
 		}
 
-		public IEnumerable<Vector2Int> GetSubjectGridPositions()
+		public int GetMaxSubjectTileCount()
+		{
+			int count = 0;
+
+			if (GridPosition.x % 2 != 0)
+			{
+				if (GridPosition.y % 2 != 0)
+					count = 4;
+				else
+					count = 2;
+			}
+			else if (GridPosition.y % 2 != 0)
+			{
+				count = 2;
+			}
+			else
+				count = -1;
+
+			return count;
+		}
+
+		public IEnumerable<Vector2Int> GetSubjectTileGridPositions()
 		{
 			HashSet<Vector2Int> uniquePositions = new HashSet<Vector2Int>();
 

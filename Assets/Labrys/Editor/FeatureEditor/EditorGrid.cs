@@ -19,9 +19,9 @@ namespace Labrys.Editor.FeatureEditor
 		private Vector2 offset;
 		private Vector2 drag;
 
-		private Dictionary<Vector2Int, GridObject> tiles;
-		private Dictionary<Vector2Int, GridObject> connections;
-		private Queue<GridUpdateOperation> staleObjects;
+		private Dictionary<Vector2Int, Tile> tiles;
+		private List<Tile> selectedTiles;
+		private Dictionary<Vector2Int, Connection> connections;
 
 		public static EditorGrid GetInstance()
 		{
@@ -38,9 +38,8 @@ namespace Labrys.Editor.FeatureEditor
 
 			offset = Vector2.zero;
 
-			tiles = new Dictionary<Vector2Int, GridObject>();
-			connections = new Dictionary<Vector2Int, GridObject>();
-			staleObjects = new Queue<GridUpdateOperation>();
+			tiles = new Dictionary<Vector2Int, Tile>();
+			connections = new Dictionary<Vector2Int, Connection>();
 		}
 
 		public void Draw()
@@ -99,12 +98,6 @@ namespace Labrys.Editor.FeatureEditor
 				foreach (GridObject c in connections.Values)
 					c.Draw();
 			}
-
-			while (staleObjects.Count > 0)
-			{
-				GridUpdateOperation operation = staleObjects.Dequeue ();
-				operation.Action.Invoke (operation.Subject);
-			}
 		}
 
 		public bool HandleEvent(Event e)
@@ -112,24 +105,6 @@ namespace Labrys.Editor.FeatureEditor
 			drag = Vector2.zero;
 
 			bool guiChanged = false;
-			if (tiles != null)
-			{
-				foreach (GridObject t in tiles.Values)
-				{
-					if (t.HandleEvent (e))
-						guiChanged = true;
-				}
-			}
-
-			if (connections != null)
-			{
-				foreach (GridObject c in connections.Values)
-				{
-					if (c.HandleEvent(e))
-						guiChanged = true;
-				}
-			}
-
 			switch (e.type)
 			{
 			case EventType.MouseDrag:
@@ -183,19 +158,47 @@ namespace Labrys.Editor.FeatureEditor
 			this.scale = scale;
 		}
 
-		public void CreateTile(Vector2 mousePos)
+		public void CreateTile(Vector2 screenPos)
 		{
-			Tile t = new Tile (mousePos, new Vector2 (lineSpacing, lineSpacing));
-			t.removed += RemoveGridObject;
-			t.dragFinished += AlignTile;
-			t.GridPosition = ScreenToGridPos (mousePos, evenOnly: true);
+			Tile t = new Tile (screenPos, new Vector2 (lineSpacing, lineSpacing));
+			t.GridPosition = ScreenToGridPos (screenPos, evenOnly: true);
 
-			//if align is successful, then tile will be added
-			if(TryAlignTile (t))
+			if (!tiles.ContainsKey(t.GridPosition))
 			{
-				
+				tiles.Add(t.GridPosition, t);
+				TryAddConnections(t);
 			}
-			
+		}
+
+		public Tile GetTile(Vector2 screenPos)
+		{
+			Vector2Int gridPos = ScreenToGridPos(screenPos, true);
+			if(tiles.TryGetValue(gridPos, out Tile t))
+			{
+				return t;
+			}
+			return null;
+		}
+
+		public bool MoveTile(Vector2 screenPos, Tile t)
+		{
+			Vector2Int newGridPos = ScreenToGridPos(screenPos, evenOnly: true);
+			if (!tiles.ContainsKey(newGridPos))
+			{
+				tiles.Remove(t.GridPosition);
+				TryRemoveConnections(t);
+
+				t.GridPosition = newGridPos;
+				tiles.Add(t.GridPosition, t);
+
+				TryAddConnections(t);
+				return true;
+			}
+			else
+			{
+				t.RevertDrag();
+				return false;
+			}
 		}
 
 		public void RemoveGridObject(GridObject go)
@@ -203,80 +206,35 @@ namespace Labrys.Editor.FeatureEditor
 			if (typeof(Tile) == go.GetType())
 			{
 				Tile t = (Tile)go;
-				t.removed -= RemoveGridObject;
-				t.dragFinished -= AlignTile;
-				staleObjects.Enqueue(new GridUpdateOperation()
-				{
-					Action = (GridObject sub) => {
-						tiles.Remove(sub.GridPosition);
-						TryRemoveConnections(t);
-					},
-					Subject = t
-				});
+				tiles.Remove(go.GridPosition);
+				TryRemoveConnections(t);
 			}
 			else
 			{
-				staleObjects.Enqueue(new GridUpdateOperation()
-				{
-					Action = (GridObject sub) => {
-						connections.Remove(sub.GridPosition);
-					},
-					Subject = go
-				});
+				connections.Remove(go.GridPosition);
 			}
 			GUI.changed = true;
 		}
 
-		private void AlignTile(GridObject t)
+		private void TryAddConnections(Tile t)
 		{
-			if(typeof(Tile) == t.GetType())
-				TryAlignTile ((Tile)t);
-		}
-
-		/// <summary>
-		/// Attempt to place a tile in a grid coordinate based on its current visual position.
-		/// </summary>
-		/// <param name="t"></param>
-		/// <returns></returns>
-		private bool TryAlignTile(Tile t)
-		{
-			GUI.changed = true;
-			Vector2Int newGridPos = ScreenToGridPos (t.ScreenPosition, evenOnly: true);
-			if (tiles.ContainsKey (newGridPos))
+			foreach (Vector2Int connectionPos in t.GetAllAdjPosition())
 			{
-				//space is occupied, return to last valid position
-				t.RevertDrag();
-				return false;
-			}
-			else
-			{
-				//space is valid, move tile
-				//TryAlignTile gets called in the tile update loop, where we can't make modifications to the contents of the dictionary.
-				//queue up an operation for after the loop is done to re-orient the tile in the dictionary.
-				staleObjects.Enqueue (new GridUpdateOperation ()
+				if (!connections.ContainsKey(connectionPos))
 				{
-					Action = (GridObject sub) => {
-						Tile subTile = (Tile)sub;
-						
-						//move tile
-						tiles.Remove(subTile.GridPosition);
-						TryRemoveConnections(subTile);
-						subTile.GridPosition = newGridPos;
-						tiles.Add (subTile.GridPosition, subTile);
-
-						//add new connections in new position
-						foreach (Vector2Int connectionPos in subTile.GetAllAdjPosition())
+					Connection c = new Connection(connectionPos);
+					connections.Add(connectionPos, c);
+					int neighborCount = 0;
+					foreach (Vector2Int tilePos in c.GetSubjectTileGridPositions())
+					{
+						if (tiles.ContainsKey(tilePos))
 						{
-							if (!connections.ContainsKey(connectionPos))
-							{
-								connections.Add(connectionPos, new Connection(connectionPos));
-							}
+							neighborCount++;
 						}
-					},
-					Subject = t
-				});
-
-				return true;
+					}
+					//TODO also do this to existing connections that neighbor new/moved tiles
+					c.Enabled = neighborCount == c.GetMaxSubjectTileCount();
+				}
 			}
 		}
 
@@ -285,27 +243,23 @@ namespace Labrys.Editor.FeatureEditor
 			//check all connections are still valid
 			foreach (Vector2Int connectionPos in t.GetAllAdjPosition())
 			{
-				if (connections.TryGetValue(connectionPos, out GridObject go))
+				if (connections.TryGetValue(connectionPos, out Connection connection))
 				{
-					if (typeof(Connection) == go.GetType())
+					int neighborCount = 0;
+					foreach (Vector2Int tilePos in connection.GetSubjectTileGridPositions())
 					{
-						Connection connection = (Connection)go;
-						bool hasNeighbor = false;
-						foreach (Vector2Int tilePos in connection.GetSubjectGridPositions())
+						if (tiles.ContainsKey(tilePos))
 						{
-							if (tiles.ContainsKey(tilePos))
-							{
-								hasNeighbor = true;
-								break;
-							}
-						}
-
-						//remove connections that have no tile neightbors
-						if (!hasNeighbor)
-						{
-							connections.Remove(connectionPos);
+							neighborCount++;
 						}
 					}
+
+					//remove connections that have no tile neightbors
+					if (neighborCount == 0)
+					{
+						connections.Remove(connectionPos);
+					}
+					connection.Enabled = neighborCount == connection.GetMaxSubjectTileCount();
 				}
 			}
 		}
@@ -356,15 +310,6 @@ namespace Labrys.Editor.FeatureEditor
 		public Vector2 GridToScreenPos(Vector2Int gridPos)
 		{
 			return GridToScreenSpace(gridPos);
-		}
-
-		/// <summary>
-		/// An action to make on a tile after the tile update loop has completed
-		/// </summary>
-		private struct GridUpdateOperation
-		{
-			public GridObject.Action Action { get; set; }
-			public GridObject Subject { get; set; }
 		}
 	}
 }
