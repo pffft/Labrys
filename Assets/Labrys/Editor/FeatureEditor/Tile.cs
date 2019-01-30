@@ -81,12 +81,6 @@ namespace Labrys.Editor.FeatureEditor
 					}
 					return true;
 				}
-				//open tile-specific context menu
-				else if (e.button == 1 && IsSelected && bounds.Contains (e.mousePosition))
-				{
-					HandleContextMenu ();
-					e.Use ();
-				}
 				break;
 			case EventType.MouseUp:
 				//stop dragging
@@ -127,16 +121,6 @@ namespace Labrys.Editor.FeatureEditor
 		{
 			ApplyShift(-dDrag);
 			dDrag = Vector2.zero;
-		}
-
-		private void HandleContextMenu()
-		{
-			GenericMenu menu = new GenericMenu ();
-			menu.AddItem (new GUIContent ("Remove tile"), false, () => {
-				if (removed != null)
-					removed.Invoke (this);
-			});
-			menu.ShowAsContext ();
 		}
 
 		public Vector2Int GetAdjPosition(LinkDirection direction)

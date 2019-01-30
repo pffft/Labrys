@@ -25,8 +25,6 @@ namespace Labrys.Editor.FeatureEditor
 		private void OnGUI()
 		{
 			EditorGrid.GetInstance().viewport = position;
-			HandleEvent (Event.current);
-
 			EditorGrid.GetInstance().Draw ();
 
 			EditorGUI.DrawRect(new Rect(0f, 0f, position.width, 22f), GUI.color);
@@ -58,6 +56,8 @@ namespace Labrys.Editor.FeatureEditor
 			}
 
 			selectTool.Draw();
+
+			HandleEvent(Event.current);
 
 			if (GUI.changed)
 				Repaint ();

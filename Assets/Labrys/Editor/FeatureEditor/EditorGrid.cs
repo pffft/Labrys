@@ -175,8 +175,12 @@ namespace Labrys.Editor.FeatureEditor
 
 		public void Resize(float scale)
 		{
+			float dScale = scale / this.scale;
+			offset -= viewport.size / 2f;
+			offset *= dScale;
+			offset += viewport.size / 2f;
+
 			this.scale = scale;
-			GUI.changed = true;
 		}
 
 		public void CreateTile(Vector2 mousePos)
