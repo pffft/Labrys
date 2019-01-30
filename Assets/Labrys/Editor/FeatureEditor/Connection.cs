@@ -58,14 +58,12 @@ namespace Labrys.Editor.FeatureEditor
 			int upperY = Mathf.FloorToInt((GridPosition.y / EditorGrid.GRID_DENSITY) + 0.5f) * (int)EditorGrid.GRID_DENSITY;
 
 			uniquePositions.Add(new Vector2Int(lowerX, lowerY));
-			uniquePositions.Add(new Vector2Int(lowerY, upperY));
+			uniquePositions.Add(new Vector2Int(lowerX, upperY));
 			uniquePositions.Add(new Vector2Int(upperX, lowerY));
 			uniquePositions.Add(new Vector2Int(upperX, upperY));
 
 			Vector2Int[] finalPositions = new Vector2Int[uniquePositions.Count];
 			uniquePositions.CopyTo(finalPositions);
-			foreach (Vector2Int v in finalPositions) //DEBUG
-				Debug.Log(v); //DEBUG
 			return finalPositions;
 		}
 	}
