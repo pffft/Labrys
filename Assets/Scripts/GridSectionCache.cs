@@ -29,10 +29,10 @@ namespace Labrys
             this.size = size;
         }
 
-        public Section Get(Vector2Int position)
+        public Section? Get(Vector2Int position)
         {
 
-            return hashCache.TryGetValue(position, out Section section) ? section : null;
+            return hashCache.TryGetValue(position, out Section section) ? section : (Section?)null;
 
             /*
             for (int i = 0; i < Mathf.Min(size, count); i++)

@@ -27,6 +27,8 @@ namespace Labrys
             serializedObject.Update();
             TileSet tileSet = (TileSet)target;
 
+            EditorGUILayout.LabelField($"Serialization status: {tileSet.status}");
+
             // Needed to plan out the whole UI
             string[] allVariants = tileSet.GetVariants();
 
@@ -72,8 +74,16 @@ namespace Labrys
                 {
 
                     // Grab all Tile objects
-                    List<Tile> tiles = tileSet.Get(new TileSet.VariantKey(TileType.ANY, allVariants[i]));
-                    Debug.Log($"For variant {allVariants[i]}, found {tiles.Count} tiles.");
+                    List<Tile> tiles = null;
+                    bool found = tileSet.Get(new TileSet.VariantKey(TileType.ANY, allVariants[i]), ref tiles);
+                    if (!found)
+                    {
+                        Debug.LogError($"Failed to find any tiles for variant {allVariants[i]}");
+                    }
+                    else
+                    {
+                        Debug.Log($"For variant {allVariants[i]}, found {tiles.Count} tiles.");
+                    }
 
                     variantVisibility[i] = EditorGUILayout.Foldout(variantVisibility[i], $"Variant \"{allVariants[i]}\"");
                     if (variantVisibility[i])
@@ -95,8 +105,11 @@ namespace Labrys
 
                             if (foundTile != null)
                             {
-                                SerializedObject serObj = new SerializedObject(foundTile);
-                                EditorGUILayout.PropertyField(serObj.FindProperty("prefab"), new GUIContent(TileType.TypeList[j].Name));
+                                //SerializedObject serObj = new SerializedObject(foundTile);
+                                //EditorGUILayout.PropertyField(serObj.FindProperty("gameObject"), new GUIContent(TileType.TypeList[j].Name));
+
+                                GameObject gameObject = EditorGUILayout.ObjectField(new GUIContent(TileType.TypeList[j].Name), foundTile, typeof(Tile), false) as GameObject;
+
                             }
                             else
                             {
@@ -129,8 +142,7 @@ namespace Labrys
                         Tile dummyTile = new Tile()
                         {
                             type = TileType.ANY,
-                            variant = newName,
-                            prefab = null
+                            variant = newName
                         };
 
                         tileSet.Add(dummyTile);

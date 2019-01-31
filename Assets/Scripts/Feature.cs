@@ -24,13 +24,7 @@ namespace Labrys
 
         public void Add(Vector2Int position, Connection allowedConnections = Connection.All, string variant = "default", Connection externalConnections = Connection.All)
         {
-            Add(position, new Section
-            {
-                internalConnections = allowedConnections,
-                externalConnections = externalConnections,
-                variant = variant,
-            }
-            );
+            Add(position, new Section(allowedConnections, externalConnections, variant));
         }
 
         private void Add(Vector2Int position, Section element)
@@ -46,7 +40,7 @@ namespace Labrys
             if (elements.ContainsKey(position))
             {
                 elements[position] = element;
-                Debug.LogWarning($"Overwrote Section at position {position} with new one, with variant \"{element.variant}\".");
+                Debug.LogWarning($"Overwrote Section at position {position} with new one, with variant \"{element.GetVariant()}\".");
             }
             else
             {

@@ -32,20 +32,22 @@ namespace Labrys
         [Tooltip("Scale factor for grid size. By default same as Tile Scale")]
         private float distanceScale = 1f;
 
-        private static Generator _instance;
-        public Generator Instance
+        // The loader implementation.
+        //private IGameObjectLoader gameObjectLoader = new LazyLoader(LazyLoader.Priority.Distance, 100);
+        private IGameObjectLoader gameObjectLoader = new BasicLoader();
+
+        public static Generator Instance;
+
+        private void Awake()
         {
-            get
+            if (Instance == null)
             {
-                if (_instance == null)
-                {
-                    _instance = this;
-                }
-                else if (_instance != this)
-                {
-                    Debug.LogError("Multiple generators exist in one scene!");
-                }
-                return _instance;
+                Instance = this;
+            }
+            else
+            {
+                Debug.LogError("Multiple generators exist in one scene!");
+                UnityEditor.EditorGUIUtility.PingObject(gameObject);
             }
         }
 
@@ -56,6 +58,13 @@ namespace Labrys
                 Debug.LogWarning("TileSet instance not set on Generator. Use the inspector to do so.");
                 tileSet = TileSet.LoadDefaultTileSet();
             }
+
+            //Debug.Log($"Generator started. TileSet status: {tileSet.status}");
+
+            // This apparently makes TileSet validiate itself. Close enough.
+            //tileSet.Initialize();
+            tileSet.OnBeforeSerialize();
+            tileSet.OnAfterDeserialize();
 
             //sectionGrid = new Dictionary<Vector2Int, Section>();
             grid = new Grid();
@@ -104,7 +113,7 @@ namespace Labrys
             //{
             //    Vector2Int position = Vector2Int.RoundToInt(75 * Random.insideUnitCircle);
 
-            //    grid[position] = new Section();
+            //    grid[position] = Section.Default();
             //}
 
             // Roughly 100k sections
@@ -112,7 +121,8 @@ namespace Labrys
             {
                 for (int j = 0; j < 317; j++) 
                 {
-                    grid[new Vector2Int(i, j)] = new Section();
+                    //grid[new Vector2Int(i, j)] = new Section(allowedConnections: Connection.North | Connection.South);
+                    grid[new Vector2Int(i, j)] = Section.Default();
                 }
             }
             Profiler.EndSample();
@@ -131,13 +141,14 @@ namespace Labrys
             //Debug.Log("Placing tiles!");
             TileSet.VariantKey searchKey = new TileSet.VariantKey();
             searchKey.variant = "default";
+            List<Tile> searchResult = new List<Tile>();
 
             foreach (Vector2Int position in grid.GetFullCells())
             {
                 Profiler.BeginSample("Calculating tile information");
 
                 Profiler.BeginSample("Extracting section");
-                Section section = grid[position];
+                Section section = (Section)grid[position]; // Search by keys; guaranteed not null
                 Profiler.EndSample();
 
                 Profiler.BeginSample("Getting physical adjacencies");
@@ -154,18 +165,17 @@ namespace Labrys
                 searchKey.tileType = type;
                 //searchKey.variant = "default";
 
-                List<Tile> tileList = tileSet.Get(searchKey);
-                Profiler.EndSample();
-                //Debug.Log("")
-
-                if (tileList.Count == 0)
+                //List<Tile> tileList = tileSet.Get(searchKey);
+                if (!tileSet.Get(searchKey, ref searchResult))
                 {
                     Debug.LogError("Couldn't resolve Section into a Tile.");
                 }
+                Profiler.EndSample();
+                //Debug.Log("")
 
                 // Arbitrarily choose first one; TODO add smarter logic to choose which
                 // variant to take (and add parameters for it)
-                Tile chosenTile = tileList[0];
+                Tile chosenTile = searchResult[0];
 
                 Profiler.EndSample();
                 Profiler.BeginSample("Placing physical GO");
@@ -175,13 +185,16 @@ namespace Labrys
 
                 // Create a new instance of the Tile's prefab and place it in the world
                 // Scale it based on the tileScale value.
-                GameObject instantiatedObject = GameObject.Instantiate(chosenTile.prefab, worldPosition, worldRotation);
-                instantiatedObject.transform.localScale = tileScale * Vector3.one;
+                //GameObject instantiatedObject = GameObject.Instantiate(chosenTile.gameObject, worldPosition, worldRotation);
+                //instantiatedObject.transform.localScale = tileScale * Vector3.one;
+                gameObjectLoader.Load(chosenTile.gameObject, worldPosition, worldRotation, tileScale * Vector3.one);
 
                 Profiler.EndSample();
 
                 //Debug.Log("Placed object at: " + worldPosition);
             }
+
+            gameObjectLoader.LastGameObjectSent();
         }
     }
 }

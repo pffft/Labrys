@@ -190,6 +190,27 @@ namespace Labrys
         {
             return !a.Name.Equals(b.Name);
         }
+
+        public override bool Equals(object obj)
+        {
+            if (obj == null)
+            {
+                return false;
+            }
+
+            if (obj.GetType() != GetType())
+            {
+                return false;
+            }
+
+            TileType other = (TileType)obj;
+            return this == other;
+        }
+
+        public override int GetHashCode()
+        {
+            return base.GetHashCode();
+        }
     }
 }
 

@@ -8,6 +8,9 @@ namespace Labrys
     public class Grid
     {
         private List<Feature> features;
+
+        // TODO: Dictionary gets slow for large sets (>10k). Implement a faster hashmap
+        // implementation, or just have buckets of a max size? Something to improve speed.
         private Dictionary<Vector2Int, Section> globalGrid;
 
         public Grid()
@@ -16,7 +19,7 @@ namespace Labrys
             globalGrid = new Dictionary<Vector2Int, Section>();
         }
 
-        public Section this[Vector2Int pos]
+        public Section? this[Vector2Int pos]
         {
             get
             {
@@ -29,6 +32,7 @@ namespace Labrys
 
             set
             {
+                // Prevent nulls from being added in
                 if (value == null)
                 {
                     return;
@@ -37,11 +41,11 @@ namespace Labrys
                 if (globalGrid.ContainsKey(pos))
                 {
                     //Debug.LogWarning($"Overriding existing Section at {pos}.");
-                    globalGrid[pos] = value;
+                    globalGrid[pos] = (Section)value;
                 }
                 else
                 {
-                    globalGrid.Add(pos, value);
+                    globalGrid.Add(pos, (Section)value);
                 }
             }
         }
@@ -312,14 +316,38 @@ namespace Labrys
             Connection.North,
             Connection.Northwest // 11
         };
-        private static Section[] adjacentSections = new Section[8];
-        //private Dictionary<Vector2Int, Section> sectionCache = new Dictionary<Vector2Int, Section>(10);
-        //private static LinkedList<System.Tuple<Vector2Int, Section>> sectionCache = new LinkedList<System.Tuple<Vector2Int, Section>>();
-        private GridSectionCache sectionCache = new GridSectionCache(500);
 
+        // Static reusable storage for the 8 adjacent sections.
+        private static Section?[] adjacentSections = new Section?[8];
+
+        // The cache works best when you have many connections, and iterate over sections in a way that
+        // lets you see all neighbors of an element before the element is removed from the cache.
+        // 
+        // E.g., if you have a dense grid of size NxN, and you iterate over it in row major order, 
+        // then a cache size of 3N + 3 will ensure an element gets accessed the maximum of 8 times in the cache.
+        // 
+        // Dense dungeons w/ many connections benefit best from block iteration, with block size MxM where
+        // M^2 is less than the slowdown speed of Dictionaries, which is ~10k. 
+        //
+        // Sparser duneons benefit from traversing down dungeon branches. BFS and DFS traversal will individually
+        // be bad for the cache: BFS will spread so wide the old elements in the cache don't get seen, while DFS
+        // will add many elements to the cache going down a path that only get used once. Some combination is ideal,
+        // based on the specific branching structure of the dungeon.
+        private GridSectionCache sectionCache = new GridSectionCache(1000);
+
+        // Static reusable storage for the current position + the grid offset.
         private static Vector2Int positionPlusOffset;
-        private static Section[] TwoByTwoArea = new Section[4];
 
+        // Static reusable storage for a 2x2 subsection of a 3x3 adjacency grid.
+        // Used to determine if a diagonal connection is allowed. 
+        private static Section?[] TwoByTwoArea = new Section?[4];
+
+        /// <summary>
+        /// Gets the physical adjacencies at a given position.
+        /// Specifically optimized for speed vs. "GetPhysicalAdjacencies".
+        /// </summary>
+        /// <returns>The physical adjacencies2.</returns>
+        /// <param name="position">Position.</param>
         public Connection GetPhysicalAdjacencies2(Vector2Int position)
         {
             Connection physicalAdjacent2 = Connection.None;
@@ -376,7 +404,7 @@ namespace Labrys
                     }
                     */
 
-                    Section foundSection = null;
+                    Section? foundSection = null;
 
                     Profiler.BeginSample("Cache lookup");
                     foundSection = sectionCache.Get(positionPlusOffset);
@@ -390,9 +418,10 @@ namespace Labrys
                     else
                     {
                         Profiler.BeginSample("Cache miss - TryGetValue");
-                        if (globalGrid.TryGetValue(positionPlusOffset, out foundSection))
+                        if (globalGrid.TryGetValue(positionPlusOffset, out Section globalFoundSection))
                         {
-                            sectionCache.Add(positionPlusOffset, foundSection);
+                            sectionCache.Add(positionPlusOffset, globalFoundSection);
+                            foundSection = globalFoundSection;
                         }
                         Profiler.EndSample();
                     }
@@ -404,17 +433,12 @@ namespace Labrys
                         continue;
                     }
 
-                    adjacentSections[i] = foundSection;
-
-                    //continue;
-
-                    // If found, then do additional checks.
-                    //found: {
-                    //}
+                    // Guaranteed to be found and not null
+                    adjacentSections[i] = (Section)foundSection;
 
                     Profiler.BeginSample("Section found postprocessing");
                     // i + 4 is the opposite direction connection; e.g., N => S.
-                    if (adjacentSections[i].CanConnect(connectionsOrdered[i + 4]))
+                    if (((Section)adjacentSections[i]).CanConnect(connectionsOrdered[i + 4]))
                     {
                         physicalAdjacent2 |= connectionsOrdered[i];
                     }
@@ -513,7 +537,7 @@ namespace Labrys
             Connection.East
         };
 
-        private bool Check2x2(Section[] sections) 
+        private bool Check2x2(Section?[] sections) 
         {
             // Check none are null
             for (int i = 0; i < 4; i++)
@@ -529,15 +553,15 @@ namespace Labrys
 
             for (int i = 0; i < 4; i++)
             {
-                if (!sections[i].CanConnect(connectionsToCheck[(3 * i) + 0]))
+                if (!((Section)sections[i]).CanConnect(connectionsToCheck[(3 * i) + 0]))
                 {
                     return false;
                 }
-                if (!sections[i].CanConnect(connectionsToCheck[(3 * i) + 1]))
+                if (!((Section)sections[i]).CanConnect(connectionsToCheck[(3 * i) + 1]))
                 {
                     return false;
                 }
-                if (!sections[i].CanConnect(connectionsToCheck[(3 * i) + 2]))
+                if (!((Section)sections[i]).CanConnect(connectionsToCheck[(3 * i) + 2]))
                 {
                     return false;
                 }

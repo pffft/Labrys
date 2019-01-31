@@ -26,7 +26,7 @@ namespace Labrys
             GUI.enabled = true;
 
             EditorGUILayout.TextField("Variant", tile.variant);
-            EditorGUILayout.PropertyField(serializedTile.FindProperty("prefab"));
+            EditorGUILayout.PropertyField(serializedTile.FindProperty("gameObject"));
         }
     }
 }

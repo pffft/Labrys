@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using UnityEngine;
 
 [Flags]
-public enum Connection
+public enum Connection : byte
 {
     East = 1,
     Northeast = 2,

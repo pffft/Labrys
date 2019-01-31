@@ -7,9 +7,8 @@ namespace Labrys
     /// <summary>
     /// A physical, individual 1x1 grid element to be placed in the world.
     /// </summary>
-    [CreateAssetMenu(fileName = "NewTile", menuName = "Labrys/RoomTile")]
-    [System.Serializable]
-    public class Tile : ScriptableObject
+    //[System.Serializable]
+    public class Tile : MonoBehaviour
     {
         /// <summary>
         /// The type of the connection.
@@ -26,15 +25,9 @@ namespace Labrys
         [SerializeField]
         public string variant;
 
-        /// <summary>
-        /// The actual physical model that represents this Tile.
-        /// </summary>
-        [SerializeField]
-        public GameObject prefab;
-
         public override string ToString()
         {
-            return $"Tile type {type.Name}, variant {variant}, prefab {prefab.name}";
+            return $"Tile type {type.Name}, variant {variant}, prefab {gameObject.name}";
         }
     }
 }

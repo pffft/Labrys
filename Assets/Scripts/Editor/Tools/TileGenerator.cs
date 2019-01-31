@@ -278,7 +278,7 @@ namespace Labrys
                     TileType type = NameToTileType(tileModelNameLower);
 
                     // Create the actual Tile object
-                    Tile newTile = ScriptableObject.CreateInstance(typeof(Tile)) as Tile;
+                    //Tile newTile = ScriptableObject.CreateInstance(typeof(Tile)) as Tile;
 
                     //string prefabLocation = $"Assets{sep}Models{sep}{variantName}{sep}{tileModelName}{tileFiles[j].Extension}";
                     string prefabLocation = "Assets" + sep + relativeInputPath + sep + variantName + sep + tileModelName + tileFiles[j].Extension;
@@ -289,20 +289,33 @@ namespace Labrys
                         Debug.LogWarning($"Failed to load in prefab at location: \"{prefabLocation}\".");
                         continue;
                     }
-                    newTile.prefab = prefab;
-                    newTile.type = type;
-                    newTile.variant = variantName.ToLowerInvariant();
+
+                    // Clone the GameObject so we can modify it without using the AssetPostProcessor
+                    GameObject clone = GameObject.Instantiate(prefab);
+
+                    // Get the Tile component of the prefab (or add it if it doesn't exist)
+                    Tile tileComponent = clone.GetComponent<Tile>();
+                    if (tileComponent == null)
+                    {
+                        tileComponent = clone.AddComponent<Tile>();
+                    }
+
+                    tileComponent.type = type;
+                    tileComponent.variant = variantName.ToLowerInvariant();
 
                     // Serialize the asset into the Tile folder
-                    //if (!AssetDatabase.Contains(newTile))
-                    //{
-                    //AssetDatabase.CreateAsset(newTile, "Assets/Tiles" + sep + variantName + sep + tileModelName + ".asset");
-                    AssetDatabase.CreateAsset(newTile, "Assets" + sep + relativeTilePath + sep + variantName + sep + tileModelName + ".asset");
-                    //AssetDatabase.AddObjectToAsset(newTile, "Tiles" + sep + tileModelName + ".asset");
-                    //}
+                    //AssetDatabase.CreateAsset(newTile, "Assets" + sep + relativeTilePath + sep + variantName + sep + tileModelName + ".asset");
+                    //AssetDatabase.CreateAsset(tileComponent, "Assets" + sep + relativeTilePath + sep + variantName + sep + tileModelName + ".prefab");
+                    string outputLocation = "Assets" + sep + relativeTilePath + sep + variantName + sep + tileModelName + ".prefab";
+                    PrefabUtility.SaveAsPrefabAsset(tileComponent.gameObject, outputLocation, out bool success);
 
-                    // Add it to the database.
-                    //TileSet.Add(new TileSet.VariantKey(type, variantName), newTile);
+                    if (!success)
+                    {
+                        Debug.LogWarning($"Failed to save prefab at location: \"{outputLocation}\".");
+                    }
+
+                    // Destroy the GameObject so it's not in the scene anymore
+                    GameObject.DestroyImmediate(clone);
                 }
             }
         }
@@ -394,6 +407,11 @@ namespace Labrys
 
             // Create the TileSet into a new asset.
             //AssetDatabase.CreateAsset(newTileSet, "Assets/TileSets/default.asset");
+
+            //string outputPath = Path.Combine(Application.streamingAssetsPath, relativeTileSetPath, tileSetName + ".asset");
+            //BuildPipeline.BuildAssetBundle(newTileSet, null, outputPath, BuildAssetBundleOptions.None, EditorUserBuildSettings.activeBuildTarget);
+
+            // TODO use asset bundles?
             AssetDatabase.CreateAsset(newTileSet, "Assets" + sep + relativeTileSetPath + sep + tileSetName + ".asset");
         }
 
