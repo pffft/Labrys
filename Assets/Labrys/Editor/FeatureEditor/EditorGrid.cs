@@ -39,6 +39,7 @@ namespace Labrys.Editor.FeatureEditor
 			offset = Vector2.zero;
 
 			tiles = new Dictionary<Vector2Int, Tile>();
+			selectedTiles = new List<Tile>();
 			connections = new Dictionary<Vector2Int, Connection>();
 		}
 
@@ -170,14 +171,53 @@ namespace Labrys.Editor.FeatureEditor
 			}
 		}
 
-		public Tile GetTile(Vector2 screenPos)
+		public GridObject GetGridObject(Vector2 screenPos)
 		{
-			Vector2Int gridPos = ScreenToGridPos(screenPos, true);
+			Vector2Int gridPos = ScreenToGridPos(screenPos);
 			if(tiles.TryGetValue(gridPos, out Tile t))
 			{
 				return t;
 			}
+			else if (connections.TryGetValue(gridPos, out Connection c))
+			{
+				return c;
+			}
 			return null;
+		}
+
+		
+		public void SelectTile(Vector2 screenPos)
+		{
+			Vector2Int gridPos = ScreenToGridPos(screenPos, true);
+			SelectTile(gridPos);
+		}
+		public void SelectTile(Vector2Int gridPos)
+		{
+			if (tiles.TryGetValue(gridPos, out Tile t))
+			{
+				if (!t.IsSelected)
+				{
+					t.IsSelected = true;
+					selectedTiles.Add(t);
+				}
+			}
+		}
+
+		public void DeselectTile(Vector2 screenPos)
+		{
+			Vector2Int gridPos = ScreenToGridPos(screenPos, true);
+			DeselectTile(gridPos);
+		}
+		public void DeselectTile(Vector2Int gridPos)
+		{
+			if (tiles.TryGetValue(gridPos, out Tile t))
+			{
+				if (t.IsSelected)
+				{
+					t.IsSelected = false;
+					selectedTiles.Remove(t);
+				}
+			}
 		}
 
 		public bool MoveTile(Vector2 screenPos, Tile t)
@@ -196,7 +236,7 @@ namespace Labrys.Editor.FeatureEditor
 			}
 			else
 			{
-				t.RevertDrag();
+				t.RevertShift();
 				return false;
 			}
 		}
@@ -220,20 +260,17 @@ namespace Labrys.Editor.FeatureEditor
 		{
 			foreach (Vector2Int connectionPos in t.GetAllAdjPosition())
 			{
-				if (!connections.ContainsKey(connectionPos))
+				if (!connections.TryGetValue(connectionPos, out Connection existingConnection))
 				{
-					Connection c = new Connection(connectionPos);
-					connections.Add(connectionPos, c);
-					int neighborCount = 0;
-					foreach (Vector2Int tilePos in c.GetSubjectTileGridPositions())
+					Connection newConnection = new Connection(connectionPos);
+					if (CheckConnectionValidity(newConnection))
 					{
-						if (tiles.ContainsKey(tilePos))
-						{
-							neighborCount++;
-						}
+						connections.Add(connectionPos, newConnection);
 					}
-					//TODO also do this to existing connections that neighbor new/moved tiles
-					c.Enabled = neighborCount == c.GetMaxSubjectTileCount();
+				}
+				else if(!CheckConnectionValidity(existingConnection))
+				{
+					connections.Remove(connectionPos);
 				}
 			}
 		}
@@ -243,25 +280,35 @@ namespace Labrys.Editor.FeatureEditor
 			//check all connections are still valid
 			foreach (Vector2Int connectionPos in t.GetAllAdjPosition())
 			{
-				if (connections.TryGetValue(connectionPos, out Connection connection))
+				if (connections.TryGetValue(connectionPos, out Connection c))
 				{
-					int neighborCount = 0;
-					foreach (Vector2Int tilePos in connection.GetSubjectTileGridPositions())
-					{
-						if (tiles.ContainsKey(tilePos))
-						{
-							neighborCount++;
-						}
-					}
-
 					//remove connections that have no tile neightbors
-					if (neighborCount == 0)
+					if (!CheckConnectionValidity(c))
 					{
 						connections.Remove(connectionPos);
 					}
-					connection.Enabled = neighborCount == connection.GetMaxSubjectTileCount();
 				}
 			}
+		}
+
+		private bool CheckConnectionValidity(Connection c)
+		{
+			int nCount = GetConnectionNeighborCount(c);
+			c.GetMinMaxSubjectTileCount(out int nMin, out int nMax);
+			return nMax == 2 ? nCount <= nMax : nCount == nMax;
+		}
+
+		private int GetConnectionNeighborCount(Connection c)
+		{
+			int neighborCount = 0;
+			foreach (Vector2Int tilePos in c.GetSubjectTileGridPositions())
+			{
+				if (tiles.ContainsKey(tilePos))
+				{
+					neighborCount++;
+				}
+			}
+			return neighborCount;
 		}
 
 		/// <summary>

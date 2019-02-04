@@ -49,6 +49,7 @@ namespace Labrys.Editor.FeatureEditor
 		/// </summary>
 		/// <param name="e"></param>
 		/// <returns></returns>
+		[System.Obsolete]
 		public abstract bool HandleEvent(Event e);
 
 		/// <summary>
