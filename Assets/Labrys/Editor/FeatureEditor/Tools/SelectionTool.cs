@@ -48,7 +48,9 @@ namespace Labrys.Editor.FeatureEditor.Tools
 				if(e.button == 0)
 				{
 					//select all tiles within selection box
-
+					Command c = Use();
+					c.Do();
+					History.RecordCommand(c);
 					selectionRect = new Rect();
 					return true;
 				}
@@ -61,7 +63,7 @@ namespace Labrys.Editor.FeatureEditor.Tools
 		{
 			return new SelectionCommand()
 			{
-				SelectedTiles = new List<Tile>()
+				SelectionBox = new Rect(selectionRect)
 			};
 		}
 	}

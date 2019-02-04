@@ -1,5 +1,4 @@
-﻿using Labrys.Editor.FeatureEditor.Commands;
-using Labrys.Editor.FeatureEditor.Tools;
+﻿using Labrys.Editor.FeatureEditor.Tools;
 using UnityEditor;
 using UnityEngine;
 
@@ -15,6 +14,13 @@ namespace Labrys.Editor.FeatureEditor
 		}
 
 		private SelectionTool selectTool = new SelectionTool();
+
+		private Tool activeTool;
+
+		public MainWindow()
+		{
+			activeTool = selectTool;
+		}
 
 		private void OnEnable()
 		{
@@ -42,6 +48,7 @@ namespace Labrys.Editor.FeatureEditor
 			if (GUI.Button(new Rect(70f, 0f, 64f, 20f), "Edit"))
 			{
 				GenericMenu editMenu = new GenericMenu();
+				editMenu.AddItem(new GUIContent("Undo "))
 				editMenu.AddDisabledItem(new GUIContent("TODO"));
 
 				editMenu.ShowAsContext();
@@ -55,7 +62,7 @@ namespace Labrys.Editor.FeatureEditor
 				viewMenu.ShowAsContext();
 			}
 
-			selectTool.Draw();
+			activeTool.Draw();
 
 			HandleEvent(Event.current);
 
@@ -68,29 +75,21 @@ namespace Labrys.Editor.FeatureEditor
 			if (EditorGrid.GetInstance().HandleEvent(e))
 				GUI.changed = true;
 
-			//TODO remove debug test
-			if (selectTool.HandleEvent(e))
+			if (activeTool.HandleEvent(e))
 				GUI.changed = true;
 
 			switch (e.type)
 			{
-			//open context menu
-			case EventType.MouseDown:
-				if (e.button == 1)
-				{
-					HandleContextMenu (e.mousePosition);
-				}
-				break;
 			case EventType.KeyDown:
 				if (e.control)
 				{
 					if (e.keyCode == KeyCode.Z)
 					{
-						//TODO undo
+						History.Undo();
 					}
 					else if (e.keyCode == KeyCode.Y)
 					{
-						//TODO redo
+						History.Redo();
 					}
 				}
 				break;
@@ -117,15 +116,6 @@ namespace Labrys.Editor.FeatureEditor
 		private void SaveAsFeature()
 		{
 			Debug.Log("TODO");
-		}
-
-		private void HandleContextMenu(Vector2 mousePos)
-		{
-			GenericMenu menu = new GenericMenu ();
-			menu.AddItem(new GUIContent("Recenter view"), false, () => { EditorGrid.GetInstance().Recenter (); });
-			menu.AddSeparator ("");
-			menu.AddItem(new GUIContent("Add tile"), false, () => EditorGrid.GetInstance().CreateTile(mousePos));
-			menu.ShowAsContext ();
 		}
 	}
 }

@@ -15,7 +15,6 @@ namespace Labrys.Editor.FeatureEditor
 
 		private Rect bounds;
 		private Vector2 baseSize;
-		private Vector2 dDrag;
 
 		[PropertyField(Name = "Variant")]
 		public string Variant { get; set; }
@@ -63,6 +62,7 @@ namespace Labrys.Editor.FeatureEditor
 			GUI.color = temp;
 		}
 
+		[System.Obsolete("Events are only driven in EditorGrid now")]
 		public override bool HandleEvent(Event e)
 		{
 			switch (e.type)
@@ -97,7 +97,7 @@ namespace Labrys.Editor.FeatureEditor
 				if (e.button == 0 && IsDragging)
 				{
 					ApplyShift (e.delta);
-					dDrag += e.delta;
+					//dDrag += e.delta;
 					e.Use ();
 					return true;
 				}
@@ -115,12 +115,6 @@ namespace Labrys.Editor.FeatureEditor
 				break;
 			}
 			return false;
-		}
-
-		public void RevertDrag()
-		{
-			ApplyShift(-dDrag);
-			dDrag = Vector2.zero;
 		}
 
 		public Vector2Int GetAdjPosition(LinkDirection direction)
