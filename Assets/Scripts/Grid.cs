@@ -19,6 +19,7 @@ namespace Labrys
             globalGrid = new Dictionary<Vector2Int, Section>();
         }
 
+        // Vector2Int access
         public Section? this[Vector2Int pos]
         {
             get
@@ -48,6 +49,13 @@ namespace Labrys
                     globalGrid.Add(pos, (Section)value);
                 }
             }
+        }
+
+        // Separate access
+        public Section? this[int x, int y]
+        {
+            get => this[new Vector2Int(x, y)];
+            set => this[new Vector2Int(x, y)] = value;
         }
 
         public Vector2Int[] GetFullCells()
@@ -333,7 +341,7 @@ namespace Labrys
         // be bad for the cache: BFS will spread so wide the old elements in the cache don't get seen, while DFS
         // will add many elements to the cache going down a path that only get used once. Some combination is ideal,
         // based on the specific branching structure of the dungeon.
-        private GridSectionCache sectionCache = new GridSectionCache(1000);
+        private GridSectionCache sectionCache = new GridSectionCache(5000);
 
         // Static reusable storage for the current position + the grid offset.
         private static Vector2Int positionPlusOffset;
@@ -341,6 +349,23 @@ namespace Labrys
         // Static reusable storage for a 2x2 subsection of a 3x3 adjacency grid.
         // Used to determine if a diagonal connection is allowed. 
         private static Section?[] TwoByTwoArea = new Section?[4];
+
+        // The connections checked by Check2x2, in order.
+        private static readonly Connection[] connectionsToCheck =
+        {
+            Connection.East,
+            Connection.Northeast,
+            Connection.North,
+            Connection.North,
+            Connection.Northwest,
+            Connection.West,
+            Connection.West,
+            Connection.Southwest,
+            Connection.South,
+            Connection.South,
+            Connection.Southeast,
+            Connection.East
+        };
 
         /// <summary>
         /// Gets the physical adjacencies at a given position.
@@ -406,15 +431,18 @@ namespace Labrys
 
                     Section? foundSection = null;
 
+                    // Try to find the section in the cache first.
                     Profiler.BeginSample("Cache lookup");
                     foundSection = sectionCache.Get(positionPlusOffset);
                     Profiler.EndSample();
 
+                    // Found it - report. Can remove this when profiling is over.
                     if (foundSection != null)
                     {
                         Profiler.BeginSample("Cache hit");
                         Profiler.EndSample();
                     }
+                    // Didn't find it- try looking it up in the big dictionary.
                     else
                     {
                         Profiler.BeginSample("Cache miss - TryGetValue");
@@ -426,6 +454,7 @@ namespace Labrys
                         Profiler.EndSample();
                     }
 
+                    // Still not found in the big dictionary. Doesn't exist, so skip it.
                     if (foundSection == null)
                     {
                         Profiler.BeginSample("Section not found skip");
@@ -437,6 +466,7 @@ namespace Labrys
                     adjacentSections[i] = (Section)foundSection;
 
                     Profiler.BeginSample("Section found postprocessing");
+                    // Ensure the section can connect back.
                     // i + 4 is the opposite direction connection; e.g., N => S.
                     if (((Section)adjacentSections[i]).CanConnect(connectionsOrdered[i + 4]))
                     {
@@ -516,58 +546,48 @@ namespace Labrys
                     physicalAdjacent2 &= ~Connection.Southeast;
                 }
             }
+
+            /// <summary>
+            /// Checks a 2x2 group of sections to make sure they're valid.
+            /// </summary>
+            /// <returns>The check2x2.</returns>
+            /// <param name="sections">Sections.</param>
+            bool Check2x2(Section?[] sections)
+            {
+                // Check none are null
+                for (int i = 0; i < 4; i++)
+                {
+                    if (sections[i] == null)
+                    {
+                        return false;
+                    }
+                }
+
+                // We do 3 checks per each element of the 2x2 in the following pattern:
+                // 0, 1, 2, 2, 3, 4, 4, 5, 6, 6, 7, 0
+
+                for (int i = 0; i < 4; i++)
+                {
+                    if (!((Section)sections[i]).CanConnect(connectionsToCheck[(3 * i) + 0]))
+                    {
+                        return false;
+                    }
+                    if (!((Section)sections[i]).CanConnect(connectionsToCheck[(3 * i) + 1]))
+                    {
+                        return false;
+                    }
+                    if (!((Section)sections[i]).CanConnect(connectionsToCheck[(3 * i) + 2]))
+                    {
+                        return false;
+                    }
+                }
+
+                return true;
+            }
+
             Profiler.EndSample();
 
             return physicalAdjacent2;
-        }
-        
-        private static readonly Connection[] connectionsToCheck =
-        {
-            Connection.East,
-            Connection.Northeast,
-            Connection.North,
-            Connection.North,
-            Connection.Northwest,
-            Connection.West,
-            Connection.West,
-            Connection.Southwest,
-            Connection.South,
-            Connection.South,
-            Connection.Southeast,
-            Connection.East
-        };
-
-        private bool Check2x2(Section?[] sections) 
-        {
-            // Check none are null
-            for (int i = 0; i < 4; i++)
-            {
-                if (sections[i] == null)
-                {
-                    return false;
-                }
-            }
-
-            // We do 3 checks per each element of the 2x2 in the following pattern:
-            // 0, 1, 2, 2, 3, 4, 4, 5, 6, 6, 7, 0
-
-            for (int i = 0; i < 4; i++)
-            {
-                if (!((Section)sections[i]).CanConnect(connectionsToCheck[(3 * i) + 0]))
-                {
-                    return false;
-                }
-                if (!((Section)sections[i]).CanConnect(connectionsToCheck[(3 * i) + 1]))
-                {
-                    return false;
-                }
-                if (!((Section)sections[i]).CanConnect(connectionsToCheck[(3 * i) + 2]))
-                {
-                    return false;
-                }
-            }
-
-            return true;
         }
     }
 }

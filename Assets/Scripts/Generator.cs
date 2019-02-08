@@ -109,22 +109,40 @@ namespace Labrys
             //grid[new Vector2Int(0, -1)] = new Section();
 
             Profiler.BeginSample("Adding tiles to grid");
-            //for (int i = 0; i < 25000; i++)
+            //for (int i = 0; i < 5000; i++)
             //{
-            //    Vector2Int position = Vector2Int.RoundToInt(75 * Random.insideUnitCircle);
+            //    Vector2Int position = Vector2Int.RoundToInt(25 * Random.insideUnitCircle);
 
             //    grid[position] = Section.Default();
             //}
 
             // Roughly 100k sections
-            for (int i = 0; i < 317; i++)
-            {
-                for (int j = 0; j < 317; j++) 
-                {
-                    //grid[new Vector2Int(i, j)] = new Section(allowedConnections: Connection.North | Connection.South);
-                    grid[new Vector2Int(i, j)] = Section.Default();
-                }
-            }
+
+            //int sideLength = (int)Mathf.Sqrt(500000) + 1;
+
+            //for (int i = 0; i < sideLength; i++)
+            //{
+            //    for (int j = 0; j < sideLength; j++) 
+            //    {
+            //        //grid[new Vector2Int(i, j)] = new Section(allowedConnections: Connection.North | Connection.South);
+            //        grid[new Vector2Int(i, j)] = Section.Default();
+            //    }
+            //}
+
+            // Feature testing
+            grid[new Vector2Int(0, 0)] = new Section();
+
+            // Basic 2x2
+            Feature feature = new Feature();
+            feature.Add(new Vector2Int(0, 0));
+            feature.Add(new Vector2Int(1, 0));
+            feature.Add(new Vector2Int(0, 1));
+            feature.Add(new Vector2Int(1, 1));
+
+            Debug.Log($"Can place feature at center?: " + feature.CanPlace(grid, Vector2Int.zero, Vector2Int.zero, 0));
+            Debug.Log($"Can place feature to right?: " + feature.CanPlace(grid, Vector2Int.right, Vector2Int.zero, 0));
+
+
             Profiler.EndSample();
 
             Profiler.BeginSample("Resolving tiles");
