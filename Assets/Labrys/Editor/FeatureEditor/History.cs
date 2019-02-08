@@ -8,11 +8,8 @@ namespace Labrys.Editor.FeatureEditor
 		private static RingBuffer<Command> commands;
 		private static int allowedRedos;
 
+		public static Command NextUndo => commands.Peek();
 
-		public static Command NextUndo
-		{
-
-		}
 		static History()
 		{
 			commands = new RingBuffer<Command>(capacity: 100);
@@ -23,8 +20,6 @@ namespace Labrys.Editor.FeatureEditor
 		{
 			commands.Add(command);
 			allowedRedos = 0;
-
-			Debug.Log("[HIST] Recorded " + command.GetType().Name); //TODO remove debug
 		}
 
 		public static void Undo()
@@ -37,9 +32,14 @@ namespace Labrys.Editor.FeatureEditor
 			}
 		}
 
+		public static bool CanRedo()
+		{
+			return allowedRedos > 0;
+		}
+
 		public static void Redo()
 		{
-			if (allowedRedos > 0)
+			if (CanRedo())
 			{
 				commands.Seek(1);
 				commands.Peek()?.Do();
