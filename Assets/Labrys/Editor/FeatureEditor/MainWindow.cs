@@ -48,7 +48,9 @@ namespace Labrys.Editor.FeatureEditor
 			if (GUI.Button(new Rect(70f, 0f, 64f, 20f), "Edit"))
 			{
 				GenericMenu editMenu = new GenericMenu();
-				editMenu.AddItem(new GUIContent("Undo "))
+				bool hasUndo = History.NextUndo != null;
+				editMenu.AddItem(new GUIContent("Undo " + (hasUndo ? History.NextUndo.Description : "")), hasUndo, ()=> { History.Undo(); });
+				editMenu.AddItem(new GUIContent("Redo ???"), History.CanRedo(), () => { History.Redo(); });
 				editMenu.AddDisabledItem(new GUIContent("TODO"));
 
 				editMenu.ShowAsContext();
@@ -86,10 +88,12 @@ namespace Labrys.Editor.FeatureEditor
 					if (e.keyCode == KeyCode.Z)
 					{
 						History.Undo();
+						e.Use();
 					}
 					else if (e.keyCode == KeyCode.Y)
 					{
 						History.Redo();
+						e.Use();
 					}
 				}
 				break;
