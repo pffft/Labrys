@@ -251,5 +251,21 @@ namespace Tests
             Assert.False(feature.CanPlace(grid, new Vector2Int(0, -2), new Vector2Int(5, 3), 3));
             Assert.True(feature.CanPlace(grid, new Vector2Int(0, -3), new Vector2Int(5, 3), 3));
         }
+
+        [Test]
+        public void CanConnectBasic()
+        {
+            Labrys.Grid grid = new Labrys.Grid();
+            grid[0, 0] = new Section();
+
+            // 3x1 feature
+            Feature feature = new Feature();
+            feature.Add(0, 0);
+            feature.Add(1, 0);
+            feature.Add(2, 0);
+
+            //Assert.True(feature.CanConnect(grid, Vector2Int.zero));
+            List<Feature.PlacementConfiguration> configurations = feature.CanConnect(grid, Vector2Int.zero);
+        }
     }
 }

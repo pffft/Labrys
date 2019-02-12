@@ -67,67 +67,6 @@ namespace Labrys
             }
         }
 
-        /// <summary>
-        /// Returns this Feature, but rotated (rotation * 90) degrees clockwise.
-        /// Used for generator trying to place Features into the world.
-        /// 
-        /// TODO: can make this implicit by just changing the input coordinates
-        /// </summary>
-        /// <returns>The rotate.</returns>
-        /// <param name="rotation">Rotation.</param>
-        //public Feature Rotate(int rotation)
-        //{
-
-        //    Feature rotatedFeature = new Feature();
-        //    // Transform every position (x, y) -> (y, -x) to rotate clockwise 90 degrees.
-        //    foreach (KeyValuePair<Vector2Int, Section> pair in elements)
-        //    {
-        //        Vector2Int pos = pair.Key;
-        //        rotatedFeature.Add(new Vector2Int(pos.y, -pos.x), pair.Value);
-        //    }
-
-        //    return rotatedFeature;
-        //}
-
-        /// <summary>
-        /// Rotates this Feature clockwise 90 degrees "rotation" amount of times.
-        /// For example, to flip this Feature upside-down, call Rotate(2).
-        /// </summary>
-        /// <param name="rotation">Rotation.</param>
-        private void Rotate(int rot) 
-        {
-            this.rotation = (int)Mathf.Repeat(this.rotation + rot, 4);
-        }
-
-        private void Offset(Vector2Int position) 
-        {
-            Offset(position.x, position.y);
-        }
-
-        private void Offset(int x, int y) 
-        {
-            this.offsetX += x;
-            this.offsetY += y;
-
-            this.minX += x;
-            this.minY += y;
-
-            this.maxX += x;
-            this.maxY += y;
-        }
-
-        private Vector2Int RotatedMin()
-        {
-            switch (this.rotation)
-            {
-                case 0: return Rotate(new Vector2Int(minX, minY), rotation);
-                case 1: return Rotate(new Vector2Int(maxX, minY), rotation);
-                case 2: return Rotate(new Vector2Int(maxX, maxY), rotation);
-                case 3: return Rotate(new Vector2Int(minX, maxY), rotation);
-                default: return Rotate(new Vector2Int(minX, minY), rotation);
-            }
-        }
-
         // Rotates the given position 90 degrees clockwise "rot" number of times.
         public static Vector2Int Rotate(Vector2Int pos, int rot)
         {
@@ -141,7 +80,9 @@ namespace Labrys
             }
         }
 
-        // Takes a corner of the bounding box, and rotates it around.
+        // Takes a corner of the bounding box, and rotates it around. This will
+        // return the new bottom-left corner for a given rotation.
+        // 
         // I.e., rot = 0 gives bottom-left corner. Rot = 1 gives bottom-right,
         // but rotated 90 degrees clockwise so it's the bottom-left corner.
         public Vector2Int RotatedMin(int rot)
@@ -156,97 +97,160 @@ namespace Labrys
             }
         }
 
-        public List<Vector2Int> GetTransformedSections(Vector2Int offset, int rotation) 
+        /// <summary>
+        /// Returns a list of valid configurations at the provided grid position.
+        /// 
+        /// A configuration is uniquely defined by the grid position, the local position (which
+        /// represents the specific Section we place at the adjacent grid position), and the
+        /// rotation used. Additional information is provided to aid in selecting an interesting
+        /// configuration in generation (such as the direction we connected in).
+        /// 
+        /// A configuration is considered valid if every Section within this Feature can be
+        /// placed onto the Grid without overlapping any existing Grid Sections.
+        /// 
+        /// 
+        /// 
+        /// TODO find some way to optimize this, if it's possible to do so. Maybe a cache of recently checked
+        /// positions, placed in the CanConnect method? This would amortize O(n^2) checks into O(n)? unique
+        /// lookups, but O(n^2) comparisons still. 
+        /// 
+        /// Another idea: statically maintain a list of "internal" Sections within each Feature, and ignore those
+        /// as seed positions within the CheckPlacement method. The thinking being internal points would never have
+        /// any external ability to connect. Theoretically still O(n^2) (case study: space-filling curves have n^2
+        /// surface area and take up n^2 space), but in practice, most Features are likely to have a linear exposed
+        /// area.
+        /// 
+        /// Another idea: Change the iteration order of the CanPlace method to check nearby Sections first, to
+        /// increase the likelihood of breaking out early when checking for overlaps. Or check Grid sections near
+        /// the bounding box? Some heuristics might be faster than others. 
+        /// 
+        /// Another idea: Do a bounding box check first, if there's a way to do a cheap check in the global grid.
+        /// 
+        /// </summary>
+        /// <returns>A List containing all valid configurations found.</returns>
+        /// <param name="placedSections">The grid, containing the positions of Sections already placed.</param>
+        /// <param name="gridPosition">The position in the grid we want to place the Feature at.</param>
+        public List<PlacementConfiguration> CanConnect(Grid placedSections, Vector2Int gridPosition) 
         {
-            List<Vector2Int> toReturn = new List<Vector2Int>();
-
-            foreach (Vector2Int section in elements.Keys)
+            Section? maybeGridSection = placedSections[gridPosition];
+            if (maybeGridSection == null)
             {
-                toReturn.Add(Rotate(section + offset, rotation));
+                // TODO brute force all possibilities here- rotation + position
+                //return false;
+                return null;
             }
+            Section gridSection = maybeGridSection.Value;
+
+            // Build up all possible valid configurations
+            List<PlacementConfiguration> toReturn = new List<PlacementConfiguration>();
+
+            CheckPlacements(gridPosition + Vector2Int.up);
+            CheckPlacements(gridPosition + Vector2Int.right);
+            CheckPlacements(gridPosition + Vector2Int.down);
+            CheckPlacements(gridPosition + Vector2Int.left);
 
             return toReturn;
+
+            // Checks all possible configurations of placing this Feature down at
+            // a given grid position. Add them to the returning list
+            void CheckPlacements(Vector2Int pos)
+            {
+                foreach (KeyValuePair<Vector2Int, Section> element in elements)
+                {
+                    // Check which of the 4 rotations we should check
+                    // Then check CanPlace using the rotation, and localPosition = element.key
+                    // If any are true, return true immediately.
+
+                    // For now brute force all configurations
+                    for (int rot = 0; rot < 4; rot++)
+                    {
+                        PlacementConfiguration configuration = new PlacementConfiguration
+                        {
+                            gridPosition = pos,
+                            localPosition = element.Key,
+                            rotation = rot
+                        };
+
+                        // If it's a valid configuration, add it
+                        if (CanPlace(placedSections, configuration))
+                        {
+                            toReturn.Add(configuration);
+                        }
+                    }
+                }
+            }
         }
 
-        public bool CanConnect(Grid placedSections, Vector2Int position, Connection connection) 
+        public bool CanPlace(Grid placedSections, PlacementConfiguration configuration)
         {
-            return false;
+            return CanPlace(placedSections, configuration.gridPosition, configuration.localPosition, configuration.rotation);
         }
 
         /// <summary>
         /// Can we place this Feature at the provided position?
+        /// 
         /// </summary>
-        /// <returns><c>true</c>, if place was caned, <c>false</c> otherwise.</returns>
+        /// <returns><c>true</c>, if the Feature could be placed, <c>false</c> otherwise.</returns>
         /// <param name="placedSections">The grid, containing all the Sections we wish to avoid.</param>
         /// <param name="gridPosition">The grid position we want to place the Feature at.</param>
         /// <param name="localPosition">The location of the Section we want to place at "gridPosition".</param>
         /// <param name="rot">Rotation.</param>
-        public bool CanPlace(Grid placedSections, Vector2Int gridPosition, Vector2Int localPosition, int rot)
+        public bool CanPlace(Grid placedSections, Vector2Int gridPosition, Vector2Int localPosition, int rotation)
         {
-            //Offset(localPosition);
-            //Offset(new Vector2Int(-localPosition.x, -localPosition.y));
-            Rotate(rot);
-
             foreach (Vector2Int sectionPosition in elements.Keys)
             {
-                Vector2Int transformedOffset = Rotate(localPosition, rotation);
+                // Shift this Section's position over by the offset, "localPosition". 
+                // This places "localPosition" at (0, 0). 
+                // Then rotate the point by the provided rotation.
+                //
+                // Because "localPosition" is provided in the same coordinates as "sectionPosition",
+                // the resulting position is already normalized. 
+                Vector2Int rotatedPoint = Rotate(sectionPosition - localPosition, rotation);
 
-                Vector2Int rotatedPoint = Rotate(sectionPosition, rotation);
-
-                //Vector2Int transformedPoint = rotatedPoint;
-                //Vector2Int rotatedMin = new Vector2Int(minX, minY);
-                Vector2Int rotatedMin = RotatedMin();
-
-                //Vector2Int normalized = rotatedPoint - rotatedMin - transformedOffset;
-                Vector2Int normalized = rotatedPoint - transformedOffset;
-
-                if (placedSections[gridPosition + normalized] != null)
+                if (placedSections[gridPosition + rotatedPoint] != null)
                 {
-                    // Undo transforms
-                    //Offset(localPosition);
-                    //Offset(new Vector2Int(-localPosition.x, -localPosition.y));
-                    Rotate(-rot);
                     return false;
                 }
             }
 
-            // Undo transforms
-            //Offset(new Vector2Int(-localPosition.x, -localPosition.y));
-            //Offset(localPosition);
-            Rotate(-rot);
-
             return true;
+        }
 
-            //foreach (Vector2Int sectionPosition in elements.Keys) 
-            //{
-            //    /*
-            //     * Grid position is where we want to place the Feature at.
-            //     * Local position is the offset from the (0, 0) point of the Feature.
-            //     * Section position is the section in the Feature we try to connect with.
-            //     */
-            //    //Vector2Int absolutePosition = gridPosition + sectionPosition - localPosition;
+        /// <summary>
+        /// Returns a copy of this Feature's Sections, but placed in a given Configuration.
+        /// 
+        /// This will translate and rotate the positions of each Section in the same way that
+        /// CanPlace uses to check the validity of a Configuration.
+        /// 
+        /// TODO use this method in CanPlace, and just check against the Grid. 
+        /// TODO Also find a way to optimize this so we don't duplicate every entry and transform every time-
+        /// maybe a duplicate dictionary used for temporary transforms? 
+        /// </summary>
+        /// <returns>The configuration.</returns>
+        /// <param name="configuration">Configuration.</param>
+        public Dictionary<Vector2Int, Section> GetConfiguration(PlacementConfiguration configuration) 
+        {
+            Dictionary<Vector2Int, Section> toReturn = new Dictionary<Vector2Int, Section>();
+            foreach (KeyValuePair<Vector2Int, Section> keyValuePair in elements) 
+            {
+                toReturn.Add(
+                    configuration.gridPosition + Rotate(keyValuePair.Key - configuration.localPosition, configuration.rotation),
+                    keyValuePair.Value
+                );
+            }
+            return toReturn;
+        }
 
-            //    // TODO this is a bit buggy. Check if local position is being applied properly under rotation.
 
-            //    // Rotate the position in our dictionary
-            //    Vector2Int rotatedPos = Rotate(sectionPosition - localPosition, rotation);
-            //    Vector2Int rotatedMin = RotatedMin(rotation);
+        public struct PlacementConfiguration
+        {
+            // These 3 variables are needed to uniquely identify this configuration
 
-            //    // Normalize the position so (0, 0) is the minimum positioned element
-            //    Vector2Int normalized = rotatedPos - rotatedMin;
+            public Vector2Int gridPosition;
+            public Vector2Int localPosition;
+            public int rotation;
 
-            //    //Vector2Int rotatedLocalPos = Rotate(localPosition, rotation);
-            //    //Vector2Int normalizedWithOffset = normalized - rotatedLocalPos;
-
-            //    Vector2Int absolutePosition = gridPosition + normalized;
-
-            //    if (placedSections[absolutePosition] != null) 
-            //    {
-            //        return false;
-            //    }
-            //}
-
-            return true;
+            // Any other variables are useful, but not necessary.
         }
     }
 }

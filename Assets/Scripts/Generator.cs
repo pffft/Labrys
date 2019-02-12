@@ -130,7 +130,10 @@ namespace Labrys
             //}
 
             // Feature testing
-            grid[new Vector2Int(0, 0)] = new Section();
+            grid[new Vector2Int(0, 0)] = Section.Default();
+            grid[new Vector2Int(1, 0)] = Section.Default();
+            grid[new Vector2Int(0, 1)] = Section.Default();
+            grid[new Vector2Int(1, 1)] = Section.Default();
 
             // Basic 2x2
             Feature feature = new Feature();
@@ -143,9 +146,21 @@ namespace Labrys
             feature.Add(0, 0);
             feature.Add(1, 0);
             feature.Add(2, 0);
+            feature.Add(3, 0);
+            feature.Add(3, 1);
+
+            List<Feature.PlacementConfiguration> configs = new List<Feature.PlacementConfiguration>();
+
+            configs.AddRange(feature.CanConnect(grid, Vector2Int.zero));
+            configs.AddRange(feature.CanConnect(grid, new Vector2Int(1, 0)));
+            configs.AddRange(feature.CanConnect(grid, new Vector2Int(0, 1)));
+            configs.AddRange(feature.CanConnect(grid, new Vector2Int(1, 1)));
+
+            StartCoroutine(CoolPlaceTiles(feature, configs));
+
 
             //Assert.False(feature.CanPlace(grid, new Vector2Int(0, 0), new Vector2Int(1, 0), 1));
-            feature.GetTransformedSections(new Vector2Int(1, 0), 1).ForEach(pos => grid[pos] = new Section());
+            //feature.GetTransformedSections(new Vector2Int(1, 0), 1).ForEach(pos => grid[pos] = new Section());
 
             //Debug.Log($"Can place feature at center?: " + feature.CanPlace(grid, Vector2Int.zero, Vector2Int.zero, 0));
             //Debug.Log($"Can place feature to right?: " + feature.CanPlace(grid, Vector2Int.right, Vector2Int.zero, 0));
@@ -156,6 +171,42 @@ namespace Labrys
             Profiler.BeginSample("Resolving tiles");
             PlaceTiles();
             Profiler.EndSample();
+        }
+
+        private IEnumerator CoolPlaceTiles(Feature feature, List<Feature.PlacementConfiguration> configs)
+        {
+            yield return new WaitForSeconds(0.5f);
+
+            int count = 0;
+            foreach (Feature.PlacementConfiguration configuration in configs)
+            {
+                Debug.Log($"Trying configuration {count++}.");
+                // Clear all gameobjects (inefficiently, but just for the demo)
+                Tile[] tiles = GameObject.FindObjectsOfType<Tile>();
+                for (int i = 0; i < tiles.Length; i++) 
+                {
+                    GameObject.DestroyImmediate(tiles[i].gameObject);
+                }
+
+                // Make a new empty grid
+                grid = new Grid();
+                grid[new Vector2Int(0, 0)] = Section.Default();
+                grid[new Vector2Int(1, 0)] = Section.Default();
+                grid[new Vector2Int(0, 1)] = Section.Default();
+                grid[new Vector2Int(1, 1)] = Section.Default();
+
+                // Place the configuration
+                foreach (KeyValuePair<Vector2Int, Section> keyValuePair in feature.GetConfiguration(configuration))
+                {
+                    grid[keyValuePair.Key] = keyValuePair.Value;
+                }
+
+                // Resolve to physical
+                PlaceTiles();
+
+                // Wait
+                yield return new WaitForSeconds(Mathf.Max(0.1f, (10 - count) / 10f));
+            }
         }
 
 
