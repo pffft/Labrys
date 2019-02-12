@@ -20,12 +20,18 @@ namespace Labrys
     {
         private Dictionary<Vector2Int, Section> elements;
 
-        private int minX, minY, maxX, maxY;
+        public int minX, minY, maxX, maxY;
         private int offsetX, offsetY;
         private int rotation;
 
         public Feature() {
             this.elements = new Dictionary<Vector2Int, Section>();
+
+            // Set good defaults, so every addition will change these values
+            this.minX = int.MaxValue;
+            this.minY = int.MaxValue;
+            this.maxX = int.MinValue;
+            this.maxY = int.MinValue;
         }
 
         // Seperate x,y add
@@ -88,21 +94,78 @@ namespace Labrys
         /// For example, to flip this Feature upside-down, call Rotate(2).
         /// </summary>
         /// <param name="rotation">Rotation.</param>
-        public void Rotate(int rotation) 
+        private void Rotate(int rot) 
         {
-            this.rotation = (this.rotation + rotation) % 4;
+            this.rotation = (int)Mathf.Repeat(this.rotation + rot, 4);
         }
 
-        public void Offset(Vector2Int position) 
+        private void Offset(Vector2Int position) 
         {
-            this.offsetX += position.x;
-            this.offsetY += position.y;
+            Offset(position.x, position.y);
         }
 
-        public void Offset(int x, int y) 
+        private void Offset(int x, int y) 
         {
             this.offsetX += x;
             this.offsetY += y;
+
+            this.minX += x;
+            this.minY += y;
+
+            this.maxX += x;
+            this.maxY += y;
+        }
+
+        private Vector2Int RotatedMin()
+        {
+            switch (this.rotation)
+            {
+                case 0: return Rotate(new Vector2Int(minX, minY), rotation);
+                case 1: return Rotate(new Vector2Int(maxX, minY), rotation);
+                case 2: return Rotate(new Vector2Int(maxX, maxY), rotation);
+                case 3: return Rotate(new Vector2Int(minX, maxY), rotation);
+                default: return Rotate(new Vector2Int(minX, minY), rotation);
+            }
+        }
+
+        // Rotates the given position 90 degrees clockwise "rot" number of times.
+        public static Vector2Int Rotate(Vector2Int pos, int rot)
+        {
+            switch ((int)Mathf.Repeat(rot, 4))
+            {
+                case 0: return pos;
+                case 1: return new Vector2Int(pos.y, -pos.x);
+                case 2: return new Vector2Int(-pos.x, -pos.y);
+                case 3: return new Vector2Int(-pos.y, pos.x);
+                default: return pos;
+            }
+        }
+
+        // Takes a corner of the bounding box, and rotates it around.
+        // I.e., rot = 0 gives bottom-left corner. Rot = 1 gives bottom-right,
+        // but rotated 90 degrees clockwise so it's the bottom-left corner.
+        public Vector2Int RotatedMin(int rot)
+        {
+            switch ((int)Mathf.Repeat(rot, 4))
+            {
+                case 0: return Rotate(new Vector2Int(minX, minY), rot);
+                case 1: return Rotate(new Vector2Int(maxX, minY), rot);
+                case 2: return Rotate(new Vector2Int(maxX, maxY), rot);
+                case 3: return Rotate(new Vector2Int(minX, maxY), rot);
+                default: return Rotate(new Vector2Int(minX, minY), rot);
+            }
+        }
+
+        public List<Vector2Int> GetTransformedSections(Vector2Int offset, int rotation) 
+        {
+            List<Vector2Int> toReturn = new List<Vector2Int>();
+
+            foreach (Vector2Int section in elements.Keys)
+            {
+                toReturn.Add(Rotate(section + offset, rotation));
+            }
+
+            return toReturn;
         }
 
         public bool CanConnect(Grid placedSections, Vector2Int position, Connection connection) 
@@ -117,66 +180,71 @@ namespace Labrys
         /// <param name="placedSections">The grid, containing all the Sections we wish to avoid.</param>
         /// <param name="gridPosition">The grid position we want to place the Feature at.</param>
         /// <param name="localPosition">The location of the Section we want to place at "gridPosition".</param>
-        /// <param name="rotation">Rotation.</param>
-        public bool CanPlace(Grid placedSections, Vector2Int gridPosition, Vector2Int localPosition, int rotation) 
+        /// <param name="rot">Rotation.</param>
+        public bool CanPlace(Grid placedSections, Vector2Int gridPosition, Vector2Int localPosition, int rot)
         {
+            //Offset(localPosition);
+            //Offset(new Vector2Int(-localPosition.x, -localPosition.y));
+            Rotate(rot);
 
-            // Rotates the given position 90 degrees clockwise "rot" number of times.
-            Vector2Int Rotate(Vector2Int pos, int rot) 
+            foreach (Vector2Int sectionPosition in elements.Keys)
             {
-                switch(rot % 4) 
+                Vector2Int transformedOffset = Rotate(localPosition, rotation);
+
+                Vector2Int rotatedPoint = Rotate(sectionPosition, rotation);
+
+                //Vector2Int transformedPoint = rotatedPoint;
+                //Vector2Int rotatedMin = new Vector2Int(minX, minY);
+                Vector2Int rotatedMin = RotatedMin();
+
+                //Vector2Int normalized = rotatedPoint - rotatedMin - transformedOffset;
+                Vector2Int normalized = rotatedPoint - transformedOffset;
+
+                if (placedSections[gridPosition + normalized] != null)
                 {
-                    case 0: return pos; 
-                    case 1: return new Vector2Int( pos.y, -pos.x);
-                    case 2: return new Vector2Int(-pos.x, -pos.y);
-                    case 3: return new Vector2Int(-pos.y,  pos.x);
-                    default: return pos;
-                }
-            }
-
-            // Takes a corner of the bounding box, and rotates it around.
-            // I.e., rot = 0 gives bottom-left corner. Rot = 1 gives bottom-right,
-            // but rotated 90 degrees clockwise so it's the bottom-left corner.
-            Vector2Int RotatedMin(int rot) 
-            {
-                switch(rot % 4) 
-                {
-                    case 0: return Rotate(new Vector2Int(minX, minY), rot);
-                    case 1: return Rotate(new Vector2Int(maxX, minY), rot);
-                    case 2: return Rotate(new Vector2Int(maxX, maxY), rot);
-                    case 3: return Rotate(new Vector2Int(minX, maxY), rot);
-                    default: return Rotate(new Vector2Int(minX, minY), rot);
-                }
-            }
-
-            foreach (Vector2Int sectionPosition in elements.Keys) 
-            {
-                /*
-                 * Grid position is where we want to place the Feature at.
-                 * Local position is the offset from the (0, 0) point of the Feature.
-                 * Section position is the section in the Feature we try to connect with.
-                 */
-                //Vector2Int absolutePosition = gridPosition + sectionPosition - localPosition;
-
-                // TODO this is a bit buggy. Check if local position is being applied properly under rotation.
-
-                // Rotate the position in our dictionary
-                Vector2Int rotatedPos = Rotate(sectionPosition - localPosition, rotation);
-                Vector2Int rotatedMin = RotatedMin(rotation);
-
-                // Normalize the position so (0, 0) is the minimum positioned element
-                Vector2Int normalized = rotatedPos - rotatedMin;
-
-                //Vector2Int rotatedLocalPos = Rotate(localPosition, rotation);
-                //Vector2Int normalizedWithOffset = normalized - rotatedLocalPos;
-
-                Vector2Int absolutePosition = gridPosition + normalized;
-
-                if (placedSections[absolutePosition] != null) 
-                {
+                    // Undo transforms
+                    //Offset(localPosition);
+                    //Offset(new Vector2Int(-localPosition.x, -localPosition.y));
+                    Rotate(-rot);
                     return false;
                 }
             }
+
+            // Undo transforms
+            //Offset(new Vector2Int(-localPosition.x, -localPosition.y));
+            //Offset(localPosition);
+            Rotate(-rot);
+
+            return true;
+
+            //foreach (Vector2Int sectionPosition in elements.Keys) 
+            //{
+            //    /*
+            //     * Grid position is where we want to place the Feature at.
+            //     * Local position is the offset from the (0, 0) point of the Feature.
+            //     * Section position is the section in the Feature we try to connect with.
+            //     */
+            //    //Vector2Int absolutePosition = gridPosition + sectionPosition - localPosition;
+
+            //    // TODO this is a bit buggy. Check if local position is being applied properly under rotation.
+
+            //    // Rotate the position in our dictionary
+            //    Vector2Int rotatedPos = Rotate(sectionPosition - localPosition, rotation);
+            //    Vector2Int rotatedMin = RotatedMin(rotation);
+
+            //    // Normalize the position so (0, 0) is the minimum positioned element
+            //    Vector2Int normalized = rotatedPos - rotatedMin;
+
+            //    //Vector2Int rotatedLocalPos = Rotate(localPosition, rotation);
+            //    //Vector2Int normalizedWithOffset = normalized - rotatedLocalPos;
+
+            //    Vector2Int absolutePosition = gridPosition + normalized;
+
+            //    if (placedSections[absolutePosition] != null) 
+            //    {
+            //        return false;
+            //    }
+            //}
 
             return true;
         }

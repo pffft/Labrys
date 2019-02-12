@@ -134,13 +134,21 @@ namespace Labrys
 
             // Basic 2x2
             Feature feature = new Feature();
-            feature.Add(new Vector2Int(0, 0));
-            feature.Add(new Vector2Int(1, 0));
-            feature.Add(new Vector2Int(0, 1));
-            feature.Add(new Vector2Int(1, 1));
+            //feature.Add(new Vector2Int(0, 0));
+            //feature.Add(new Vector2Int(1, 0));
+            //feature.Add(new Vector2Int(0, 1));
+            //feature.Add(new Vector2Int(1, 1));
 
-            Debug.Log($"Can place feature at center?: " + feature.CanPlace(grid, Vector2Int.zero, Vector2Int.zero, 0));
-            Debug.Log($"Can place feature to right?: " + feature.CanPlace(grid, Vector2Int.right, Vector2Int.zero, 0));
+            // 3x1 feature
+            feature.Add(0, 0);
+            feature.Add(1, 0);
+            feature.Add(2, 0);
+
+            //Assert.False(feature.CanPlace(grid, new Vector2Int(0, 0), new Vector2Int(1, 0), 1));
+            feature.GetTransformedSections(new Vector2Int(1, 0), 1).ForEach(pos => grid[pos] = new Section());
+
+            //Debug.Log($"Can place feature at center?: " + feature.CanPlace(grid, Vector2Int.zero, Vector2Int.zero, 0));
+            //Debug.Log($"Can place feature to right?: " + feature.CanPlace(grid, Vector2Int.right, Vector2Int.zero, 0));
 
 
             Profiler.EndSample();
