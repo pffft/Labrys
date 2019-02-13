@@ -120,11 +120,23 @@ namespace Labrys
         /// surface area and take up n^2 space), but in practice, most Features are likely to have a linear exposed
         /// area.
         /// 
+        /// Tangent from the above idea. Space filling curves like the spiral or comb have O(n^2) surface area, but
+        /// need "thin" or "small" connection points to be satisfied. Because we try to place Features off of a single 
+        /// Section, we aren't being smart about how it can connect, so we allow bad cases like this. If we take the
+        /// neighboring e.g. 2-3 Sections in the Grid, we can try fitting small polygons within the Feature instead of
+        /// individual Sections. If the small polygon is logarithmic in size [width * height = O(log^2(n))], then the 
+        /// "gaps" in the space filling curve must be at least logarithmic as well [O(sqrt(log^2(n))) == O(log(n))]. This 
+        /// might mean that the worst-case behavior is avoided, because the large gaps might force the number of Sections 
+        /// to be O(n log n) instead of O(n^2).
+        /// 
         /// Another idea: Change the iteration order of the CanPlace method to check nearby Sections first, to
         /// increase the likelihood of breaking out early when checking for overlaps. Or check Grid sections near
         /// the bounding box? Some heuristics might be faster than others. 
         /// 
         /// Another idea: Do a bounding box check first, if there's a way to do a cheap check in the global grid.
+        /// 
+        /// Another idea: Keep track if this Feature has rotational symmetry (either 2 way or 4 way). If so, we can
+        /// memoize the different rotation checks for up to 4x speedup in 4-way rotationally symmetrical cases.
         /// 
         /// </summary>
         /// <returns>A List containing all valid configurations found.</returns>
@@ -135,15 +147,27 @@ namespace Labrys
             Section? maybeGridSection = placedSections[gridPosition];
             if (maybeGridSection == null)
             {
-                // TODO brute force all possibilities here- rotation + position
-                //return false;
-                return null;
+                // Empty Section is invalid, we always need to be passed in a full one.
+                return new List<PlacementConfiguration>();
             }
             Section gridSection = maybeGridSection.Value;
 
-            // Build up all possible valid configurations
+            // A cache of the configurations we've seen while trying to place this Feature.
+            //
+            // Two configurations are considered equal if their gridPosition+localPosition and rotation are equal.
+            // 
+            // This provides up to 4x speedup. Can be achieved with dense Features (approaching filled square
+            // or a checkerboard pattern). 
+            // 
+            // Motivating 2x2 Feature example: checking if the top-right corner can be placed North of a given
+            // Section is equivalent to checking if the bottom-left corner can be placed West of the same Section.
+            // With larger dense Features, Sections away from the edges will produce up to 4 duplicate placement checks.
+            Dictionary<PlacementConfiguration, bool> cache = new Dictionary<PlacementConfiguration, bool>();
+
+            // Build up all possible valid configurations we'll return
             List<PlacementConfiguration> toReturn = new List<PlacementConfiguration>();
 
+            // Try to place the Feature at all adjacent grid positions
             CheckPlacements(gridPosition + Vector2Int.up);
             CheckPlacements(gridPosition + Vector2Int.right);
             CheckPlacements(gridPosition + Vector2Int.down);
@@ -155,13 +179,17 @@ namespace Labrys
             // a given grid position. Add them to the returning list
             void CheckPlacements(Vector2Int pos)
             {
+                // If the provided input position already has a Section, then trivially
+                // any Section we try to place here will conflict. So we return early.
+                if (placedSections[pos] != null) 
+                {
+                    return;
+                }
+
+                // Else try every possible local position.
                 foreach (KeyValuePair<Vector2Int, Section> element in elements)
                 {
-                    // Check which of the 4 rotations we should check
-                    // Then check CanPlace using the rotation, and localPosition = element.key
-                    // If any are true, return true immediately.
-
-                    // For now brute force all configurations
+                    // And every possible rotational variant for each.
                     for (int rot = 0; rot < 4; rot++)
                     {
                         PlacementConfiguration configuration = new PlacementConfiguration
@@ -171,8 +199,18 @@ namespace Labrys
                             rotation = rot
                         };
 
-                        // If it's a valid configuration, add it
-                        if (CanPlace(placedSections, configuration))
+                        // Have we already tried this configuration? Check the cache.
+                        if (!cache.TryGetValue(configuration, out bool canPlace))
+                        {
+                            // If it's not in there, compute it manually and add it.
+                            canPlace = CanPlace(placedSections, configuration);
+                            cache[configuration] = canPlace;
+                        } else {
+                            Debug.Log("Cache hit!");
+                        }
+
+                        // If the configuration is valid (no overlaps w/ grid), add it
+                        if (canPlace) 
                         {
                             toReturn.Add(configuration);
                         }
@@ -245,12 +283,32 @@ namespace Labrys
         public struct PlacementConfiguration
         {
             // These 3 variables are needed to uniquely identify this configuration
-
             public Vector2Int gridPosition;
             public Vector2Int localPosition;
             public int rotation;
 
             // Any other variables are useful, but not necessary.
+
+            // Hashcode to determine unique configurations
+            public override int GetHashCode()
+            {
+                return ((gridPosition + localPosition).GetHashCode() << 2) | rotation;
+            }
+
+            // Two configurations are equal if they require identical checks-
+            // specifically, if gridPosition + localPosition and rotation are equal,
+            // then CanPlace will check exactly the same tiles.
+            public override bool Equals(object obj)
+            {
+                if (!(obj is PlacementConfiguration)) 
+                {
+                    return false;
+                }
+                PlacementConfiguration other = (PlacementConfiguration)obj;
+
+                return (gridPosition + localPosition == other.gridPosition + other.localPosition) && 
+                    rotation == other.rotation;
+            }
         }
     }
 }

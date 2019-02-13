@@ -137,17 +137,24 @@ namespace Labrys
 
             // Basic 2x2
             Feature feature = new Feature();
-            //feature.Add(new Vector2Int(0, 0));
-            //feature.Add(new Vector2Int(1, 0));
-            //feature.Add(new Vector2Int(0, 1));
-            //feature.Add(new Vector2Int(1, 1));
+            feature.Add(new Vector2Int(0, 0));
+            feature.Add(new Vector2Int(1, 0));
+            feature.Add(new Vector2Int(0, 1));
+            feature.Add(new Vector2Int(1, 1));
+
+            //feature.Add(new Vector2Int(0, 2)); // These next 5 make it a 3x3
+            //feature.Add(new Vector2Int(1, 2));
+            //feature.Add(new Vector2Int(2, 2));
+            //feature.Add(new Vector2Int(2, 1));
+            //feature.Add(new Vector2Int(2, 0));
 
             // 3x1 feature
-            feature.Add(0, 0);
-            feature.Add(1, 0);
-            feature.Add(2, 0);
-            feature.Add(3, 0);
-            feature.Add(3, 1);
+            //feature.Add(0, 0);
+            //feature.Add(1, 0);
+            //feature.Add(2, 0);
+            //feature.Add(3, 0); // Add these two for
+            //feature.Add(3, 1); // a long L feature
+
 
             List<Feature.PlacementConfiguration> configs = new List<Feature.PlacementConfiguration>();
 
