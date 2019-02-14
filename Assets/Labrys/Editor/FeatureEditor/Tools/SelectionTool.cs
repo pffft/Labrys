@@ -1,13 +1,17 @@
 ﻿using Labrys.Editor.FeatureEditor.Commands;
-using System.Collections.Generic;
 using UnityEngine;
 
 namespace Labrys.Editor.FeatureEditor.Tools
 {
 	public class SelectionTool : Tool
 	{
+		private const int SELECT_MODE_NONE = 0;
+		private const int SELECT_MODE_SELECT = 1;
+		private const int SELECT_MODE_DESELECT = 2;
+
 		private Rect selectionRect;
 		private bool isDragging;
+		private int selectionMode;
 
 		public SelectionTool()
 		{
@@ -32,11 +36,20 @@ namespace Labrys.Editor.FeatureEditor.Tools
 					//start selection box
 					selectionRect.position = e.mousePosition;
 					e.Use();
+					selectionMode = SELECT_MODE_SELECT;
+					return true;
+				}
+				else if (e.button == 1)
+				{
+					//start selection box
+					selectionRect.position = e.mousePosition;
+					e.Use();
+					selectionMode = SELECT_MODE_DESELECT;
 					return true;
 				}
 				break;
 			case EventType.MouseDrag:
-				if(e.button == 0)
+				if(e.button == 0 || e.button == 1)
 				{
 					//update selection box
 					selectionRect.max = e.mousePosition;
@@ -45,26 +58,38 @@ namespace Labrys.Editor.FeatureEditor.Tools
 				}
 				break;
 			case EventType.MouseUp:
-				if(e.button == 0)
+				if(e.button == 0 || e.button == 1)
 				{
 					//select all tiles within selection box
-					Command c = Use();
+					Command c;
+					if (selectionMode == SELECT_MODE_SELECT)
+					{
+						c = new SelectionCommand()
+						{
+							SelectionBox = new Rect(selectionRect)
+						};
+					}
+					else if (selectionMode == SELECT_MODE_DESELECT)
+					{
+						c = new DeselectionCommand()
+						{
+							SelectionBox = new Rect(selectionRect)
+						};
+					}
+					else
+					{
+						return false;
+					}
 					c.Do();
 					History.RecordCommand(c);
 					selectionRect = new Rect();
+					selectionMode = SELECT_MODE_NONE;
+					e.Use();
 					return true;
 				}
 				break;
 			}
 			return false;
-		}
-
-		public override Command Use()
-		{
-			return new SelectionCommand()
-			{
-				SelectionBox = new Rect(selectionRect)
-			};
 		}
 	}
 }
