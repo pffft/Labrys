@@ -14,12 +14,13 @@ namespace Labrys.Editor.FeatureEditor
 		}
 
 		private SelectionTool selectTool = new SelectionTool();
+		private TilePaintTool tilePaintTool = new TilePaintTool();
 
 		private Tool activeTool;
 
 		public MainWindow()
 		{
-			activeTool = selectTool;
+			activeTool = tilePaintTool;
 		}
 
 		private void OnEnable()
@@ -85,6 +86,8 @@ namespace Labrys.Editor.FeatureEditor
 			case EventType.KeyDown:
 				if (e.control)
 				{
+					/* Currently an issue with getting undos to work with Unity's existing system.
+					 * TODO: figure that shit out
 					if (e.keyCode == KeyCode.Z)
 					{
 						History.Undo();
@@ -94,6 +97,18 @@ namespace Labrys.Editor.FeatureEditor
 					{
 						History.Redo();
 						e.Use();
+					}
+					*/
+				}
+				else
+				{
+					if(e.keyCode == KeyCode.S)
+					{
+						activeTool = selectTool;
+					}
+					else if(e.keyCode == KeyCode.A)
+					{
+						activeTool = tilePaintTool;
 					}
 				}
 				break;

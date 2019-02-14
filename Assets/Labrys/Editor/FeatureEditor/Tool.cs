@@ -6,7 +6,5 @@ namespace Labrys.Editor.FeatureEditor
 	{
 		public virtual void Draw() { }
 		public abstract bool HandleEvent(Event e);
-
-		public abstract Command Use();
 	}
 }

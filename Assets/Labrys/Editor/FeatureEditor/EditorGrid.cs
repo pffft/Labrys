@@ -32,6 +32,11 @@ namespace Labrys.Editor.FeatureEditor
 			return instance;
 		}
 
+		public static bool IsTilePosition(Vector2Int gridPosition)
+		{
+			return gridPosition.x % 2 == 0 && gridPosition.y % 2 == 0;
+		}
+
 		public EditorGrid()
 		{
 			viewport = new Rect();
@@ -125,6 +130,7 @@ namespace Labrys.Editor.FeatureEditor
 				break;
 			case EventType.KeyDown:
 				//create a new tile
+				//TODO remove
 				if (e.keyCode == KeyCode.N)
 				{
 					CreateTile (e.mousePosition);
@@ -159,32 +165,48 @@ namespace Labrys.Editor.FeatureEditor
 			this.scale = scale;
 		}
 
-		public void CreateTile(Vector2 screenPos)
+		public Vector2 GetBaseTileSize()
 		{
-			Tile t = new Tile (screenPos, new Vector2 (lineSpacing, lineSpacing));
+			return new Vector2(lineSpacing, lineSpacing);
+		}
+
+		public Vector2 GetScaledTileSize()
+		{
+			return new Vector2(lineSpacing, lineSpacing) * scale;
+		}
+
+		public Tile CreateTile(Vector2 screenPos)
+		{
+			Tile t = new Tile (screenPos, GetBaseTileSize());
 			t.GridPosition = ScreenToGridPos (screenPos, evenOnly: true);
 
 			if (!tiles.ContainsKey(t.GridPosition))
 			{
 				tiles.Add(t.GridPosition, t);
 				TryAddConnections(t);
-			}
-		}
-
-		public GridObject GetGridObject(Vector2 screenPos)
-		{
-			Vector2Int gridPos = ScreenToGridPos(screenPos);
-			if(tiles.TryGetValue(gridPos, out Tile t))
-			{
 				return t;
 			}
-			else if (connections.TryGetValue(gridPos, out Connection c))
+
+			return null;
+		}
+		public Tile CreateTile(Vector2Int gridPos)
+		{
+			if (IsTilePosition(gridPos))
 			{
-				return c;
+				Vector2 screenPos = GridToScreenPos(gridPos);
+				return CreateTile(screenPos);
 			}
 			return null;
 		}
 
+		public void RemoveTile(Vector2Int gridPos)
+		{
+			if(tiles.TryGetValue(gridPos, out Tile t))
+			{
+				tiles.Remove(gridPos);
+				TryRemoveConnections(t);
+			}
+		}
 		
 		public void SelectTile(Vector2 screenPos)
 		{
@@ -220,6 +242,11 @@ namespace Labrys.Editor.FeatureEditor
 			}
 		}
 
+		public bool HasTileAt(Vector2Int gridPosition)
+		{
+			return tiles.ContainsKey(gridPosition);
+		}
+
 		public bool MoveTile(Vector2 screenPos, Tile t)
 		{
 			Vector2Int newGridPos = ScreenToGridPos(screenPos, evenOnly: true);
@@ -240,6 +267,21 @@ namespace Labrys.Editor.FeatureEditor
 				return false;
 			}
 		}
+
+		public GridObject GetGridObject(Vector2 screenPos)
+		{
+			Vector2Int gridPos = ScreenToGridPos(screenPos);
+			if (tiles.TryGetValue(gridPos, out Tile t))
+			{
+				return t;
+			}
+			else if (connections.TryGetValue(gridPos, out Connection c))
+			{
+				return c;
+			}
+			return null;
+		}
+
 
 		public void RemoveGridObject(GridObject go)
 		{
@@ -295,7 +337,7 @@ namespace Labrys.Editor.FeatureEditor
 		{
 			int nCount = GetConnectionNeighborCount(c);
 			c.GetMinMaxSubjectTileCount(out int nMin, out int nMax);
-			return nMax == 2 ? nCount <= nMax : nCount == nMax;
+			return nMax == 2 ? nCount >= nMin : nCount == nMax;
 		}
 
 		private int GetConnectionNeighborCount(Connection c)
