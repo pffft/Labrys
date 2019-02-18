@@ -9,33 +9,19 @@ namespace Labrys.Editor.FeatureEditor.Commands
 
 		public override void Do()
 		{
-			TraverseGrid((int x, int y) => EditorGrid.GetInstance().SelectTile(new Vector2Int(x, y)));
+			foreach(Vector2Int gp in EditorGrid.GetInstance().RectToGridPositions(SelectionBox, true))
+			{
+				EditorGrid.GetInstance().SelectTile(gp);
+			}
 		}
 
 		public override void Undo()
 		{
-			TraverseGrid((int x, int y) => EditorGrid.GetInstance().DeselectTile(new Vector2Int(x, y)));
-		}
-
-		private void TraverseGrid(PositionOperation operation)
-		{
-			EditorGrid grid = EditorGrid.GetInstance();
-			Vector2Int startingGridPos = grid.ScreenToGridPos(SelectionBox.min, true);
-			Vector2Int endingGridPos = grid.ScreenToGridPos(SelectionBox.max, true);
-			Vector2Int selectionAreaDimen = endingGridPos - startingGridPos;
-			int xSign = (int)Mathf.Sign(selectionAreaDimen.x);
-			int ySign = (int)Mathf.Sign(selectionAreaDimen.y);
-
-			for (int x = startingGridPos.x; x <= endingGridPos.x; x += (int)EditorGrid.GRID_DENSITY * xSign)
+			foreach (Vector2Int gp in EditorGrid.GetInstance().RectToGridPositions(SelectionBox, true))
 			{
-				for (int y = startingGridPos.y; y <= endingGridPos.y; y += (int)EditorGrid.GRID_DENSITY * ySign)
-				{
-					operation(x, y);
-				}
+				EditorGrid.GetInstance().DeselectTile(gp);
 			}
 		}
-
-		private delegate void PositionOperation(int x, int y);
 	}
 }
 
