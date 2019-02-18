@@ -203,6 +203,7 @@ namespace Labrys.Editor.FeatureEditor
 		{
 			if(tiles.TryGetValue(gridPos, out Tile t))
 			{
+				DeselectTile(t);
 				tiles.Remove(gridPos);
 				TryRemoveConnections(t);
 			}
@@ -217,11 +218,15 @@ namespace Labrys.Editor.FeatureEditor
 		{
 			if (tiles.TryGetValue(gridPos, out Tile t))
 			{
-				if (!t.IsSelected)
-				{
-					t.IsSelected = true;
-					selectedTiles.Add(t);
-				}
+				SelectTile(t);
+			}
+		}
+		public void SelectTile(Tile t)
+		{
+			if (!t.IsSelected)
+			{
+				t.IsSelected = true;
+				selectedTiles.Add(t);
 			}
 		}
 
@@ -234,11 +239,15 @@ namespace Labrys.Editor.FeatureEditor
 		{
 			if (tiles.TryGetValue(gridPos, out Tile t))
 			{
-				if (t.IsSelected)
-				{
-					t.IsSelected = false;
-					selectedTiles.Remove(t);
-				}
+				DeselectTile(t);
+			}
+		}
+		public void DeselectTile(Tile t)
+		{
+			if (t.IsSelected)
+			{
+				t.IsSelected = false;
+				selectedTiles.Remove(t);
 			}
 		}
 
@@ -399,6 +408,26 @@ namespace Labrys.Editor.FeatureEditor
 		public Vector2 GridToScreenPos(Vector2Int gridPos)
 		{
 			return GridToScreenSpace(gridPos);
+		}
+
+		public Vector2Int[] RectToGridPositions(Rect r, bool evenOnly = false)
+		{
+			Vector2Int startingGridPos = ScreenToGridPos(r.min, evenOnly);
+			Vector2Int endingGridPos = ScreenToGridPos(r.max, evenOnly);
+
+			Vector2Int selectionAreaDimen = endingGridPos - startingGridPos;
+			int xIncr = (evenOnly ? (int)GRID_DENSITY : 1) * (int)Mathf.Sign(selectionAreaDimen.x);
+			int yIncr = (evenOnly ? (int)GRID_DENSITY : 1) * (int)Mathf.Sign(selectionAreaDimen.y);
+
+			List<Vector2Int> gridPositons = new List<Vector2Int>();
+			for (int x = startingGridPos.x; x != endingGridPos.x + xIncr; x += xIncr)
+			{
+				for (int y = startingGridPos.y; y != endingGridPos.y + yIncr; y += yIncr)
+				{
+					gridPositons.Add(new Vector2Int(x, y));
+				}
+			}
+			return gridPositons.ToArray();
 		}
 	}
 }

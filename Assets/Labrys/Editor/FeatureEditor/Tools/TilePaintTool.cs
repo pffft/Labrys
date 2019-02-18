@@ -7,10 +7,12 @@ namespace Labrys.Editor.FeatureEditor.Tools
 	public class TilePaintTool : Tool
 	{
 		private HashSet<Vector2Int> manipPositions;
+		private Color previewColor;
 
 		public TilePaintTool()
 		{
 			manipPositions = new HashSet<Vector2Int>();
+			previewColor = Color.white;
 		}
 
 		public override void Draw()
@@ -22,7 +24,7 @@ namespace Labrys.Editor.FeatureEditor.Tools
 				Vector2 screenPos = EditorGrid.GetInstance().GridToScreenPos(position);
 				Rect r = new Rect(screenPos, EditorGrid.GetInstance().GetScaledTileSize());
 				r.center = screenPos;
-				GUI.color = Color.green;
+				GUI.color = previewColor;
 				GUI.Box(r, "");
 			}
 		}
@@ -40,6 +42,14 @@ namespace Labrys.Editor.FeatureEditor.Tools
 					if ((e.button == 0 && !posHasTile) || (e.button == 1 && posHasTile))
 					{
 						manipPositions.Add(position);
+						if (e.button == 0)
+						{
+							previewColor = Color.green;
+						}
+						else if (e.button == 1)
+						{
+							previewColor = Color.red;
+						}
 						return true;
 					}
 				}
