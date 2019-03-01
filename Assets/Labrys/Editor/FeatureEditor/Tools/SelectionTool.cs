@@ -66,14 +66,14 @@ namespace Labrys.Editor.FeatureEditor.Tools
 					{
 						c = new SelectionCommand()
 						{
-							SelectionBox = new Rect(selectionRect)
+							SelectedPositions = EditorGrid.GetInstance().RectToGridPositions(selectionRect, true)
 						};
 					}
 					else if (selectionMode == SELECT_MODE_DESELECT)
 					{
 						c = new DeselectionCommand()
 						{
-							SelectionBox = new Rect(selectionRect)
+							SelectedPositions = EditorGrid.GetInstance().RectToGridPositions(selectionRect, true)
 						};
 					}
 					else
