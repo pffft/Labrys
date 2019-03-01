@@ -5,11 +5,11 @@ namespace Labrys.Editor.FeatureEditor.Commands
 {
 	public class SelectionCommand : Command
 	{
-		public Rect SelectionBox { get; set; }
+		public Vector2Int[] SelectedPositions { get; set; }
 
 		public override void Do()
 		{
-			foreach(Vector2Int gp in EditorGrid.GetInstance().RectToGridPositions(SelectionBox, true))
+			foreach(Vector2Int gp in SelectedPositions)
 			{
 				EditorGrid.GetInstance().SelectTile(gp);
 			}
@@ -17,7 +17,7 @@ namespace Labrys.Editor.FeatureEditor.Commands
 
 		public override void Undo()
 		{
-			foreach (Vector2Int gp in EditorGrid.GetInstance().RectToGridPositions(SelectionBox, true))
+			foreach (Vector2Int gp in SelectedPositions)
 			{
 				EditorGrid.GetInstance().DeselectTile(gp);
 			}
