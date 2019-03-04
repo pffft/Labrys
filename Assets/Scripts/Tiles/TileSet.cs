@@ -4,7 +4,7 @@ using UnityEngine;
 
 using UnityEngine.Profiling;
 
-namespace Labrys
+namespace Labrys.Tiles
 {
     /// <summary>
     /// A database for looking up specific individual tiles.

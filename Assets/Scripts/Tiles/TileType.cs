@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace Labrys
+namespace Labrys.Tiles
 {
     /// <summary> 
     /// An implementation of 2 edge + 2 corner Wang tile set.

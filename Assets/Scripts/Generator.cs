@@ -3,6 +3,9 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Profiling;
 
+using Labrys.Tiles;
+using Labrys.Selectors;
+
 namespace Labrys
 {
     public class Generator : MonoBehaviour
@@ -35,6 +38,10 @@ namespace Labrys
         // The loader implementation.
         //private IGameObjectLoader gameObjectLoader = new LazyLoader(LazyLoader.Priority.Distance, 100);
         private IGameObjectLoader gameObjectLoader = new BasicLoader();
+
+        private IFeatureSelector featureSelector = new RandomFeatureSelector();
+        private IPositionSelector positionSelector = new RandomPositionSelector();
+        private IConfigurationSelector configurationSelector = new RandomConfigurationSelector();
 
         public static Generator Instance;
 
@@ -156,14 +163,15 @@ namespace Labrys
             //feature.Add(3, 1); // a long L feature
 
 
-            List<Feature.PlacementConfiguration> configs = new List<Feature.PlacementConfiguration>();
+            // Code for testing Feature configuration
+            //List<Feature.PlacementConfiguration> configs = new List<Feature.PlacementConfiguration>();
 
-            configs.AddRange(feature.CanConnect(grid, Vector2Int.zero));
-            configs.AddRange(feature.CanConnect(grid, new Vector2Int(1, 0)));
-            configs.AddRange(feature.CanConnect(grid, new Vector2Int(0, 1)));
-            configs.AddRange(feature.CanConnect(grid, new Vector2Int(1, 1)));
+            //configs.AddRange(feature.CanConnect(grid, Vector2Int.zero));
+            //configs.AddRange(feature.CanConnect(grid, new Vector2Int(1, 0)));
+            //configs.AddRange(feature.CanConnect(grid, new Vector2Int(0, 1)));
+            //configs.AddRange(feature.CanConnect(grid, new Vector2Int(1, 1)));
 
-            StartCoroutine(CoolPlaceTiles(feature, configs));
+            //StartCoroutine(CoolPlaceTiles(feature, configs));
 
 
             //Assert.False(feature.CanPlace(grid, new Vector2Int(0, 0), new Vector2Int(1, 0), 1));
@@ -171,6 +179,8 @@ namespace Labrys
 
             //Debug.Log($"Can place feature at center?: " + feature.CanPlace(grid, Vector2Int.zero, Vector2Int.zero, 0));
             //Debug.Log($"Can place feature to right?: " + feature.CanPlace(grid, Vector2Int.right, Vector2Int.zero, 0));
+
+            Generate();
 
 
             Profiler.EndSample();
@@ -180,6 +190,7 @@ namespace Labrys
             Profiler.EndSample();
         }
 
+        // Visually appealing tile placement strategy.
         private IEnumerator CoolPlaceTiles(Feature feature, List<Feature.PlacementConfiguration> configs)
         {
             yield return new WaitForSeconds(0.5f);
@@ -214,6 +225,53 @@ namespace Labrys
                 // Wait
                 yield return new WaitForSeconds(Mathf.Max(0.1f, (10 - count) / 10f));
             }
+        }
+
+        private void Generate() 
+        {
+            // Temporary: feature list
+            Feature basicFeature = new Feature();
+            basicFeature.Add(new Vector2Int(0, 0), Connection.Cardinal);
+            basicFeature.Add(new Vector2Int(1, 0), Connection.West | Connection.East);
+            basicFeature.Add(new Vector2Int(-1, 0), Connection.West | Connection.East);
+            basicFeature.Add(new Vector2Int(0, 1), Connection.North | Connection.South);
+            basicFeature.Add(new Vector2Int(0, -1), Connection.North | Connection.South);
+
+            Feature[] featureList = { basicFeature };
+
+            // Pick some ending condition
+            int count = 0;
+            while (count++ < 100) 
+            {
+                Feature nextFeature = featureSelector.Select(featureList);
+                if (nextFeature == null) 
+                {
+                    Debug.Log("Failed to get valid Feature.");
+                    continue;
+                }
+
+                Vector2Int nextPosition = positionSelector.Select(grid);
+
+                // Get all valid placements
+                List<Feature.PlacementConfiguration> configurations = nextFeature.CanConnect(grid, nextPosition);
+
+                if (configurations.Count == 0) 
+                {
+                    Debug.Log("Failed to find valid configuration at position: " + nextPosition);
+                    continue;
+                }
+
+                // Choose one of those placements
+                Feature.PlacementConfiguration configuration = configurationSelector.Select(configurations.ToArray());
+
+                // Add that Feature in
+                Dictionary<Vector2Int, Section> toAdd = nextFeature.GetConfiguration(configuration);
+                foreach (KeyValuePair<Vector2Int, Section> pair in toAdd) 
+                {
+                    grid[pair.Key] = pair.Value;
+                }
+            }
+
         }
 
 

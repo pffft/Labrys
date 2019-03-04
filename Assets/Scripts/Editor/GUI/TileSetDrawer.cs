@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEditor;
 
+using Labrys.Tiles;
+
 namespace Labrys
 {
     //[CustomPropertyDrawer(typeof(TileSet))]

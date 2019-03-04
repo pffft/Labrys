@@ -5,6 +5,7 @@ using UnityEngine;
 using UnityEngine.TestTools;
 
 using Labrys;
+using Labrys.Tiles;
 
 namespace Tests
 {

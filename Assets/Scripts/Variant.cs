@@ -4,6 +4,9 @@ using UnityEngine;
 
 namespace Labrys
 {
+    /// <summary>
+    /// A static class maintaining lookup tables for Variants to their IDs.
+    /// </summary>
     public static class Variant
     {
         /// <summary>

@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace Labrys
+namespace Labrys.Tiles
 {
     /// <summary>
     /// A physical, individual 1x1 grid element to be placed in the world.

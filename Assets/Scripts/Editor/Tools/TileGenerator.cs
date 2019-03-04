@@ -4,6 +4,8 @@ using UnityEngine;
 using UnityEditor;
 using System.IO;
 
+using Labrys.Tiles;
+
 namespace Labrys
 {
     //[CustomEditor(typeof(GameManager))]

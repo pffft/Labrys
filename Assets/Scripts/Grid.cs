@@ -13,10 +13,19 @@ namespace Labrys
         // implementation, or just have buckets of a max size? Something to improve speed.
         private Dictionary<Vector2Int, Section> globalGrid;
 
+        // How many distinct cells are set in this grid
+        public int NumFullCells 
+        {
+            get; private set;
+        }
+
+        private HashSet<Vector2Int> boundary;
+
         public Grid()
         {
             features = new List<Feature>();
             globalGrid = new Dictionary<Vector2Int, Section>();
+            boundary = new HashSet<Vector2Int>();
         }
 
         // Vector2Int access
@@ -47,6 +56,46 @@ namespace Labrys
                 else
                 {
                     globalGrid.Add(pos, (Section)value);
+
+                    // Add to count
+                    NumFullCells++;
+
+                    // Update boundary
+                    bool IsInternal(Vector2Int position) 
+                    {
+                        return this[position + Vector2Int.up] != null &&
+                            this[position + Vector2Int.right] != null &&
+                            this[position + Vector2Int.down] != null &&
+                            this[position + Vector2Int.left] != null;
+                    }
+
+                    // If this new position is internal, add it to boundary
+                    if (!IsInternal(pos) && !boundary.Contains(pos)) 
+                    {
+                        boundary.Add(pos);
+                    }
+
+                    // Check all neighbors. Remove if they're now internal.
+                    if (boundary.Contains(pos + Vector2Int.up) && IsInternal(pos + Vector2Int.up)) 
+                    {
+                        boundary.Remove(pos + Vector2Int.up);
+                    }
+
+                    if (boundary.Contains(pos + Vector2Int.down) && IsInternal(pos + Vector2Int.down))
+                    {
+                        boundary.Remove(pos + Vector2Int.down);
+                    }
+
+                    if (boundary.Contains(pos + Vector2Int.left) && IsInternal(pos + Vector2Int.left))
+                    {
+                        boundary.Remove(pos + Vector2Int.left);
+                    }
+
+                    if (boundary.Contains(pos + Vector2Int.right) && IsInternal(pos + Vector2Int.right))
+                    {
+                        boundary.Remove(pos + Vector2Int.right);
+                    }
+
                 }
             }
         }
@@ -62,6 +111,13 @@ namespace Labrys
         {
             Vector2Int[] toReturn = new Vector2Int[globalGrid.Count];
             globalGrid.Keys.CopyTo(toReturn, 0);
+            return toReturn;
+        }
+
+        public Vector2Int[] GetBoundary()
+        {
+            Vector2Int[] toReturn = new Vector2Int[boundary.Count];
+            boundary.CopyTo(toReturn);
             return toReturn;
         }
 
