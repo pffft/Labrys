@@ -1,5 +1,6 @@
 ﻿using Labrys.Editor.FeatureEditor.Commands;
 using System.Collections.Generic;
+using UnityEditor;
 using UnityEngine;
 
 namespace Labrys.Editor.FeatureEditor.Tools
@@ -9,7 +10,7 @@ namespace Labrys.Editor.FeatureEditor.Tools
 		private HashSet<Vector2Int> manipPositions;
 		private Color previewColor;
 
-		public TilePaintTool()
+		public TilePaintTool(EditorWindow window) : base(window)
 		{
 			manipPositions = new HashSet<Vector2Int>();
 			previewColor = Color.white;

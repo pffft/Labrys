@@ -23,9 +23,14 @@ namespace Labrys.Editor.FeatureEditor
 
 		public override void Draw()
 		{
-			Handles.color = External ? externalColor : Open ? openColor : closedColor;
+			Handles.color = Open ? openColor : closedColor;
 			Handles.BeginGUI();
 			Handles.DrawSolidDisc(new Vector3(ScreenPosition.x, ScreenPosition.y), Vector3.forward, Scale * SIZE);
+			if (External)
+			{
+				Handles.color = externalColor;
+				Handles.DrawSolidArc(new Vector3(ScreenPosition.x, ScreenPosition.y), Vector3.forward, Vector3.up, 180f, Scale * SIZE);
+			}
 			Handles.EndGUI();
 		}
 

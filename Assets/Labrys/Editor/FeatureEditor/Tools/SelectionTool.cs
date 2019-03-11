@@ -1,4 +1,5 @@
 ﻿using Labrys.Editor.FeatureEditor.Commands;
+using UnityEditor;
 using UnityEngine;
 
 namespace Labrys.Editor.FeatureEditor.Tools
@@ -13,7 +14,7 @@ namespace Labrys.Editor.FeatureEditor.Tools
 		private bool isDragging;
 		private int selectionMode;
 
-		public SelectionTool()
+		public SelectionTool(EditorWindow window) : base(window)
 		{
 			selectionRect = new Rect();
 		}
