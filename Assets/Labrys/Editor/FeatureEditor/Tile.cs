@@ -62,61 +62,6 @@ namespace Labrys.Editor.FeatureEditor
 			GUI.color = temp;
 		}
 
-		[System.Obsolete("Events are only driven in EditorGrid now")]
-		public override bool HandleEvent(Event e)
-		{
-			switch (e.type)
-			{
-			case EventType.MouseDown:
-				//select and drag
-				if (e.button == 0)
-				{
-					if (bounds.Contains (e.mousePosition))
-					{
-						IsDragging = IsSelected = true;
-					}
-					else
-					{
-						IsSelected = false;
-					}
-					return true;
-				}
-				break;
-			case EventType.MouseUp:
-				//stop dragging
-				if (IsDragging)
-				{
-					IsDragging = false;
-					dragFinished?.Invoke(this);
-					RevertShift();
-					return true;
-				}
-				break;
-			case EventType.MouseDrag:
-				//perform drag
-				if (e.button == 0 && IsDragging)
-				{
-					ApplyShift (e.delta);
-					//dDrag += e.delta;
-					e.Use ();
-					return true;
-				}
-				break;
-			case EventType.KeyDown:
-				//delete selected tile with Delete or Backspace
-				if (e.keyCode == KeyCode.Delete || e.keyCode == KeyCode.Backspace)
-				{
-					if (IsSelected)
-					{
-						e.Use ();
-						removed?.Invoke (this);
-					}
-				}
-				break;
-			}
-			return false;
-		}
-
 		public Vector2Int GetAdjPosition(LinkDirection direction)
 		{
 			switch(direction)

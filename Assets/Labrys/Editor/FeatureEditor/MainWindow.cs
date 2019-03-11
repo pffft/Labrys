@@ -15,6 +15,7 @@ namespace Labrys.Editor.FeatureEditor
 
 		private SelectionTool selectTool = new SelectionTool();
 		private TilePaintTool tilePaintTool = new TilePaintTool();
+		private ConnectionEditorTool connectionEditorTool = new ConnectionEditorTool();
 
 		private Tool activeTool;
 
@@ -109,6 +110,10 @@ namespace Labrys.Editor.FeatureEditor
 					else if(e.keyCode == KeyCode.A)
 					{
 						activeTool = tilePaintTool;
+					}
+					else if (e.keyCode == KeyCode.C)
+					{
+						activeTool = connectionEditorTool;
 					}
 				}
 				break;

@@ -45,14 +45,6 @@ namespace Labrys.Editor.FeatureEditor
 		public abstract void Draw();
 
 		/// <summary>
-		/// React to a user-driven event. Returns if the event should change the GUI.
-		/// </summary>
-		/// <param name="e"></param>
-		/// <returns></returns>
-		[System.Obsolete]
-		public abstract bool HandleEvent(Event e);
-
-		/// <summary>
 		/// Apply an offset to the draw position of this 
 		/// </summary>
 		/// <param name="dPos"></param>

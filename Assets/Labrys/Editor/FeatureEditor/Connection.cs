@@ -6,12 +6,13 @@ namespace Labrys.Editor.FeatureEditor
 {
 	public class Connection : GridObject
 	{
-		private const float SIZE = 10f;
+		public const float SIZE = 10f;
 		private static Color openColor = new Color(0f, 0.8f, 0f);
 		private static Color closedColor = new Color(0.9f, 0f, 0f);
+		private static Color externalColor = new Color(0.8f, 0.8f, 0f);
 
-		public bool Open { get; private set; }
-		public bool External { get; private set; }
+		public bool Open { get; set; }
+		public bool External { get; set; }
 
 		public Connection(Vector2Int position)
 		{
@@ -22,31 +23,10 @@ namespace Labrys.Editor.FeatureEditor
 
 		public override void Draw()
 		{
-			Handles.color = Open ? openColor : closedColor;
+			Handles.color = External ? externalColor : Open ? openColor : closedColor;
 			Handles.BeginGUI();
 			Handles.DrawSolidDisc(new Vector3(ScreenPosition.x, ScreenPosition.y), Vector3.forward, Scale * SIZE);
 			Handles.EndGUI();
-		}
-
-		[System.Obsolete]
-		public override bool HandleEvent(Event e)
-		{
-			if (Vector2.Distance(e.mousePosition, ScreenPosition) < Scale * SIZE)
-			{
-				switch (e.type)
-				{
-				case EventType.MouseDown:
-					if (e.button == 1)
-					{
-						//toggle connection
-						Open = !Open;
-						e.Use();
-						return true;
-					}
-					break;
-				}
-			}
-			return false;
 		}
 
 		public void GetMinMaxSubjectTileCount(out int min, out int max)
@@ -78,9 +58,9 @@ namespace Labrys.Editor.FeatureEditor
 		{
 			HashSet<Vector2Int> uniquePositions = new HashSet<Vector2Int>();
 
-			int lowerX = Mathf.FloorToInt((GridPosition.x / EditorGrid.GRID_DENSITY)) * (int)EditorGrid.GRID_DENSITY;
+			int lowerX = Mathf.FloorToInt(GridPosition.x / EditorGrid.GRID_DENSITY) * (int)EditorGrid.GRID_DENSITY;
 			int upperX = Mathf.FloorToInt((GridPosition.x / EditorGrid.GRID_DENSITY) + 0.5f) * (int)EditorGrid.GRID_DENSITY;
-			int lowerY = Mathf.FloorToInt((GridPosition.y / EditorGrid.GRID_DENSITY)) * (int)EditorGrid.GRID_DENSITY;
+			int lowerY = Mathf.FloorToInt(GridPosition.y / EditorGrid.GRID_DENSITY) * (int)EditorGrid.GRID_DENSITY;
 			int upperY = Mathf.FloorToInt((GridPosition.y / EditorGrid.GRID_DENSITY) + 0.5f) * (int)EditorGrid.GRID_DENSITY;
 
 			uniquePositions.Add(new Vector2Int(lowerX, lowerY));
