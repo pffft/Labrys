@@ -307,6 +307,19 @@ namespace Labrys.Editor.FeatureEditor
 			GUI.changed = true;
 		}
 
+		public bool HasConnectionAt(Vector2Int gridPos)
+		{
+			return connections.ContainsKey(gridPos);
+		}
+
+		public void SetConnectionState(Vector2Int gridPos, bool isOpen)
+		{
+			if (connections.TryGetValue(gridPos, out Connection target))
+			{
+				target.Open = isOpen;
+			}
+		}
+
 		private void TryAddConnections(Tile t)
 		{
 			foreach (Vector2Int connectionPos in t.GetAllAdjPosition())
