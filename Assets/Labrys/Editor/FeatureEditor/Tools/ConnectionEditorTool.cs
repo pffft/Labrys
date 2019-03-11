@@ -1,4 +1,5 @@
 ﻿using Labrys.Editor.FeatureEditor.Commands;
+using Labrys.Editor.FeatureEditor.Panels;
 using System.Collections.Generic;
 using UnityEditor;
 using UnityEngine;
@@ -10,10 +11,13 @@ namespace Labrys.Editor.FeatureEditor.Tools
 		private HashSet<Vector2Int> manipPositions;
 		private Color previewColor;
 
-		public ConnectionEditorTool()
+		private ConnectionEditorPanel panel;
+
+		public ConnectionEditorTool(EditorWindow window) : base(window)
 		{
 			manipPositions = new HashSet<Vector2Int>();
 			previewColor = Color.white;
+			panel = new ConnectionEditorPanel(window, InternalPanel.DockPosition.right, 150f);
 		}
 
 		public override void Draw()
@@ -26,10 +30,15 @@ namespace Labrys.Editor.FeatureEditor.Tools
 				Handles.DrawSolidDisc(new Vector3(screenPos.x, screenPos.y), Vector3.forward, EditorGrid.GetInstance().scale * Connection.SIZE);
 			}
 			Handles.EndGUI();
+
+			panel.Draw();
 		}
 
 		public override bool HandleEvent(Event e)
 		{
+			if (panel.HandleEvent(e))
+				return true;
+
 			switch (e.type)
 			{
 			case EventType.MouseDown:
