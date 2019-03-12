@@ -25,11 +25,12 @@ namespace Labrys.Editor.FeatureEditor.Tools
 		public override void Draw()
 		{
 			Handles.color = previewColor;
+			Vector3 rotStartDir = settingExternal ? Vector3.right : Vector3.down;
 			Handles.BeginGUI();
 			foreach (Vector2Int position in manipPositions)
 			{
 				Vector2 screenPos = EditorGrid.GetInstance().GridToScreenPos(position);
-				Handles.DrawSolidArc(new Vector3(screenPos.x, screenPos.y), Vector3.forward, Vector3.down, 180f, EditorGrid.GetInstance().scale * Connection.SIZE);
+				Handles.DrawSolidArc(new Vector3(screenPos.x, screenPos.y), Vector3.forward, rotStartDir, 180f, EditorGrid.GetInstance().scale * Connection.SIZE);
 			}
 			Handles.EndGUI();
 
