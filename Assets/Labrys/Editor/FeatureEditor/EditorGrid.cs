@@ -320,6 +320,14 @@ namespace Labrys.Editor.FeatureEditor
 			}
 		}
 
+		public void SetConnectionExternal(Vector2Int gridPos, bool isExternal)
+		{
+			if (connections.TryGetValue(gridPos, out Connection target))
+			{
+				target.External = isExternal;
+			}
+		}
+
 		private void TryAddConnections(Tile t)
 		{
 			foreach (Vector2Int connectionPos in t.GetAllAdjPosition())

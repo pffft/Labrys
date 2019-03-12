@@ -13,6 +13,8 @@ namespace Labrys.Editor.FeatureEditor.Tools
 
 		private ConnectionEditorPanel panel;
 
+		private bool settingExternal = false;
+
 		public ConnectionEditorTool(EditorWindow window) : base(window)
 		{
 			manipPositions = new HashSet<Vector2Int>();
@@ -27,7 +29,7 @@ namespace Labrys.Editor.FeatureEditor.Tools
 			foreach (Vector2Int position in manipPositions)
 			{
 				Vector2 screenPos = EditorGrid.GetInstance().GridToScreenPos(position);
-				Handles.DrawSolidDisc(new Vector3(screenPos.x, screenPos.y), Vector3.forward, EditorGrid.GetInstance().scale * Connection.SIZE);
+				Handles.DrawSolidArc(new Vector3(screenPos.x, screenPos.y), Vector3.forward, Vector3.down, 180f, EditorGrid.GetInstance().scale * Connection.SIZE);
 			}
 			Handles.EndGUI();
 
@@ -42,6 +44,8 @@ namespace Labrys.Editor.FeatureEditor.Tools
 			switch (e.type)
 			{
 			case EventType.MouseDown:
+				settingExternal = (e.button == 0 || e.button == 1) && e.control;
+				goto case EventType.MouseDrag;
 			case EventType.MouseDrag:
 				if (e.button == 0 || e.button == 1)
 				{
@@ -49,7 +53,11 @@ namespace Labrys.Editor.FeatureEditor.Tools
 					if (EditorGrid.GetInstance().HasConnectionAt(position))
 					{
 						manipPositions.Add(position);
-						if (e.button == 0)
+						if(settingExternal)
+						{
+							previewColor = Color.yellow;
+						}
+						else if (e.button == 0)
 						{
 							previewColor = Color.green;
 						}
@@ -66,7 +74,16 @@ namespace Labrys.Editor.FeatureEditor.Tools
 				{
 					Vector2Int[] finalPositions = new Vector2Int[manipPositions.Count];
 					manipPositions.CopyTo(finalPositions);
-					Command c = new ConnectionToggleCommand(finalPositions) { TargetState = e.button == 0 ? true : e.button == 1 ? false : false };
+					bool targetState = e.button == 0 ? true : e.button == 1 ? false : false;
+					Command c;
+					if (settingExternal)
+					{
+						c = new ConnectionMarkExCommand(finalPositions) { TargetState = targetState };
+					}
+					else
+					{
+						c = new ConnectionToggleCommand(finalPositions) { TargetState = targetState };
+					}
 					c.Do();
 					History.RecordCommand(c);
 					e.Use();
