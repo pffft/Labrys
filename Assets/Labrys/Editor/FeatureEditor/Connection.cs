@@ -29,7 +29,7 @@ namespace Labrys.Editor.FeatureEditor
 			if (External)
 			{
 				Handles.color = externalColor;
-				Handles.DrawSolidArc(new Vector3(ScreenPosition.x, ScreenPosition.y), Vector3.forward, Vector3.up, 180f, Scale * SIZE);
+				Handles.DrawSolidArc(new Vector3(ScreenPosition.x, ScreenPosition.y), Vector3.forward, Vector3.left, 180f, Scale * SIZE);
 			}
 			Handles.EndGUI();
 		}
