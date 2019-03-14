@@ -11,7 +11,7 @@ namespace Labrys.Editor.FeatureEditor.Commands
 		{
 			foreach(Vector2Int gp in SelectedPositions)
 			{
-				EditorGrid.GetInstance().SelectTile(gp);
+				EditorGrid.GetInstance().Feature.SelectSection(gp);
 			}
 		}
 
@@ -19,7 +19,7 @@ namespace Labrys.Editor.FeatureEditor.Commands
 		{
 			foreach (Vector2Int gp in SelectedPositions)
 			{
-				EditorGrid.GetInstance().DeselectTile(gp);
+				EditorGrid.GetInstance().Feature.DeselectSection(gp);
 			}
 		}
 	}

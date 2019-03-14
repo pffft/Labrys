@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using Labrys.FeatureEditor;
+using System.Collections.Generic;
 using UnityEditor;
 using UnityEngine;
 
@@ -6,7 +7,14 @@ namespace Labrys.Editor.FeatureEditor
 {
 	public class EditorGrid
 	{
-		public const float GRID_DENSITY = 2f;
+		public static Color lineColor = new Color(0.4f, 0.4f, 0.4f);
+
+		private static Color selectedColor = new Color(0.5f, 0.5f, 0.8f);
+
+		public const float LINK_SIZE = 10f;
+		private static Color openColor = new Color(0f, 0.8f, 0f);
+		private static Color closedColor = new Color(0.9f, 0f, 0f);
+		private static Color externalColor = new Color(0.8f, 0.8f, 0f);
 
 		private static EditorGrid instance;
 
@@ -14,14 +22,11 @@ namespace Labrys.Editor.FeatureEditor
 
 		public float scale = 1f;
 		public float lineSpacing = 64f;
-		public Color lineColor = new Color(0.4f, 0.4f, 0.4f);
 
 		private Vector2 offset;
 		private Vector2 drag;
 
-		private Dictionary<Vector2Int, Tile> tiles;
-		private List<Tile> selectedTiles;
-		private Dictionary<Vector2Int, Connection> connections;
+		public FeatureAsset Feature { get; set; }
 
 		public static EditorGrid GetInstance()
 		{
@@ -32,20 +37,11 @@ namespace Labrys.Editor.FeatureEditor
 			return instance;
 		}
 
-		public static bool IsTilePosition(Vector2Int gridPosition)
-		{
-			return gridPosition.x % 2 == 0 && gridPosition.y % 2 == 0;
-		}
-
 		public EditorGrid()
 		{
 			viewport = new Rect();
 
 			offset = Vector2.zero;
-
-			tiles = new Dictionary<Vector2Int, Tile>();
-			selectedTiles = new List<Tile>();
-			connections = new Dictionary<Vector2Int, Connection>();
 		}
 
 		public void Draw()
@@ -93,16 +89,36 @@ namespace Labrys.Editor.FeatureEditor
 
 		private void DrawObjects()
 		{
-			if (tiles != null)
+			if (Feature == null)
+				return;
+
+			Vector2 screenPosition = Vector2.zero;
+			Rect bounds = new Rect(screenPosition, GetScaledTileSize());
+
+			// Draw Sections
+			foreach(KeyValuePair<Vector2Int, FeatureAsset.Section> section in Feature.GetSections())
 			{
-				foreach (GridObject t in tiles.Values)
-					t.Draw ();
+				screenPosition = GridToScreenPos(section.Key);				bounds.position = screenPosition;
+				bounds.center = screenPosition;
+				Color temp = GUI.color;
+				GUI.color = Feature.IsSelected(section.Key) ? selectedColor : Color.white;
+				GUI.Box(bounds, "");
+				GUI.color = temp;
 			}
 
-			if (connections != null)
+			// Draw Links
+			foreach(KeyValuePair<Vector2Int, FeatureAsset.Link> link in Feature.GetLinks())
 			{
-				foreach (GridObject c in connections.Values)
-					c.Draw();
+				screenPosition = GridToScreenPos(link.Key);
+				Handles.color = link.Value.Open ? openColor : closedColor;
+				Handles.BeginGUI();
+				Handles.DrawSolidDisc(new Vector3(screenPosition.x, screenPosition.y), Vector3.forward, scale * LINK_SIZE);
+				if (link.Value.External)
+				{
+					Handles.color = externalColor;
+					Handles.DrawSolidArc(new Vector3(screenPosition.x, screenPosition.y), Vector3.forward, Vector3.left, 180f, scale * LINK_SIZE);
+				}
+				Handles.EndGUI();
 			}
 		}
 
@@ -117,7 +133,7 @@ namespace Labrys.Editor.FeatureEditor
 				//drag the grid and the tiles
 				if (e.button == 2)
 				{
-					Shift (e.delta);
+					Shift(e.delta);
 					guiChanged = true;
 				}
 				break;
@@ -127,15 +143,6 @@ namespace Labrys.Editor.FeatureEditor
 				else
 					Resize(scale * 1.1f);
 				guiChanged = true;
-				break;
-			case EventType.KeyDown:
-				//create a new tile
-				//TODO remove
-				if (e.keyCode == KeyCode.N)
-				{
-					CreateTile (e.mousePosition);
-					guiChanged = true;
-				}
 				break;
 			}
 
@@ -175,214 +182,6 @@ namespace Labrys.Editor.FeatureEditor
 			return new Vector2(lineSpacing, lineSpacing) * scale;
 		}
 
-		public Tile CreateTile(Vector2 screenPos)
-		{
-			Tile t = new Tile (screenPos, GetBaseTileSize());
-			t.GridPosition = ScreenToGridPos (screenPos, evenOnly: true);
-
-			if (!tiles.ContainsKey(t.GridPosition))
-			{
-				tiles.Add(t.GridPosition, t);
-				TryAddConnections(t);
-				return t;
-			}
-
-			return null;
-		}
-		public Tile CreateTile(Vector2Int gridPos)
-		{
-			if (IsTilePosition(gridPos))
-			{
-				Vector2 screenPos = GridToScreenPos(gridPos);
-				return CreateTile(screenPos);
-			}
-			return null;
-		}
-
-		public void RemoveTile(Vector2Int gridPos)
-		{
-			if(tiles.TryGetValue(gridPos, out Tile t))
-			{
-				DeselectTile(t);
-				tiles.Remove(gridPos);
-				TryRemoveConnections(t);
-			}
-		}
-		
-		public void SelectTile(Vector2 screenPos)
-		{
-			Vector2Int gridPos = ScreenToGridPos(screenPos, true);
-			SelectTile(gridPos);
-		}
-		public void SelectTile(Vector2Int gridPos)
-		{
-			if (tiles.TryGetValue(gridPos, out Tile t))
-			{
-				SelectTile(t);
-			}
-		}
-		public void SelectTile(Tile t)
-		{
-			if (!t.IsSelected)
-			{
-				t.IsSelected = true;
-				selectedTiles.Add(t);
-			}
-		}
-
-		public void DeselectTile(Vector2 screenPos)
-		{
-			Vector2Int gridPos = ScreenToGridPos(screenPos, true);
-			DeselectTile(gridPos);
-		}
-		public void DeselectTile(Vector2Int gridPos)
-		{
-			if (tiles.TryGetValue(gridPos, out Tile t))
-			{
-				DeselectTile(t);
-			}
-		}
-		public void DeselectTile(Tile t)
-		{
-			if (t.IsSelected)
-			{
-				t.IsSelected = false;
-				selectedTiles.Remove(t);
-			}
-		}
-
-		public bool HasTileAt(Vector2Int gridPosition)
-		{
-			return tiles.ContainsKey(gridPosition);
-		}
-
-		public bool MoveTile(Vector2 screenPos, Tile t)
-		{
-			Vector2Int newGridPos = ScreenToGridPos(screenPos, evenOnly: true);
-			if (!tiles.ContainsKey(newGridPos))
-			{
-				tiles.Remove(t.GridPosition);
-				TryRemoveConnections(t);
-
-				t.GridPosition = newGridPos;
-				tiles.Add(t.GridPosition, t);
-
-				TryAddConnections(t);
-				return true;
-			}
-			else
-			{
-				t.RevertShift();
-				return false;
-			}
-		}
-
-		public GridObject GetGridObject(Vector2 screenPos)
-		{
-			Vector2Int gridPos = ScreenToGridPos(screenPos);
-			if (tiles.TryGetValue(gridPos, out Tile t))
-			{
-				return t;
-			}
-			else if (connections.TryGetValue(gridPos, out Connection c))
-			{
-				return c;
-			}
-			return null;
-		}
-
-
-		public void RemoveGridObject(GridObject go)
-		{
-			if (typeof(Tile) == go.GetType())
-			{
-				Tile t = (Tile)go;
-				tiles.Remove(go.GridPosition);
-				TryRemoveConnections(t);
-			}
-			else
-			{
-				connections.Remove(go.GridPosition);
-			}
-			GUI.changed = true;
-		}
-
-		public bool HasConnectionAt(Vector2Int gridPos)
-		{
-			return connections.ContainsKey(gridPos);
-		}
-
-		public void SetConnectionState(Vector2Int gridPos, bool isOpen)
-		{
-			if (connections.TryGetValue(gridPos, out Connection target))
-			{
-				target.Open = isOpen;
-			}
-		}
-
-		public void SetConnectionExternal(Vector2Int gridPos, bool isExternal)
-		{
-			if (connections.TryGetValue(gridPos, out Connection target))
-			{
-				target.External = isExternal;
-			}
-		}
-
-		private void TryAddConnections(Tile t)
-		{
-			foreach (Vector2Int connectionPos in t.GetAllAdjPosition())
-			{
-				if (!connections.TryGetValue(connectionPos, out Connection existingConnection))
-				{
-					Connection newConnection = new Connection(connectionPos);
-					if (CheckConnectionValidity(newConnection))
-					{
-						connections.Add(connectionPos, newConnection);
-					}
-				}
-				else if(!CheckConnectionValidity(existingConnection))
-				{
-					connections.Remove(connectionPos);
-				}
-			}
-		}
-
-		private void TryRemoveConnections(Tile t)
-		{
-			//check all connections are still valid
-			foreach (Vector2Int connectionPos in t.GetAllAdjPosition())
-			{
-				if (connections.TryGetValue(connectionPos, out Connection c))
-				{
-					//remove connections that have no tile neightbors
-					if (!CheckConnectionValidity(c))
-					{
-						connections.Remove(connectionPos);
-					}
-				}
-			}
-		}
-
-		private bool CheckConnectionValidity(Connection c)
-		{
-			int nCount = GetConnectionNeighborCount(c);
-			c.GetMinMaxSubjectTileCount(out int nMin, out int nMax);
-			return nMax == 2 ? nCount >= nMin : nCount == nMax;
-		}
-
-		private int GetConnectionNeighborCount(Connection c)
-		{
-			int neighborCount = 0;
-			foreach (Vector2Int tilePos in c.GetSubjectTileGridPositions())
-			{
-				if (tiles.ContainsKey(tilePos))
-				{
-					neighborCount++;
-				}
-			}
-			return neighborCount;
-		}
-
 		/// <summary>
 		/// Transforms a screen position to a grid position (1:1).
 		/// </summary>
@@ -395,7 +194,7 @@ namespace Labrys.Editor.FeatureEditor
 			{
 				gridPos = new Vector2(Mathf.Round(gridPos.x), Mathf.Round(gridPos.y));
 			}
-			return gridPos * GRID_DENSITY;
+			return gridPos * FeatureAsset.GRID_DENSITY;
 		}
 
 		/// <summary>
@@ -417,8 +216,8 @@ namespace Labrys.Editor.FeatureEditor
 		public Vector2 GridToScreenSpace(Vector2 gridPos)
 		{
 			return new Vector2(
-				(gridPos.x * lineSpacing * scale / GRID_DENSITY) + offset.x,
-				(gridPos.y * lineSpacing * scale / GRID_DENSITY) + offset.y);
+				(gridPos.x * lineSpacing * scale / FeatureAsset.GRID_DENSITY) + offset.x,
+				(gridPos.y * lineSpacing * scale / FeatureAsset.GRID_DENSITY) + offset.y);
 		}
 
 		/// <summary>
@@ -437,8 +236,8 @@ namespace Labrys.Editor.FeatureEditor
 			Vector2Int endingGridPos = ScreenToGridPos(r.max, evenOnly);
 
 			Vector2Int selectionAreaDimen = endingGridPos - startingGridPos;
-			int xIncr = (evenOnly ? (int)GRID_DENSITY : 1) * (int)Mathf.Sign(selectionAreaDimen.x);
-			int yIncr = (evenOnly ? (int)GRID_DENSITY : 1) * (int)Mathf.Sign(selectionAreaDimen.y);
+			int xIncr = (evenOnly ? (int)FeatureAsset.GRID_DENSITY : 1) * (int)Mathf.Sign(selectionAreaDimen.x);
+			int yIncr = (evenOnly ? (int)FeatureAsset.GRID_DENSITY : 1) * (int)Mathf.Sign(selectionAreaDimen.y);
 
 			List<Vector2Int> gridPositons = new List<Vector2Int>();
 			for (int x = startingGridPos.x; x != endingGridPos.x + xIncr; x += xIncr)

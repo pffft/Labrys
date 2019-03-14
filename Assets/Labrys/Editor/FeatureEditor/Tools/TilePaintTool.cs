@@ -41,7 +41,7 @@ namespace Labrys.Editor.FeatureEditor.Tools
 				if (e.button == 0 || e.button == 1)
 				{
 					Vector2Int position = EditorGrid.GetInstance().ScreenToGridPos(e.mousePosition, true);
-					bool posHasTile = EditorGrid.GetInstance().HasTileAt(position);
+					bool posHasTile = EditorGrid.GetInstance().Feature.HasSectionAt(position);
 					if ((e.button == 0 && !posHasTile) || (e.button == 1 && posHasTile))
 					{
 						manipPositions.Add(position);

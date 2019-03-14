@@ -16,7 +16,7 @@ namespace Labrys.Editor.FeatureEditor.Commands
 		{
 			foreach(Vector2Int position in manipPositions)
 			{
-				Tile t = EditorGrid.GetInstance().CreateTile(position);
+				EditorGrid.GetInstance().Feature.AddSection(position);
 			}
 		}
 
@@ -24,7 +24,7 @@ namespace Labrys.Editor.FeatureEditor.Commands
 		{
 			foreach (Vector2Int position in manipPositions)
 			{
-				EditorGrid.GetInstance().RemoveTile(position);
+				EditorGrid.GetInstance().Feature.RemoveSection(position);
 			}
 		}
 	}
