@@ -1,5 +1,4 @@
-﻿
-using UnityEngine;
+﻿using UnityEngine;
 
 namespace Labrys.Editor.FeatureEditor.Commands
 {

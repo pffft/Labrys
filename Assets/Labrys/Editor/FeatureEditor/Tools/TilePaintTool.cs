@@ -14,6 +14,8 @@ namespace Labrys.Editor.FeatureEditor.Tools
 		{
 			manipPositions = new HashSet<Vector2Int>();
 			previewColor = Color.white;
+
+			Name = "Tile Brush";
 		}
 
 		public override void Draw()
