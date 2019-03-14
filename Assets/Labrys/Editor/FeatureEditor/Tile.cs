@@ -1,5 +1,4 @@
-﻿using UnityEditor;
-using UnityEngine;
+﻿using UnityEngine;
 
 namespace Labrys.Editor.FeatureEditor
 {
@@ -7,16 +6,11 @@ namespace Labrys.Editor.FeatureEditor
 	{
 		private static Color selectedColor = new Color(0.5f, 0.5f, 0.8f);
 
-		public event Action removed;
-		public event Action dragFinished;
-
-		public bool IsDragging { get; set; }
 		public bool IsSelected { get; set; }
 
 		private Rect bounds;
 		private Vector2 baseSize;
 
-		[PropertyField(Name = "Variant")]
 		public string Variant { get; set; }
 
 		public Vector2Int Right => GridPosition + Vector2Int.right;
