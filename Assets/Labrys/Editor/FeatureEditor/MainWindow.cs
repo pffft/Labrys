@@ -1,6 +1,8 @@
 ﻿using Labrys.Editor.FeatureEditor.Panels;
 using Labrys.Editor.FeatureEditor.Tools;
+using Labrys.FeatureEditor;
 using UnityEditor;
+using UnityEditor.Callbacks;
 using UnityEngine;
 
 namespace Labrys.Editor.FeatureEditor
@@ -12,6 +14,19 @@ namespace Labrys.Editor.FeatureEditor
 		{
 			MainWindow window = GetWindow<MainWindow> ();
 			window.titleContent = new GUIContent ("Labrys Feature Editor");
+		}
+
+		[OnOpenAsset(1)]
+		private static bool OnOpenAsset(int instanceId, int line)
+		{
+			if(Selection.activeObject != null && Selection.activeObject is FeatureAsset)
+			{
+				Debug.Log("Opening " + Selection.activeObject.name + " in Feature Editor"); //TODO remove debug\
+				EditorGrid.GetInstance().Feature = (FeatureAsset)Selection.activeObject;
+				OpenWindow();
+				return true;
+			}
+			return false;
 		}
 
 		private ToolBox toolBox;

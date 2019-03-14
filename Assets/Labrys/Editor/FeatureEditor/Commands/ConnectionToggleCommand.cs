@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using Labrys.FeatureEditor;
+using UnityEngine;
 
 namespace Labrys.Editor.FeatureEditor.Commands
 {
@@ -17,7 +18,10 @@ namespace Labrys.Editor.FeatureEditor.Commands
 		{
 			foreach (Vector2Int position in manipPositions)
 			{
-				EditorGrid.GetInstance().SetConnectionState(position, TargetState);
+				if (EditorGrid.GetInstance().Feature.TryGetLink(position, out FeatureAsset.Link link))
+				{
+					link.Open = TargetState;
+				}
 			}
 		}
 
@@ -25,7 +29,10 @@ namespace Labrys.Editor.FeatureEditor.Commands
 		{
 			foreach (Vector2Int position in manipPositions)
 			{
-				EditorGrid.GetInstance().SetConnectionState(position, !TargetState);
+				if (EditorGrid.GetInstance().Feature.TryGetLink(position, out FeatureAsset.Link link))
+				{
+					link.Open = !TargetState;
+				}
 			}
 		}
 	}

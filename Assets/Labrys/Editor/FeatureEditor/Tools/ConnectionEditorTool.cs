@@ -32,7 +32,7 @@ namespace Labrys.Editor.FeatureEditor.Tools
 			foreach (Vector2Int position in manipPositions)
 			{
 				Vector2 screenPos = EditorGrid.GetInstance().GridToScreenPos(position);
-				Handles.DrawSolidArc(new Vector3(screenPos.x, screenPos.y), Vector3.forward, rotStartDir, 180f, EditorGrid.GetInstance().scale * Connection.SIZE);
+				Handles.DrawSolidArc(new Vector3(screenPos.x, screenPos.y), Vector3.forward, rotStartDir, 180f, EditorGrid.GetInstance().scale * EditorGrid.LINK_SIZE);
 			}
 			Handles.EndGUI();
 
@@ -53,7 +53,7 @@ namespace Labrys.Editor.FeatureEditor.Tools
 				if (e.button == 0 || e.button == 1)
 				{
 					Vector2Int position = EditorGrid.GetInstance().ScreenToGridPos(e.mousePosition);
-					if (EditorGrid.GetInstance().HasConnectionAt(position))
+					if (EditorGrid.GetInstance().Feature.HasLinkAt(position))
 					{
 						manipPositions.Add(position);
 						if(settingExternal)
