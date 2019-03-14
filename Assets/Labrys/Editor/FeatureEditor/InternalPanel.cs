@@ -1,6 +1,5 @@
 ﻿using UnityEngine;
 using UnityEditor;
-using JetBrains.Annotations;
 
 namespace Labrys.Editor.FeatureEditor
 {
@@ -14,7 +13,7 @@ namespace Labrys.Editor.FeatureEditor
 		public float Width { get { return bounds.width; } set { bounds.width = value; } }
 		public float Height { get { return bounds.height; } set { bounds.height = value; } }
 
-		public InternalPanel([NotNull] EditorWindow window, DockPosition alignment, float scale)
+		public InternalPanel(EditorWindow window, DockPosition alignment, float scale)
 		{
 			this.window = window;
 			this.alignment = alignment;
@@ -25,6 +24,7 @@ namespace Labrys.Editor.FeatureEditor
 		public virtual void Draw()
 		{
 			CalculateRect();
+			GUI.color = Color.white;
 			GUI.Box(bounds, "");
 		}
 

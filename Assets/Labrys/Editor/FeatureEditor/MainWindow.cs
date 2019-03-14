@@ -14,22 +14,14 @@ namespace Labrys.Editor.FeatureEditor
 			window.titleContent = new GUIContent ("Labrys Feature Editor");
 		}
 
-		private SelectionTool selectTool;
-		private TilePaintTool tilePaintTool;
-		private ConnectionEditorTool connectionEditorTool;
-
-		private Tool activeTool;
-
 		private ToolBox toolBox;
 
 		public MainWindow()
 		{
-			selectTool = new SelectionTool(this);
-			tilePaintTool = new TilePaintTool(this);
-			connectionEditorTool = new ConnectionEditorTool(this);
-			activeTool = selectTool;
-
 			toolBox = new ToolBox(this, InternalPanel.DockPosition.left, 150f);
+			toolBox.AddTool(new SelectionTool(this));
+			toolBox.AddTool(new TilePaintTool(this));
+			toolBox.AddTool(new ConnectionEditorTool(this));
 		}
 
 		private void OnEnable()
@@ -42,7 +34,7 @@ namespace Labrys.Editor.FeatureEditor
 		{
 			EditorGrid.GetInstance().viewport = position;
 			EditorGrid.GetInstance().Draw ();
-			activeTool.Draw();
+			toolBox.ActiveTool.Draw();
 
 			toolBox.Draw();
 
@@ -60,7 +52,7 @@ namespace Labrys.Editor.FeatureEditor
 				return;
 			}
 
-			if (activeTool.HandleEvent(e))
+			if (toolBox.ActiveTool.HandleEvent(e))
 			{
 				GUI.changed = true;
 				return;
@@ -93,24 +85,7 @@ namespace Labrys.Editor.FeatureEditor
 				}
 				else
 				{
-					if(e.keyCode == KeyCode.S)
-					{
-						activeTool = selectTool;
-						GUI.changed = true;
-						e.Use();
-					}
-					else if(e.keyCode == KeyCode.A)
-					{
-						activeTool = tilePaintTool;
-						GUI.changed = true;
-						e.Use();
-					}
-					else if (e.keyCode == KeyCode.C)
-					{
-						activeTool = connectionEditorTool;
-						GUI.changed = true;
-						e.Use();
-					}
+
 				}
 				break;
 			default:

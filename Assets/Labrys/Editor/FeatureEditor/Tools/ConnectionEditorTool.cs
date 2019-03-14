@@ -20,6 +20,8 @@ namespace Labrys.Editor.FeatureEditor.Tools
 			manipPositions = new HashSet<Vector2Int>();
 			previewColor = Color.white;
 			panel = new ConnectionEditorPanel(window, InternalPanel.DockPosition.right, 150f);
+
+			Name = "Connection Editor";
 		}
 
 		public override void Draw()

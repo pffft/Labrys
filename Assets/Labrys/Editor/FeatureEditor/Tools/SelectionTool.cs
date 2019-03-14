@@ -17,6 +17,8 @@ namespace Labrys.Editor.FeatureEditor.Tools
 		public SelectionTool(EditorWindow window) : base(window)
 		{
 			selectionRect = new Rect();
+
+			Name = "Select";
 		}
 
 		public override void Draw()
