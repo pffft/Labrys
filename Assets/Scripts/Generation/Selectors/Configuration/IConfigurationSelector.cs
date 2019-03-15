@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace Labrys.Selectors
+namespace Labrys.Generation.Selectors
 {
     public interface IConfigurationSelector
     {

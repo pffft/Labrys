@@ -5,7 +5,7 @@ using UnityEditor;
 
 using Labrys.Tiles;
 
-namespace Labrys
+namespace Labrys.Generation
 {
     //[CustomPropertyDrawer(typeof(TileSet))]
     public class TileSetDrawer : PropertyDrawer

@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Profiling;
 
-namespace Labrys
+namespace Labrys.Generation
 {
     public class Grid
     {

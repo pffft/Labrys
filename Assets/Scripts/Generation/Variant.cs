@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace Labrys
+namespace Labrys.Generation
 {
     /// <summary>
     /// A static class maintaining lookup tables for Variants to their IDs.

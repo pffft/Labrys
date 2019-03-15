@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace Labrys
+namespace Labrys.Generation
 {
     public class LazyLoader : IGameObjectLoader
     {

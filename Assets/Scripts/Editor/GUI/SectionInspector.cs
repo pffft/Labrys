@@ -2,9 +2,9 @@
 using UnityEditor;
 using UnityEditor.AnimatedValues;
 
-namespace Labrys
+namespace Labrys.Generation
 {
-    [CustomEditor(typeof(Section))]
+    //[CustomEditor(typeof(Section))]
     public class SectionInspector : Editor
     {
         public override void OnInspectorGUI()

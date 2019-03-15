@@ -4,7 +4,7 @@ using NUnit.Framework;
 using UnityEngine;
 using UnityEngine.TestTools;
 
-using Labrys;
+using Labrys.Generation;
 
 namespace Tests
 {
@@ -66,7 +66,7 @@ namespace Tests
         [Test]
         public void CanPlaceBasic() 
         {
-            Labrys.Grid grid = new Labrys.Grid();
+            Labrys.Generation.Grid grid = new Labrys.Generation.Grid();
 
             grid[0, 0] = new Section();
 
@@ -121,7 +121,7 @@ namespace Tests
         [Test]
         public void CanPlaceWithRotation()
         {
-            Labrys.Grid grid = new Labrys.Grid();
+            Labrys.Generation.Grid grid = new Labrys.Generation.Grid();
             grid[0, 0] = new Section();
 
             // 3x1 feature
@@ -214,7 +214,7 @@ namespace Tests
         [Test]
         public void CanPlaceWithRotationAndOffset()
         {
-            Labrys.Grid grid = new Labrys.Grid();
+            Labrys.Generation.Grid grid = new Labrys.Generation.Grid();
             grid[0, 0] = new Section();
 
             // 3x1 feature, but offset.
@@ -255,7 +255,7 @@ namespace Tests
         [Test]
         public void CanConnectBasic()
         {
-            Labrys.Grid grid = new Labrys.Grid();
+            Labrys.Generation.Grid grid = new Labrys.Generation.Grid();
             grid[0, 0] = new Section();
 
             // 3x1 feature

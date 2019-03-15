@@ -5,7 +5,7 @@ using UnityEditor;
 
 using Labrys.Tiles;
 
-namespace Labrys
+namespace Labrys.Generation
 {
     [CustomEditor(typeof(TileSet))]
     public class TileSetInspector : Editor

@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace Labrys
+namespace Labrys.Generation
 {
     /// <summary>
     /// A logical collection of Section objects. A Feature contains a list of

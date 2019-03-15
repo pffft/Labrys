@@ -16,6 +16,8 @@ public enum Connection : byte
     Southeast = 128,
 
     None = 0,
+    Vertical = North | South,
+    Horizontal = East | West,
     Cardinal = East | North | West | South,
     All = Cardinal | Northeast | Northwest | Southeast | Southwest
 }

@@ -5,7 +5,7 @@ using UnityEditor;
 
 using Labrys.Tiles;
 
-namespace Labrys
+namespace Labrys.Generation
 {
     [CustomEditor(typeof(Tile))]
     public class TileInspector : Editor
@@ -28,7 +28,13 @@ namespace Labrys
             GUI.enabled = true;
 
             EditorGUILayout.TextField("Variant", tile.variant);
-            EditorGUILayout.PropertyField(serializedTile.FindProperty("gameObject"));
+            //EditorGUILayout.PropertyField(serializedTile.FindProperty("gameObject"));
+
+            // TODO remove this debug
+            GUI.enabled = false;
+            EditorGUILayout.TextField("Internal Connections", tile.section.internalConnections.ToString());
+            EditorGUILayout.TextField("External Connections", tile.section.externalConnections.ToString());
+            GUI.enabled = true;
         }
     }
 }

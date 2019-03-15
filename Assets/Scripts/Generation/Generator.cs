@@ -4,9 +4,9 @@ using UnityEngine;
 using UnityEngine.Profiling;
 
 using Labrys.Tiles;
-using Labrys.Selectors;
+using Labrys.Generation.Selectors;
 
-namespace Labrys
+namespace Labrys.Generation
 {
     public class Generator : MonoBehaviour
     {
@@ -137,10 +137,10 @@ namespace Labrys
             //}
 
             // Feature testing
-            grid[new Vector2Int(0, 0)] = Section.Default();
-            grid[new Vector2Int(1, 0)] = Section.Default();
-            grid[new Vector2Int(0, 1)] = Section.Default();
-            grid[new Vector2Int(1, 1)] = Section.Default();
+            //grid[new Vector2Int(0, 0)] = Section.Default();
+            //grid[new Vector2Int(1, 0)] = Section.Default();
+            //grid[new Vector2Int(0, 1)] = Section.Default();
+            //grid[new Vector2Int(1, 1)] = Section.Default();
 
             // Basic 2x2
             Feature feature = new Feature();
@@ -231,13 +231,26 @@ namespace Labrys
         {
             // Temporary: feature list
             Feature basicFeature = new Feature();
-            basicFeature.Add(new Vector2Int(0, 0), Connection.Cardinal);
-            basicFeature.Add(new Vector2Int(1, 0), Connection.West | Connection.East);
-            basicFeature.Add(new Vector2Int(-1, 0), Connection.West | Connection.East);
-            basicFeature.Add(new Vector2Int(0, 1), Connection.North | Connection.South);
-            basicFeature.Add(new Vector2Int(0, -1), Connection.North | Connection.South);
+            basicFeature.Add(new Vector2Int(0, 0), Connection.Horizontal, externalConnections: Connection.West);
+
+            //Feature crossFeature = new Feature();
+            //crossFeature.Add(new Vector2Int(0, 0), Connection.All, "default", Connection.Cardinal);
+            //crossFeature.Add(new Vector2Int(1, 0), Connection.All, "default", Connection.North | Connection.South);
+            //crossFeature.Add(new Vector2Int(-1, 0), Connection.All, "default", Connection.North | Connection.South);
+            //crossFeature.Add(new Vector2Int(0, 1), Connection.All, "default", Connection.West | Connection.East);
+            //crossFeature.Add(new Vector2Int(0, -1), Connection.All, "default", Connection.West | Connection.East);
+
+            //Feature corridor = new Feature();
+            //corridor.Add(new Vector2Int(0, 0), Connection.Cardinal, externalConnections: Connection.West);
+            //corridor.Add(new Vector2Int(1, 0), Connection.Vertical, externalConnections: Connection.None);
+            //corridor.Add(new Vector2Int(2, 0), Connection.Vertical, externalConnections: Connection.None);
+            //corridor.Add(new Vector2Int(3, 0), Connection.Vertical, externalConnections: Connection.None);
+            //corridor.Add(new Vector2Int(4, 0), Connection.Cardinal, externalConnections: Connection.East);
 
             Feature[] featureList = { basicFeature };
+
+            // Initialize with a single starting room
+            grid[0, 0] = Section.Default();
 
             // Pick some ending condition
             int count = 0;
@@ -318,6 +331,7 @@ namespace Labrys
                 // Arbitrarily choose first one; TODO add smarter logic to choose which
                 // variant to take (and add parameters for it)
                 Tile chosenTile = searchResult[0];
+                chosenTile.section = section;
 
                 Profiler.EndSample();
                 Profiler.BeginSample("Placing physical GO");

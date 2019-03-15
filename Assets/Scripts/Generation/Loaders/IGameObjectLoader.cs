@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace Labrys
+namespace Labrys.Generation
 {
     /// <summary>
     /// An interface providing GameObject loading functionality.

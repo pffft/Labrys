@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-namespace Labrys.Selectors 
+namespace Labrys.Generation.Selectors 
 {
     public class RandomPositionSelector : IPositionSelector
     {

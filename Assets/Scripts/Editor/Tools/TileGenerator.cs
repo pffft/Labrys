@@ -6,7 +6,7 @@ using System.IO;
 
 using Labrys.Tiles;
 
-namespace Labrys
+namespace Labrys.Generation
 {
     //[CustomEditor(typeof(GameManager))]
     public class TileGenerator : EditorWindow

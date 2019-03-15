@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+using Labrys.Generation;
+
 namespace Labrys.Tiles
 {
     /// <summary>
@@ -24,6 +26,10 @@ namespace Labrys.Tiles
         /// </summary>
         [SerializeField]
         public string variant;
+
+        // TODO remove me; this is debug
+        [SerializeField]
+        public Section section;
 
         public override string ToString()
         {
