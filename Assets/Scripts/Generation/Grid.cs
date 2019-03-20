@@ -5,6 +5,9 @@ using UnityEngine.Profiling;
 
 namespace Labrys.Generation
 {
+    /// <summary>
+    /// A Dictionary mapping Vector2Int positions to Section objects.
+    /// </summary>
     public class Grid
     {
         private List<Feature> features;
@@ -125,9 +128,8 @@ namespace Labrys.Generation
         /// If a Section has a neighbor, sets a Connection flag. Returns the combined
         /// set of Connection flags.
         /// 
-        /// TODO: optimize this method slightly. TryGetValue is relatively slow,
-        /// and is called 16 times when it can be called as few as 8 times.
-        /// CanConnect is already quite fast, so can be called more often.
+        /// Note: This is the easily readable, but much slower version of the function.
+        /// This function will likely be deprecated at some point.
         /// 
         /// </summary>
         /// <returns>The physical adjacencies.</returns>
@@ -427,7 +429,7 @@ namespace Labrys.Generation
         /// Gets the physical adjacencies at a given position.
         /// Specifically optimized for speed vs. "GetPhysicalAdjacencies".
         /// </summary>
-        /// <returns>The physical adjacencies2.</returns>
+        /// <returns>The physical adjacencies.</returns>
         /// <param name="position">Position.</param>
         public Connection GetPhysicalAdjacencies2(Vector2Int position)
         {
@@ -441,50 +443,10 @@ namespace Labrys.Generation
             {
                 if (thisSection.CanConnect(connectionsOrdered[i]))
                 {
+                    // Cache which one of the neighboring positions we're looking at.
                     positionPlusOffset = position + adjacentOffsets[i];
 
-                    // Try to find the Section in the cache, first.
-                    //foreach ((Vector2Int cachePosition, Section cacheSection) in sectionCache)
-                    //foreach (System.Tuple<Vector2Int, Section> tuple in sectionCache)
-                    //{
-                    //    if (tuple.Item1 == positionPlusOffset)
-                    //    {
-                    //        adjacentSections[i] = tuple.Item2;
-                    //        goto found;
-                    //    }
-                    //}
-
-                    /*
-                    Section cacheSection = sectionCache.Get(positionPlusOffset);
-                    if (cacheSection != null)
-                    {
-                        Profiler.BeginSample("Cache hit");
-                        Profiler.EndSample();
-                        adjacentSections[i] = cacheSection;
-                    }
-                    // If we couldn't find it in the cache, look it up in the big dictionary.
-                    // adjacentSections[i] is set to the Section, or null if it couldn't be found.
-                    else if (globalGrid.TryGetValue(positionPlusOffset, out adjacentSections[i]))
-                    {
-                        // Update the cache (if we found something)
-                        //if (sectionCache.Count == 10)
-                        //{
-                        //    sectionCache.RemoveLast();
-                        //    sectionCache.AddFirst((positionPlusOffset, adjacentSections[i]));
-                        //}
-                        //else
-                        //{
-                        //    sectionCache.AddFirst((positionPlusOffset, adjacentSections[i]));
-                        //}
-                        sectionCache.Add(positionPlusOffset, adjacentSections[i]);
-                    }
-                    // Didn't find it in either cache or dictionary- continue.
-                    else
-                    {
-                        continue;
-                    }
-                    */
-
+                    // The Section at the neighboring position
                     Section? foundSection = null;
 
                     // Try to find the section in the cache first.
@@ -492,7 +454,7 @@ namespace Labrys.Generation
                     foundSection = sectionCache.Get(positionPlusOffset);
                     Profiler.EndSample();
 
-                    // Found it - report. Can remove this when profiling is over.
+                    // If we found it - report. Can remove this when profiling is over.
                     if (foundSection != null)
                     {
                         Profiler.BeginSample("Cache hit");
@@ -504,6 +466,7 @@ namespace Labrys.Generation
                         Profiler.BeginSample("Cache miss - TryGetValue");
                         if (globalGrid.TryGetValue(positionPlusOffset, out Section globalFoundSection))
                         {
+                            // Ensure it's in the cache for next time.
                             sectionCache.Add(positionPlusOffset, globalFoundSection);
                             foundSection = globalFoundSection;
                         }
@@ -518,11 +481,11 @@ namespace Labrys.Generation
                         continue;
                     }
 
-                    // Guaranteed to be found and not null
+                    // Guaranteed to be found and not null at this point; Section? -> Section cast
                     adjacentSections[i] = (Section)foundSection;
 
                     Profiler.BeginSample("Section found postprocessing");
-                    // Ensure the section can connect back.
+                    // Ensure the neighboring section can connect back to the original position.
                     // i + 4 is the opposite direction connection; e.g., N => S.
                     if (((Section)adjacentSections[i]).CanConnect(connectionsOrdered[i + 4]))
                     {

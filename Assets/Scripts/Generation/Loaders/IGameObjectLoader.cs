@@ -13,6 +13,13 @@ namespace Labrys.Generation
     /// </summary>
     public interface IGameObjectLoader
     {
+        /// <summary>
+        /// Load the specified toLoad, position, rotation and scale.
+        /// </summary>
+        /// <param name="toLoad">To load.</param>
+        /// <param name="position">Position.</param>
+        /// <param name="rotation">Rotation.</param>
+        /// <param name="scale">Scale.</param>
         void Load(GameObject toLoad, Vector3 position, Quaternion rotation, Vector3 scale);
 
         void LastGameObjectSent();

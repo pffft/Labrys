@@ -4,6 +4,11 @@ using UnityEngine;
 
 namespace Labrys.Generation
 {
+    /// <summary>
+    /// A lazy loader implementation. Will do nothing until it has received every
+    /// GameObject that will be created, and then instantiate a certain amount per
+    /// frame. The order in which the objects are loaded can be specified.
+    /// </summary>
     public class LazyLoader : IGameObjectLoader
     {
         public enum Priority

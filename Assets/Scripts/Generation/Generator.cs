@@ -10,7 +10,10 @@ namespace Labrys.Generation
 {
     public class Generator : MonoBehaviour
     {
-
+        /// <summary>
+        /// A map of positions : Sections used to represent the current structure
+        /// of the dungeon at this generation step.
+        /// </summary>
         private Grid grid;
 
         [SerializeField]
@@ -35,18 +38,49 @@ namespace Labrys.Generation
         [Tooltip("Scale factor for grid size. By default same as Tile Scale")]
         private float distanceScale = 1f;
 
-        // The loader implementation.
+        /// <summary>
+        /// The game object loader implementation. After generation is complete, this loader will
+        /// be called to create the physical GameObjects (with different events passed in).
+        /// </summary>
+        /// <remarks>
+        /// BasicLoader will try to load every GameObject as soon as it is requested, which acts as
+        /// a blocking operation.
+        /// 
+        /// LazyLoader will wait until every GameObject that will be generated is requested, at
+        /// which point it will load up to "amountPerFrame" objects per frame. The order in which
+        /// they are loaded can also be specified. These parameters can be tweaked to make the
+        /// loading block minimally or maximally, or ensure a certain framerate.
+        /// 
+        /// TODO: add the loader and selectors to editor using a custom inspector.
+        /// </remarks>
         //private IGameObjectLoader gameObjectLoader = new LazyLoader(LazyLoader.Priority.Distance, 100);
         private IGameObjectLoader gameObjectLoader = new BasicLoader();
 
+        /// <summary>
+        /// Logic for deciding which Feature will get placed in the next generation step.
+        /// </summary>
         private IFeatureSelector featureSelector = new RandomFeatureSelector();
+
+        /// <summary>
+        /// Logic for deciding at which position we will try to place a Feature 
+        /// in the next generation step.
+        /// </summary>
         private IPositionSelector positionSelector = new RandomPositionSelector();
+
+        /// <summary>
+        /// Given a position and Feature, this holds the logic for which specific 
+        /// valid Configuration we should place down. 
+        /// </summary>
         private IConfigurationSelector configurationSelector = new RandomConfigurationSelector();
 
+        /// <summary>
+        /// Singleton instance of the Generator object.
+        /// </summary>
         public static Generator Instance;
 
         private void Awake()
         {
+            // Singleton setup code
             if (Instance == null)
             {
                 Instance = this;
@@ -66,137 +100,36 @@ namespace Labrys.Generation
                 tileSet = TileSet.LoadDefaultTileSet();
             }
 
-            //Debug.Log($"Generator started. TileSet status: {tileSet.status}");
-
             // This apparently makes TileSet validiate itself. Close enough.
             //tileSet.Initialize();
             tileSet.OnBeforeSerialize();
             tileSet.OnAfterDeserialize();
 
-            //sectionGrid = new Dictionary<Vector2Int, Section>();
             grid = new Grid();
 
-            // Dead-end
-            //grid[new Vector2Int(-1, 0)] = new Section();
-
-            //// Corner that can't connect to dead-end
-            //grid[new Vector2Int(-1, 1)] = new Section(Connection.All & ~Connection.South);
-            //grid[new Vector2Int(-1, 2)] = new Section();
-
-            // 2x2 room (corner rooms)
-            //grid[new Vector2Int(0, 0)] = new Section();
-            //grid[new Vector2Int(1, 0)] = new Section();
-            //grid[new Vector2Int(0, 1)] = new Section();
-            //grid[new Vector2Int(1, 1)] = new Section();
-
-
-            // 2 wide + shape
-            //grid[new Vector2Int(0, 0)] = new Section();
-            //grid[new Vector2Int(1, 0)] = new Section();
-            //grid[new Vector2Int(0, 1)] = new Section();
-            //grid[new Vector2Int(1, 1)] = new Section();
-
-            //grid[new Vector2Int(-1, 0)] = new Section();
-            //grid[new Vector2Int(-1, 1)] = new Section();
-
-            //grid[new Vector2Int(2, 0)] = new Section();
-            //grid[new Vector2Int(2, 1)] = new Section();
-
-            //grid[new Vector2Int(0, -1)] = new Section();
-            //grid[new Vector2Int(1, -1)] = new Section();
-
-            //grid[new Vector2Int(0, 2)] = new Section();
-            //grid[new Vector2Int(1, 2)] = new Section();
-
-            // Single + shape
-            //grid[new Vector2Int(-1, 0)] = new Section();
-            //grid[new Vector2Int(1, 0)] = new Section();
-            //grid[new Vector2Int(0, 0)] = new Section();
-            //grid[new Vector2Int(0, 1)] = new Section();
-            //grid[new Vector2Int(0, -1)] = new Section();
-
             Profiler.BeginSample("Adding tiles to grid");
-            //for (int i = 0; i < 5000; i++)
-            //{
-            //    Vector2Int position = Vector2Int.RoundToInt(25 * Random.insideUnitCircle);
 
-            //    grid[position] = Section.Default();
-            //}
-
-            // Roughly 100k sections
-
-            //int sideLength = (int)Mathf.Sqrt(500000) + 1;
-
-            //for (int i = 0; i < sideLength; i++)
-            //{
-            //    for (int j = 0; j < sideLength; j++) 
-            //    {
-            //        //grid[new Vector2Int(i, j)] = new Section(allowedConnections: Connection.North | Connection.South);
-            //        grid[new Vector2Int(i, j)] = Section.Default();
-            //    }
-            //}
-
-            // Feature testing
-            //grid[new Vector2Int(0, 0)] = Section.Default();
-            //grid[new Vector2Int(1, 0)] = Section.Default();
-            //grid[new Vector2Int(0, 1)] = Section.Default();
-            //grid[new Vector2Int(1, 1)] = Section.Default();
-
-            // Basic 2x2
-            Feature feature = new Feature();
-            feature.Add(new Vector2Int(0, 0));
-            feature.Add(new Vector2Int(1, 0));
-            feature.Add(new Vector2Int(0, 1));
-            feature.Add(new Vector2Int(1, 1));
-
-            //feature.Add(new Vector2Int(0, 2)); // These next 5 make it a 3x3
-            //feature.Add(new Vector2Int(1, 2));
-            //feature.Add(new Vector2Int(2, 2));
-            //feature.Add(new Vector2Int(2, 1));
-            //feature.Add(new Vector2Int(2, 0));
-
-            // 3x1 feature
-            //feature.Add(0, 0);
-            //feature.Add(1, 0);
-            //feature.Add(2, 0);
-            //feature.Add(3, 0); // Add these two for
-            //feature.Add(3, 1); // a long L feature
-
-
-            // Code for testing Feature configuration
-            //List<Feature.PlacementConfiguration> configs = new List<Feature.PlacementConfiguration>();
-
-            //configs.AddRange(feature.CanConnect(grid, Vector2Int.zero));
-            //configs.AddRange(feature.CanConnect(grid, new Vector2Int(1, 0)));
-            //configs.AddRange(feature.CanConnect(grid, new Vector2Int(0, 1)));
-            //configs.AddRange(feature.CanConnect(grid, new Vector2Int(1, 1)));
-
-            //StartCoroutine(CoolPlaceTiles(feature, configs));
-
-
-            //Assert.False(feature.CanPlace(grid, new Vector2Int(0, 0), new Vector2Int(1, 0), 1));
-            //feature.GetTransformedSections(new Vector2Int(1, 0), 1).ForEach(pos => grid[pos] = new Section());
-
-            //Debug.Log($"Can place feature at center?: " + feature.CanPlace(grid, Vector2Int.zero, Vector2Int.zero, 0));
-            //Debug.Log($"Can place feature to right?: " + feature.CanPlace(grid, Vector2Int.right, Vector2Int.zero, 0));
-
+            // Primary generation algorithm. Repeatedly adds features to the grid.
             Generate();
-
 
             Profiler.EndSample();
 
             Profiler.BeginSample("Resolving tiles");
+
+            // A method that resolves Section structures into physical Tiles.
             PlaceTiles();
+
             Profiler.EndSample();
         }
 
         // Visually appealing tile placement strategy.
-        private IEnumerator CoolPlaceTiles(Feature feature, List<Feature.PlacementConfiguration> configs)
+        // TODO this will probably be removed.
+        private IEnumerator CoolPlaceTiles(Feature feature, List<Feature.Configuration> configs)
         {
             yield return new WaitForSeconds(0.5f);
 
             int count = 0;
-            foreach (Feature.PlacementConfiguration configuration in configs)
+            foreach (Feature.Configuration configuration in configs)
             {
                 Debug.Log($"Trying configuration {count++}.");
                 // Clear all gameobjects (inefficiently, but just for the demo)
@@ -227,32 +160,34 @@ namespace Labrys.Generation
             }
         }
 
+        /// <summary>
+        /// Primary generation method. Summary:
+        /// 
+        /// 1. Gather feature list (stubbed for now)
+        /// 2. Generate starting room
+        /// 3. If ending condition is met, goto 10. Else continue.
+        /// 4. Select next Feature.
+        /// 5. Select next position.
+        /// 6. Compute all valid configurations.
+        /// 7. Select next configuration.
+        /// 8. Add all the Sections of the configured Feature.
+        /// 9. Goto 3.
+        /// 10. Done.
+        /// </summary>
         private void Generate() 
         {
             // Temporary: feature list
             Feature basicFeature = new Feature();
-            basicFeature.Add(new Vector2Int(0, 0), Connection.Horizontal, externalConnections: Connection.West);
-
-            //Feature crossFeature = new Feature();
-            //crossFeature.Add(new Vector2Int(0, 0), Connection.All, "default", Connection.Cardinal);
-            //crossFeature.Add(new Vector2Int(1, 0), Connection.All, "default", Connection.North | Connection.South);
-            //crossFeature.Add(new Vector2Int(-1, 0), Connection.All, "default", Connection.North | Connection.South);
-            //crossFeature.Add(new Vector2Int(0, 1), Connection.All, "default", Connection.West | Connection.East);
-            //crossFeature.Add(new Vector2Int(0, -1), Connection.All, "default", Connection.West | Connection.East);
-
-            //Feature corridor = new Feature();
-            //corridor.Add(new Vector2Int(0, 0), Connection.Cardinal, externalConnections: Connection.West);
-            //corridor.Add(new Vector2Int(1, 0), Connection.Vertical, externalConnections: Connection.None);
-            //corridor.Add(new Vector2Int(2, 0), Connection.Vertical, externalConnections: Connection.None);
-            //corridor.Add(new Vector2Int(3, 0), Connection.Vertical, externalConnections: Connection.None);
-            //corridor.Add(new Vector2Int(4, 0), Connection.Cardinal, externalConnections: Connection.East);
+            // TODO I don't think this works properly with connections specified.
+            basicFeature.Add(new Vector2Int(0, 0), Connection.All, externalConnections: Connection.All);
 
             Feature[] featureList = { basicFeature };
 
             // Initialize with a single starting room
+            // Later, this can be e.g. a specific starting chamber.
             grid[0, 0] = Section.Default();
 
-            // Pick some ending condition
+            // Pick some ending condition. For now it's just "try 100 times".
             int count = 0;
             while (count++ < 100) 
             {
@@ -266,7 +201,7 @@ namespace Labrys.Generation
                 Vector2Int nextPosition = positionSelector.Select(grid);
 
                 // Get all valid placements
-                List<Feature.PlacementConfiguration> configurations = nextFeature.CanConnect(grid, nextPosition);
+                List<Feature.Configuration> configurations = nextFeature.CanConnect(grid, nextPosition);
 
                 if (configurations.Count == 0) 
                 {
@@ -275,7 +210,7 @@ namespace Labrys.Generation
                 }
 
                 // Choose one of those placements
-                Feature.PlacementConfiguration configuration = configurationSelector.Select(configurations.ToArray());
+                Feature.Configuration configuration = configurationSelector.Select(configurations.ToArray());
 
                 // Add that Feature in
                 Dictionary<Vector2Int, Section> toAdd = nextFeature.GetConfiguration(configuration);
@@ -293,9 +228,9 @@ namespace Labrys.Generation
         /// </summary>
         private void PlaceTiles()
         {
-            //Debug.Log("Placing tiles!");
             TileSet.VariantKey searchKey = new TileSet.VariantKey();
             searchKey.variant = "default";
+
             List<Tile> searchResult = new List<Tile>();
 
             foreach (Vector2Int position in grid.GetFullCells())
@@ -303,30 +238,32 @@ namespace Labrys.Generation
                 Profiler.BeginSample("Calculating tile information");
 
                 Profiler.BeginSample("Extracting section");
-                Section section = (Section)grid[position]; // Search by keys; guaranteed not null
+                // Search by keys; guaranteed not null, so we cast from Section? -> Section
+                Section section = (Section)grid[position]; 
                 Profiler.EndSample();
 
                 Profiler.BeginSample("Getting physical adjacencies");
-                Connection physicalAdjacencies = grid.GetPhysicalAdjacencies2(position);
+                // Find all the Sections that neighbor this one ("physical adjacency").
+                // Cached + optimized algorithm
+                Connection physicalAdjacencies = grid.GetPhysicalAdjacencies2(position); 
                 Profiler.EndSample();
-
-                //Debug.Log($"For position {position}, have connections: {physicalAdjacencies}.");
 
                 Profiler.BeginSample("Resolving TileType");
+                // Knowing physical adjacencies, get the TileType and rotation
                 (TileType type, int rotation) = TileType.GetTileType(physicalAdjacencies, section.internalConnections);
                 Profiler.EndSample();
+
                 Profiler.BeginSample("Searching for Tiles");
 
+                // Hardcoded to have "default" variant for efficieny. 
+                // TODO replace searchKey.variant with Section.getVariant(), and logic
+                // to fallback to a search for "default".
                 searchKey.tileType = type;
-                //searchKey.variant = "default";
-
-                //List<Tile> tileList = tileSet.Get(searchKey);
                 if (!tileSet.Get(searchKey, ref searchResult))
                 {
                     Debug.LogError("Couldn't resolve Section into a Tile.");
                 }
                 Profiler.EndSample();
-                //Debug.Log("")
 
                 // Arbitrarily choose first one; TODO add smarter logic to choose which
                 // variant to take (and add parameters for it)
@@ -336,18 +273,14 @@ namespace Labrys.Generation
                 Profiler.EndSample();
                 Profiler.BeginSample("Placing physical GO");
 
+                // Compute the GameObject values from the known parameters
                 Vector3 worldPosition = new Vector3(distanceScale * position.x, 0, distanceScale * position.y);
                 Quaternion worldRotation = Quaternion.AngleAxis(90f * rotation, Vector3.up);
 
                 // Create a new instance of the Tile's prefab and place it in the world
-                // Scale it based on the tileScale value.
-                //GameObject instantiatedObject = GameObject.Instantiate(chosenTile.gameObject, worldPosition, worldRotation);
-                //instantiatedObject.transform.localScale = tileScale * Vector3.one;
                 gameObjectLoader.Load(chosenTile.gameObject, worldPosition, worldRotation, tileScale * Vector3.one);
 
                 Profiler.EndSample();
-
-                //Debug.Log("Placed object at: " + worldPosition);
             }
 
             gameObjectLoader.LastGameObjectSent();

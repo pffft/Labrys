@@ -9,10 +9,6 @@ namespace Labrys.Generation
     /// Section objects, their positions, information about the variations they
     /// can take on (either hard-coded, or algorithmically determined), how this
     /// feature can connect externally.
-    /// 
-    /// Position -> Section, variation, external connections
-    /// Boundary information (lowest/highest X/Y for normalization)
-    /// 
     /// </summary>
     //[CreateAssetMenu(fileName = "NewFeature", menuName = "Labrys/RoomFeature")]
     //[System.Serializable]
@@ -20,6 +16,7 @@ namespace Labrys.Generation
     {
         private Dictionary<Vector2Int, Section> elements;
 
+        // TODO add public getter/private setter to these
         public int minX, minY, maxX, maxY;
         private int offsetX, offsetY;
         private int rotation;
@@ -27,7 +24,7 @@ namespace Labrys.Generation
         public Feature() {
             this.elements = new Dictionary<Vector2Int, Section>();
 
-            // Set good defaults, so every addition will change these values
+            // This sets good defaults, so any addition will change these values
             this.minX = int.MaxValue;
             this.minY = int.MaxValue;
             this.maxX = int.MinValue;
@@ -142,13 +139,13 @@ namespace Labrys.Generation
         /// <returns>A List containing all valid configurations found.</returns>
         /// <param name="placedSections">The grid, containing the positions of Sections already placed.</param>
         /// <param name="gridPosition">The position in the grid we want to place the Feature at.</param>
-        public List<PlacementConfiguration> CanConnect(Grid placedSections, Vector2Int gridPosition) 
+        public List<Configuration> CanConnect(Grid placedSections, Vector2Int gridPosition) 
         {
             Section? maybeGridSection = placedSections[gridPosition];
             if (maybeGridSection == null)
             {
                 // Empty Section is invalid, we always need to be passed in a full one.
-                return new List<PlacementConfiguration>();
+                return new List<Configuration>();
             }
             Section gridSection = maybeGridSection.Value;
 
@@ -162,10 +159,10 @@ namespace Labrys.Generation
             // Motivating 2x2 Feature example: checking if the top-right corner can be placed North of a given
             // Section is equivalent to checking if the bottom-left corner can be placed West of the same Section.
             // With larger dense Features, Sections away from the edges will produce up to 4 duplicate placement checks.
-            Dictionary<PlacementConfiguration, bool> cache = new Dictionary<PlacementConfiguration, bool>();
+            Dictionary<Configuration, bool> cache = new Dictionary<Configuration, bool>();
 
             // Build up all possible valid configurations we'll return
-            List<PlacementConfiguration> toReturn = new List<PlacementConfiguration>();
+            List<Configuration> toReturn = new List<Configuration>();
 
             // Try to place the Feature at all adjacent grid positions
             CheckPlacements(gridPosition + Vector2Int.up);
@@ -192,7 +189,7 @@ namespace Labrys.Generation
                     // And every possible rotational variant for each.
                     for (int rot = 0; rot < 4; rot++)
                     {
-                        PlacementConfiguration configuration = new PlacementConfiguration
+                        Configuration configuration = new Configuration
                         {
                             gridPosition = pos,
                             localPosition = element.Key,
@@ -219,7 +216,7 @@ namespace Labrys.Generation
             }
         }
 
-        public bool CanPlace(Grid placedSections, PlacementConfiguration configuration)
+        public bool CanPlace(Grid placedSections, Configuration configuration)
         {
             return CanPlace(placedSections, configuration.gridPosition, configuration.localPosition, configuration.rotation);
         }
@@ -266,7 +263,7 @@ namespace Labrys.Generation
         /// </summary>
         /// <returns>The configuration.</returns>
         /// <param name="configuration">Configuration.</param>
-        public Dictionary<Vector2Int, Section> GetConfiguration(PlacementConfiguration configuration) 
+        public Dictionary<Vector2Int, Section> GetConfiguration(Configuration configuration) 
         {
             Dictionary<Vector2Int, Section> toReturn = new Dictionary<Vector2Int, Section>();
             foreach (KeyValuePair<Vector2Int, Section> keyValuePair in elements) 
@@ -280,7 +277,7 @@ namespace Labrys.Generation
         }
 
 
-        public struct PlacementConfiguration
+        public struct Configuration
         {
             // These 3 variables are needed to uniquely identify this configuration
             public Vector2Int gridPosition;
@@ -300,11 +297,11 @@ namespace Labrys.Generation
             // then CanPlace will check exactly the same tiles.
             public override bool Equals(object obj)
             {
-                if (!(obj is PlacementConfiguration)) 
+                if (!(obj is Configuration)) 
                 {
                     return false;
                 }
-                PlacementConfiguration other = (PlacementConfiguration)obj;
+                Configuration other = (Configuration)obj;
 
                 return (gridPosition + localPosition == other.gridPosition + other.localPosition) && 
                     rotation == other.rotation;

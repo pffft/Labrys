@@ -4,6 +4,9 @@ using UnityEngine;
 
 namespace Labrys.Generation
 {
+    /// <summary>
+    /// A cache used for the 
+    /// </summary>
     public class GridSectionCache
     {
         private Dictionary<Vector2Int, Section> hashCache;

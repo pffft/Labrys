@@ -4,6 +4,9 @@ using UnityEngine;
 
 namespace Labrys.Generation.Selectors
 {
+    /// <summary>
+    /// Chooses a Feature to place next in the next generation step.
+    /// </summary>
     public interface IFeatureSelector
     {
         /// <summary>

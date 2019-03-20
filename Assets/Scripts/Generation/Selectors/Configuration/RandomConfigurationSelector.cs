@@ -10,12 +10,9 @@ namespace Labrys.Generation.Selectors
         {
         }
 
-        public Feature.PlacementConfiguration Select(Feature.PlacementConfiguration[] configurations)
+        public Feature.Configuration Select(Feature.Configuration[] configurations)
         {
-            Debug.Log(configurations.Length);
-            int chosen = Random.Range(0, configurations.Length);
-            Debug.Log("Chose: " + chosen);
-            return configurations[chosen];
+            return configurations[Random.Range(0, configurations.Length)];
         }
     }
 }

@@ -265,7 +265,7 @@ namespace Tests
             feature.Add(2, 0);
 
             //Assert.True(feature.CanConnect(grid, Vector2Int.zero));
-            List<Feature.PlacementConfiguration> configurations = feature.CanConnect(grid, Vector2Int.zero);
+            List<Feature.Configuration> configurations = feature.CanConnect(grid, Vector2Int.zero);
         }
     }
 }

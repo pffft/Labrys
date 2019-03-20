@@ -4,6 +4,10 @@ using UnityEngine;
 
 namespace Labrys.Generation
 {
+    /// <summary>
+    /// A struct representing a single grid element during generation. This will
+    /// map 1:1 to a Tile when generation is completed.
+    /// </summary>
     [System.Serializable]
     public struct Section
     {
