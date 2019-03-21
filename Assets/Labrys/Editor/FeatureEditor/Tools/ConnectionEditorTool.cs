@@ -39,6 +39,16 @@ namespace Labrys.Editor.FeatureEditor.Tools
 			panel.Draw();
 		}
 
+		private bool isPrimaryControl(Event e)
+		{
+			return (e.isMouse && e.button == 0);
+		}
+
+		private bool isSecondaryControl(Event e)
+		{
+			return (e.isMouse && e.button == 1);
+		}
+
 		public override bool HandleEvent(Event e)
 		{
 			if (panel.HandleEvent(e))
@@ -47,10 +57,10 @@ namespace Labrys.Editor.FeatureEditor.Tools
 			switch (e.type)
 			{
 			case EventType.MouseDown:
-				settingExternal = (e.button == 0 || e.button == 1) && e.control;
+				settingExternal = (isPrimaryControl(e) || isSecondaryControl(e)) && e.control;
 				goto case EventType.MouseDrag;
 			case EventType.MouseDrag:
-				if (e.button == 0 || e.button == 1)
+				if (isPrimaryControl(e) || isSecondaryControl(e))
 				{
 					Vector2Int position = EditorGrid.GetInstance().ScreenToGridPos(e.mousePosition);
 					if (EditorGrid.GetInstance().Feature.HasLinkAt(position))
@@ -60,11 +70,11 @@ namespace Labrys.Editor.FeatureEditor.Tools
 						{
 							previewColor = Color.yellow;
 						}
-						else if (e.button == 0)
+						else if (isPrimaryControl(e))
 						{
 							previewColor = Color.green;
 						}
-						else if (e.button == 1)
+						else if (isSecondaryControl(e))
 						{
 							previewColor = Color.red;
 						}
@@ -73,11 +83,11 @@ namespace Labrys.Editor.FeatureEditor.Tools
 				}
 				break;
 			case EventType.MouseUp:
-				if (e.button == 0 || e.button == 1)
+				if (isPrimaryControl(e) || isSecondaryControl(e))
 				{
 					Vector2Int[] finalPositions = new Vector2Int[manipPositions.Count];
 					manipPositions.CopyTo(finalPositions);
-					bool targetState = e.button == 0 ? true : e.button == 1 ? false : false;
+					bool targetState = isPrimaryControl(e) ? true : isSecondaryControl(e) ? false : false;
 					Command c;
 					if (settingExternal)
 					{
