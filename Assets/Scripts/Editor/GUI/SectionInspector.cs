@@ -5,7 +5,7 @@ using UnityEditor.AnimatedValues;
 namespace Labrys.Generation
 {
     //[CustomEditor(typeof(Section))]
-    public class SectionInspector : Editor
+    public class SectionInspector : UnityEditor.Editor
     {
         public override void OnInspectorGUI()
         {
