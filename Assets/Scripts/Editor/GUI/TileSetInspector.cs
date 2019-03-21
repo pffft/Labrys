@@ -8,7 +8,7 @@ using Labrys.Tiles;
 namespace Labrys.Generation
 {
     [CustomEditor(typeof(TileSet))]
-    public class TileSetInspector : Editor
+    public class TileSetInspector : UnityEditor.Editor
     {
 
         SerializedProperty tileSetList;
