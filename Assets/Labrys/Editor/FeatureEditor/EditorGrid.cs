@@ -16,6 +16,8 @@ namespace Labrys.Editor.FeatureEditor
 		private static Color closedColor = new Color(0.9f, 0f, 0f);
 		private static Color externalColor = new Color(0.8f, 0.8f, 0f);
 
+		private const float ZOOM_FACTOR = 1.1f;
+
 		private static EditorGrid instance;
 
 		public Rect viewport;
@@ -129,6 +131,42 @@ namespace Labrys.Editor.FeatureEditor
 			bool guiChanged = false;
 			switch (e.type)
 			{
+			case EventType.KeyDown:
+				Vector2 shiftDelta = Vector2.zero;
+				if (e.keyCode == KeyCode.RightArrow)
+				{
+					shiftDelta += Vector2.left;
+				}
+				if (e.keyCode == KeyCode.UpArrow)
+				{
+					shiftDelta += Vector2.up;
+				}
+				if (e.keyCode == KeyCode.LeftArrow)
+				{
+					shiftDelta += Vector2.right;
+				}
+				if (e.keyCode == KeyCode.DownArrow)
+				{
+					shiftDelta += Vector2.down;
+				}
+
+				if (shiftDelta != Vector2.zero)
+				{
+					Shift(shiftDelta.normalized * 10f);
+					guiChanged = true;
+				}
+
+				if(e.keyCode == KeyCode.Equals || e.keyCode == KeyCode.KeypadPlus)
+				{
+					Resize(scale * ZOOM_FACTOR);
+					guiChanged = true;
+				}
+				else if (e.keyCode == KeyCode.Minus || e.keyCode == KeyCode.KeypadMinus)
+				{
+					Resize(scale / ZOOM_FACTOR);
+					guiChanged = true;
+				}
+				break;
 			case EventType.MouseDrag:
 				//drag the grid and the tiles
 				if (e.button == 2)
@@ -138,10 +176,11 @@ namespace Labrys.Editor.FeatureEditor
 				}
 				break;
 			case EventType.ScrollWheel:
-				if (Mathf.Sign(e.delta.y) > 0)
-					Resize(scale / 1.1f);
+				float scrollDelta = e.delta.y / 3f;
+				if (Mathf.Sign(scrollDelta) > 0)
+					Resize(scale / ZOOM_FACTOR);
 				else
-					Resize(scale * 1.1f);
+					Resize(scale * ZOOM_FACTOR);
 				guiChanged = true;
 				break;
 			}

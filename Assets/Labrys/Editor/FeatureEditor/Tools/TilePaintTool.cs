@@ -32,24 +32,34 @@ namespace Labrys.Editor.FeatureEditor.Tools
 			}
 		}
 
+		private bool isPrimaryControl(Event e)
+		{
+			return (e.isMouse && e.button == 0);
+		}
+
+		private bool isSecondaryControl(Event e)
+		{
+			return (e.isMouse && e.button == 1);
+		}
+
 		public override bool HandleEvent(Event e)
 		{
 			switch(e.type)
 			{
 			case EventType.MouseDown:
 			case EventType.MouseDrag:
-				if (e.button == 0 || e.button == 1)
+				if (isPrimaryControl(e) || isSecondaryControl(e))
 				{
 					Vector2Int position = EditorGrid.GetInstance().ScreenToGridPos(e.mousePosition, true);
 					bool posHasTile = EditorGrid.GetInstance().Feature.HasSectionAt(position);
-					if ((e.button == 0 && !posHasTile) || (e.button == 1 && posHasTile))
+					if ((isPrimaryControl(e) && !posHasTile) || (isSecondaryControl(e) && posHasTile))
 					{
 						manipPositions.Add(position);
-						if (e.button == 0)
+						if (isPrimaryControl(e))
 						{
 							previewColor = Color.green;
 						}
-						else if (e.button == 1)
+						else if (isSecondaryControl(e))
 						{
 							previewColor = Color.red;
 						}
@@ -58,17 +68,17 @@ namespace Labrys.Editor.FeatureEditor.Tools
 				}
 				break;
 			case EventType.MouseUp:
-				if(e.button == 0 || e.button == 1)
+				if(isPrimaryControl(e) || isSecondaryControl(e))
 				{
 					//attempt to place a tile in accumpulated positions
 					Vector2Int[] finalPositions = new Vector2Int[manipPositions.Count];
 					manipPositions.CopyTo(finalPositions);
 					Command c;
-					if (e.button == 0)
+					if (isPrimaryControl(e))
 					{
 						c = new AddTileCommand(finalPositions);
 					}
-					else if (e.button == 1)
+					else if (isSecondaryControl(e))
 					{
 						c = new RemoveTileCommand(finalPositions);
 					}
