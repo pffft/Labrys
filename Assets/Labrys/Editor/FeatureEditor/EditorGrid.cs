@@ -102,7 +102,8 @@ namespace Labrys.Editor.FeatureEditor
 			// Draw Sections
 			foreach(KeyValuePair<Vector2Int, FeatureAsset.Section> section in feature.GetSections())
 			{
-				screenPosition = GridToScreenPos(section.Key);				bounds.position = screenPosition;
+				screenPosition = GridToScreenPos(section.Key);
+				bounds.position = screenPosition;
 				bounds.center = screenPosition;
 				Color temp = GUI.color;
 				GUI.color = feature.IsSelected(section.Key) ? sectionSelectedColor : Color.white;
