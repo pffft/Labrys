@@ -7,13 +7,27 @@ using UnityEngine;
 
 namespace Labrys.Editor.FeatureEditor
 {
-	public class MainWindow : EditorWindow
+	public class FeatureEditorWindow : EditorWindow
 	{
-		[MenuItem("Window/Labrys Feature Editor")]
-		private static void OpenWindow()
+		private const string EDITOR_PREF_SETTINGS = "FeatureEditorWindowSettings";
+
+		private static FeatureEditorWindow instance;
+
+		public static FeatureEditorWindow GetInstance()
 		{
-			MainWindow window = GetWindow<MainWindow> ();
+			if(instance == null)
+			{
+				instance = OpenWindow();
+			}
+			return instance;
+		}
+
+		[MenuItem("Window/Labrys Feature Editor")]
+		private static FeatureEditorWindow OpenWindow()
+		{
+			FeatureEditorWindow window = GetWindow<FeatureEditorWindow> ();
 			window.titleContent = new GUIContent ("Labrys Feature Editor");
+			return window;
 		}
 
 		[OnOpenAsset(1)]
@@ -21,17 +35,19 @@ namespace Labrys.Editor.FeatureEditor
 		{
 			if(Selection.activeObject != null && Selection.activeObject is FeatureAsset)
 			{
-				Debug.Log("Opening " + Selection.activeObject.name + " in Feature Editor"); //TODO remove debug\
-				EditorGrid.GetInstance().Feature = (FeatureAsset)Selection.activeObject;
-				OpenWindow();
+				GetInstance().feature = (FeatureAsset)Selection.activeObject;
+
 				return true;
 			}
 			return false;
 		}
 
+		public FeatureAsset Feature { get { return feature; } }
+		[SerializeField]
+		private FeatureAsset feature;
 		private ToolBox toolBox;
 
-		public MainWindow()
+		public FeatureEditorWindow()
 		{
 			toolBox = new ToolBox(this, InternalPanel.DockPosition.left, 150f);
 			toolBox.AddTool(new SelectionTool(this));
@@ -43,6 +59,15 @@ namespace Labrys.Editor.FeatureEditor
 		{
 			EditorGrid.GetInstance().viewport = position;
 			EditorGrid.GetInstance().Recenter();
+
+			string data = EditorPrefs.GetString(EDITOR_PREF_SETTINGS, EditorJsonUtility.ToJson(this));
+			EditorJsonUtility.FromJsonOverwrite(data, this);
+		}
+
+		private void OnDisable()
+		{
+			string data = EditorJsonUtility.ToJson(this);
+			EditorPrefs.SetString(EDITOR_PREF_SETTINGS, data);
 		}
 
 		private void OnGUI()
@@ -76,34 +101,6 @@ namespace Labrys.Editor.FeatureEditor
 			if (EditorGrid.GetInstance().HandleEvent(e))
 			{
 				GUI.changed = true;
-				return;
-			}
-
-			switch (e.type)
-			{
-			case EventType.KeyDown:
-				if (e.control)
-				{
-					/* Currently an issue with getting undos to work with Unity's existing system.
-					 * TODO: figure that shit out
-					if (e.keyCode == KeyCode.Z)
-					{
-						History.Undo();
-						e.Use();
-					}
-					else if (e.keyCode == KeyCode.Y)
-					{
-						History.Redo();
-						e.Use();
-					}
-					*/
-				}
-				else
-				{
-
-				}
-				break;
-			default:
 				return;
 			}
 		}

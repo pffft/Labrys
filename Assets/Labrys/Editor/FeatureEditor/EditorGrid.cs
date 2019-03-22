@@ -5,16 +5,17 @@ using UnityEngine;
 
 namespace Labrys.Editor.FeatureEditor
 {
+	[System.Serializable]
 	public class EditorGrid
 	{
 		public static Color lineColor = new Color(0.4f, 0.4f, 0.4f);
 
-		private static Color selectedColor = new Color(0.5f, 0.5f, 0.8f);
+		private static Color sectionSelectedColor = new Color(0.5f, 0.5f, 0.8f);
 
 		public const float LINK_SIZE = 10f;
-		private static Color openColor = new Color(0f, 0.8f, 0f);
-		private static Color closedColor = new Color(0.9f, 0f, 0f);
-		private static Color externalColor = new Color(0.8f, 0.8f, 0f);
+		private static Color linkOpenColor = new Color(0f, 0.8f, 0f);
+		private static Color linkClosedColor = new Color(0.9f, 0f, 0f);
+		private static Color linkExternalColor = new Color(0.8f, 0.8f, 0f);
 
 		private const float ZOOM_FACTOR = 1.1f;
 
@@ -25,10 +26,10 @@ namespace Labrys.Editor.FeatureEditor
 		public float scale = 1f;
 		public float lineSpacing = 64f;
 
+		[SerializeField]
 		private Vector2 offset;
+		[SerializeField]
 		private Vector2 drag;
-
-		public FeatureAsset Feature { get; set; }
 
 		public static EditorGrid GetInstance()
 		{
@@ -91,33 +92,34 @@ namespace Labrys.Editor.FeatureEditor
 
 		private void DrawObjects()
 		{
-			if (Feature == null)
+			FeatureAsset feature = FeatureEditorWindow.GetInstance().Feature;
+			if (feature == null)
 				return;
 
 			Vector2 screenPosition = Vector2.zero;
 			Rect bounds = new Rect(screenPosition, GetScaledTileSize());
 
 			// Draw Sections
-			foreach(KeyValuePair<Vector2Int, FeatureAsset.Section> section in Feature.GetSections())
+			foreach(KeyValuePair<Vector2Int, FeatureAsset.Section> section in feature.GetSections())
 			{
 				screenPosition = GridToScreenPos(section.Key);				bounds.position = screenPosition;
 				bounds.center = screenPosition;
 				Color temp = GUI.color;
-				GUI.color = Feature.IsSelected(section.Key) ? selectedColor : Color.white;
+				GUI.color = feature.IsSelected(section.Key) ? sectionSelectedColor : Color.white;
 				GUI.Box(bounds, "");
 				GUI.color = temp;
 			}
 
 			// Draw Links
-			foreach(KeyValuePair<Vector2Int, FeatureAsset.Link> link in Feature.GetLinks())
+			foreach(KeyValuePair<Vector2Int, FeatureAsset.Link> link in feature.GetLinks())
 			{
 				screenPosition = GridToScreenPos(link.Key);
-				Handles.color = link.Value.Open ? openColor : closedColor;
+				Handles.color = link.Value.Open ? linkOpenColor : linkClosedColor;
 				Handles.BeginGUI();
 				Handles.DrawSolidDisc(new Vector3(screenPosition.x, screenPosition.y), Vector3.forward, scale * LINK_SIZE);
 				if (link.Value.External)
 				{
-					Handles.color = externalColor;
+					Handles.color = linkExternalColor;
 					Handles.DrawSolidArc(new Vector3(screenPosition.x, screenPosition.y), Vector3.forward, Vector3.left, 180f, scale * LINK_SIZE);
 				}
 				Handles.EndGUI();

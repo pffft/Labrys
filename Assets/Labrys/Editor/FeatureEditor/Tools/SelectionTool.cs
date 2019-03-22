@@ -1,6 +1,7 @@
-﻿using Labrys.Editor.FeatureEditor.Commands;
+﻿using Labrys.FeatureEditor;
 using UnityEditor;
 using UnityEngine;
+using UnityEngine.Events;
 
 namespace Labrys.Editor.FeatureEditor.Tools
 {
@@ -74,27 +75,38 @@ namespace Labrys.Editor.FeatureEditor.Tools
 				if(isPrimaryControl(e) || isSecondaryControl(e))
 				{
 					//select all tiles within selection box
-					Command c;
+					string description;
+					UnityAction action;
+					Vector2Int[] positions = EditorGrid.GetInstance().RectToGridPositions(selectionRect, true);
+					FeatureAsset feature = FeatureEditorWindow.GetInstance().Feature;
 					if (selectionMode == SELECT_MODE_SELECT)
 					{
-						c = new SelectionCommand()
-						{
-							SelectedPositions = EditorGrid.GetInstance().RectToGridPositions(selectionRect, true)
+						description = "Select section(s)";
+						action = () => {
+							foreach (Vector2Int gp in positions)
+							{
+								feature.SelectSection(gp);
+							}
 						};
 					}
 					else if (selectionMode == SELECT_MODE_DESELECT)
 					{
-						c = new DeselectionCommand()
-						{
-							SelectedPositions = EditorGrid.GetInstance().RectToGridPositions(selectionRect, true)
+						description = "Deselect section(s)";
+						action = () => {
+							foreach (Vector2Int gp in positions)
+							{
+								feature.DeselectSection(gp);
+							}
 						};
 					}
 					else
 					{
-						return false;
+						description = "ERROR";
+						action = null;
 					}
-					c.Do();
-					History.RecordCommand(c);
+
+					ChangeAsset(feature, description, action);
+
 					selectionRect = new Rect();
 					selectionMode = SELECT_MODE_NONE;
 					e.Use();

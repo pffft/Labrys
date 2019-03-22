@@ -1,7 +1,8 @@
-﻿using Labrys.Editor.FeatureEditor.Commands;
+﻿using Labrys.FeatureEditor;
 using System.Collections.Generic;
 using UnityEditor;
 using UnityEngine;
+using UnityEngine.Events;
 
 namespace Labrys.Editor.FeatureEditor.Tools
 {
@@ -51,7 +52,7 @@ namespace Labrys.Editor.FeatureEditor.Tools
 				if (isPrimaryControl(e) || isSecondaryControl(e))
 				{
 					Vector2Int position = EditorGrid.GetInstance().ScreenToGridPos(e.mousePosition, true);
-					bool posHasTile = EditorGrid.GetInstance().Feature.HasSectionAt(position);
+					bool posHasTile = FeatureEditorWindow.GetInstance().Feature.HasSectionAt(position);
 					if ((isPrimaryControl(e) && !posHasTile) || (isSecondaryControl(e) && posHasTile))
 					{
 						manipPositions.Add(position);
@@ -71,23 +72,39 @@ namespace Labrys.Editor.FeatureEditor.Tools
 				if(isPrimaryControl(e) || isSecondaryControl(e))
 				{
 					//attempt to place a tile in accumpulated positions
-					Vector2Int[] finalPositions = new Vector2Int[manipPositions.Count];
-					manipPositions.CopyTo(finalPositions);
-					Command c;
+					FeatureAsset feature = FeatureEditorWindow.GetInstance().Feature;
+					string description;
+					UnityAction action;
+
+					//add sections
 					if (isPrimaryControl(e))
 					{
-						c = new AddTileCommand(finalPositions);
+						description = "Add section(s)";
+						action = () => {
+							foreach (Vector2Int position in manipPositions)
+							{
+								FeatureEditorWindow.GetInstance().Feature.AddSection(position);
+							}
+						};
 					}
+					//remove sections
 					else if (isSecondaryControl(e))
 					{
-						c = new RemoveTileCommand(finalPositions);
+						description = "Remove section(s)";
+						action = () => {
+							foreach (Vector2Int position in manipPositions)
+							{
+								FeatureEditorWindow.GetInstance().Feature.RemoveSection(position);
+							}
+						};
 					}
 					else
 					{
 						return false;
 					}
-					c.Do();
-					History.RecordCommand(c);
+
+					ChangeAsset(feature, description, action);
+
 					e.Use();
 					manipPositions.Clear();
 					return true;

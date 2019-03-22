@@ -4,9 +4,12 @@ using UnityEngine;
 
 namespace Labrys.Editor.FeatureEditor.Panels
 {
+	[System.Serializable]
 	public class ToolBox : InternalPanel
 	{
+		[SerializeField]
 		private List<Tool> tools;
+		[SerializeField]
 		private int selectedTool;
 
 		public Tool ActiveTool { get { return tools[selectedTool]; } }

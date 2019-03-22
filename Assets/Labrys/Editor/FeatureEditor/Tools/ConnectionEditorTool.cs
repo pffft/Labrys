@@ -1,8 +1,9 @@
-﻿using Labrys.Editor.FeatureEditor.Commands;
-using Labrys.Editor.FeatureEditor.Panels;
+﻿using Labrys.Editor.FeatureEditor.Panels;
+using Labrys.FeatureEditor;
 using System.Collections.Generic;
 using UnityEditor;
 using UnityEngine;
+using UnityEngine.Events;
 
 namespace Labrys.Editor.FeatureEditor.Tools
 {
@@ -63,7 +64,7 @@ namespace Labrys.Editor.FeatureEditor.Tools
 				if (isPrimaryControl(e) || isSecondaryControl(e))
 				{
 					Vector2Int position = EditorGrid.GetInstance().ScreenToGridPos(e.mousePosition);
-					if (EditorGrid.GetInstance().Feature.HasLinkAt(position))
+					if (FeatureEditorWindow.GetInstance().Feature.HasLinkAt(position))
 					{
 						manipPositions.Add(position);
 						if(settingExternal)
@@ -85,20 +86,40 @@ namespace Labrys.Editor.FeatureEditor.Tools
 			case EventType.MouseUp:
 				if (isPrimaryControl(e) || isSecondaryControl(e))
 				{
-					Vector2Int[] finalPositions = new Vector2Int[manipPositions.Count];
-					manipPositions.CopyTo(finalPositions);
+					FeatureAsset feature = FeatureEditorWindow.GetInstance().Feature;
+					string description;
+					UnityAction action;
+
 					bool targetState = isPrimaryControl(e) ? true : isSecondaryControl(e) ? false : false;
-					Command c;
 					if (settingExternal)
 					{
-						c = new ConnectionMarkExCommand(finalPositions) { TargetState = targetState };
+						description = targetState ? "Set connection(s) to external" : "Set connections(s) to internal";
+						action = () => {
+							foreach (Vector2Int position in manipPositions)
+							{
+								if (feature.TryGetLink(position, out FeatureAsset.Link link))
+								{
+									link.External = targetState;
+								}
+							}
+						};
 					}
 					else
 					{
-						c = new ConnectionToggleCommand(finalPositions) { TargetState = targetState };
+						description = targetState ? "Set connection(s) to open" : "Set connections(s) to closed";
+						action = () => {
+							foreach (Vector2Int position in manipPositions)
+							{
+								if (feature.TryGetLink(position, out FeatureAsset.Link link))
+								{
+									link.Open = targetState;
+								}
+							}
+						};
 					}
-					c.Do();
-					History.RecordCommand(c);
+
+					ChangeAsset(feature, description, action);
+
 					e.Use();
 					manipPositions.Clear();
 					return true;
