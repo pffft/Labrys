@@ -1,14 +1,16 @@
-﻿using System;
+﻿using Labrys.Generation;
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 
 namespace Labrys.FeatureEditor
 {
+	/// <summary>
+	/// A file-backed representation of a Feature for use with the Feature Editor
+	/// </summary>
 	[CreateAssetMenu(menuName = "Labrys/Feature", fileName = "New Feature")]
 	public class FeatureAsset : ScriptableObject, ISerializationCallbackReceiver
 	{
-		public const float GRID_DENSITY = 2f;
-
 		[Serializable]
 		public class Section
 		{
@@ -69,6 +71,36 @@ namespace Labrys.FeatureEditor
 
 			public bool Open { get; set; } 
 			public bool External { get; set; }
+		}
+
+		public const float GRID_DENSITY = 2f;
+
+		private static Vector2Int[] dirVectors = new Vector2Int[] {
+				Vector2Int.right,
+				Vector2Int.up + Vector2Int.right,
+				Vector2Int.up,
+				Vector2Int.up + Vector2Int.left,
+				Vector2Int.left,
+				Vector2Int.down + Vector2Int.left,
+				Vector2Int.down,
+				Vector2Int.down + Vector2Int.right
+		};
+
+		private static Connection[] dirConnections = new Connection[] {
+				Connection.East,
+				Connection.Northeast,
+				Connection.North,
+				Connection.Northwest,
+				Connection.West,
+				Connection.Southwest,
+				Connection.South,
+				Connection.Southeast
+		};
+
+		public static FeatureAsset FromFeature(Feature f)
+		{
+			//TODO how to get section data out of feature?
+			return null;
 		}
 
 		private Dictionary<Vector2Int, Section> sections;
@@ -165,6 +197,7 @@ namespace Labrys.FeatureEditor
 			if(sections.Remove(gridPosition))
 			{
 				UpdateLinks(gridPosition);
+				DeselectSection(gridPosition);
 				return true;
 			}
 			return false;
@@ -243,54 +276,70 @@ namespace Labrys.FeatureEditor
 			if (!Section.IsValidPosition(gridPosition))
 				return;
 
-			foreach(Vector2Int adjPos in GetAdjPositions())
+			foreach(Vector2Int dir in dirVectors)
 			{
-				Vector2Int linkPos = adjPos + gridPosition;
-				if (!links.TryGetValue(linkPos, out Link existingLink))
-				{
-					Link newLink = new Link() { Open = true, External = true };
-					if(CheckLinkValid(linkPos))
-					{
-						links.Add(linkPos, newLink);
-					}
-				}
-				else
-				{
-					if(!CheckLinkValid(linkPos))
-					{
-						links.Remove(linkPos);
-					}
-				}
-			}
-
-			// Local function to check given position has the required amount of section neighbors for a link
-			bool CheckLinkValid(Vector2Int gridPos)
-			{
+				Vector2Int linkPos = dir + gridPosition;
 				int neighborCount = 0;
-				foreach (Vector2Int tilePos in Link.GetSubjectTileGridPositions(gridPos))
+				foreach (Vector2Int tilePos in Link.GetSubjectTileGridPositions(linkPos))
 				{
 					if (sections.ContainsKey(tilePos))
 					{
 						neighborCount++;
 					}
 				}
-				Link.GetMinMaxSubjectTileCount(gridPos, out int nMin, out int nMax);
-				return nMax == 2 ? neighborCount >= nMin : neighborCount == nMax;
+				Link.GetMinMaxSubjectTileCount(linkPos, out int nMin, out int nMax);
+
+				bool canBeExternal = neighborCount < nMax;
+				bool isValid = nMax == 2 ? neighborCount >= nMin : neighborCount == nMax;
+
+				if (!links.TryGetValue(linkPos, out Link existingLink))
+				{
+					Link newLink = new Link() { Open = true, External = canBeExternal };
+					if(isValid)
+					{
+						links.Add(linkPos, newLink);
+					}
+				}
+				else
+				{
+					if (!isValid)
+					{
+						links.Remove(linkPos);
+					}
+
+					if (!canBeExternal)
+						existingLink.External = false;
+				}
 			}
 		}
 
-		private Vector2Int[] GetAdjPositions()
+		public Feature ToFeature()
 		{
-			Vector2Int[] positions = new Vector2Int[8];
-			positions[0] = Vector2Int.right;
-			positions[1] = Vector2Int.up + Vector2Int.right;
-			positions[2] = Vector2Int.up;
-			positions[3] = Vector2Int.up + Vector2Int.left;
-			positions[4] = Vector2Int.left;
-			positions[5] = Vector2Int.down + Vector2Int.left;
-			positions[6] = Vector2Int.down;
-			positions[7] = Vector2Int.down + Vector2Int.right;
-			return positions;
+			Feature feature = new Feature();
+			foreach(KeyValuePair<Vector2Int, FeatureAsset.Section> section in sections)
+			{
+				Connection internalConnections = Connection.None;
+				Connection externalConnections = Connection.None;
+				for(int i = 0; i < dirVectors.Length; i++)
+				{
+					Vector2Int adjPos = section.Key + dirVectors[i];
+					if(TryGetLink(adjPos, out Link link))
+					{
+						if(link.Open)
+						{
+							internalConnections |= dirConnections[i];
+						}
+
+						if(link.External)
+						{
+							externalConnections |= dirConnections[i];
+						}
+					}
+				}
+
+				feature.Add(section.Key, internalConnections, section.Value.Variant, externalConnections);
+			}
+			return feature;
 		}
 	}
 }
