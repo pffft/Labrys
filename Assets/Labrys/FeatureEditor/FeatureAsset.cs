@@ -142,6 +142,12 @@ namespace Labrys.FeatureEditor
 			sections = new Dictionary<Vector2Int, Section>();
 			links = new Dictionary<Vector2Int, Link>();
 			selected = new HashSet<Vector2Int>();
+
+			sectionPositions = new List<Vector2Int>();
+			sectionData = new List<Section>();
+			linkPositions = new List<Vector2Int>();
+			linkData = new List<Link>();
+			selectionPositions = new List<Vector2Int>();
 		}
 
 		public void AddSection(Vector2Int gridPosition)
