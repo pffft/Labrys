@@ -14,21 +14,25 @@ namespace Labrys.Generation
     //[System.Serializable]
     public class Feature// : ScriptableObject
     {
-        private Dictionary<Vector2Int, Section> elements;
+        /// <summary>
+        /// Dictionary representing the Sections in this Feature. 
+        /// </summary>
+        /// <value>The elements.</value>
+        public Dictionary<Vector2Int, Section> Elements { get; private set; }
 
-        // TODO add public getter/private setter to these
-        public int minX, minY, maxX, maxY;
-        private int offsetX, offsetY;
-        private int rotation;
+        public int MinX { get; private set; }
+        public int MinY { get; private set; }
+        public int MaxX { get; private set; }
+        public int MaxY { get; private set; }
 
         public Feature() {
-            this.elements = new Dictionary<Vector2Int, Section>();
+            this.Elements = new Dictionary<Vector2Int, Section>();
 
             // This sets good defaults, so any addition will change these values
-            this.minX = int.MaxValue;
-            this.minY = int.MaxValue;
-            this.maxX = int.MinValue;
-            this.maxY = int.MinValue;
+            this.MinX = int.MaxValue;
+            this.MinY = int.MaxValue;
+            this.MaxX = int.MinValue;
+            this.MaxY = int.MinValue;
         }
 
         // Seperate x,y add
@@ -46,21 +50,21 @@ namespace Labrys.Generation
         private void Add(Vector2Int position, Section element)
         {
             // Update the boundaries
-            minX = Mathf.Min(position.x, minX);
-            maxX = Mathf.Max(position.x, maxX);
+            MinX = Mathf.Min(position.x, MinX);
+            MaxX = Mathf.Max(position.x, MaxX);
 
-            minY = Mathf.Min(position.y, minY);
-            maxY = Mathf.Max(position.y, maxY);
+            MinY = Mathf.Min(position.y, MinY);
+            MaxY = Mathf.Max(position.y, MaxY);
 
             // Add the section into the feature. If it exists, replace, but warn.
-            if (elements.ContainsKey(position))
+            if (Elements.ContainsKey(position))
             {
-                elements[position] = element;
+                Elements[position] = element;
                 Debug.LogWarning($"Overwrote Section at position {position} with new one, with variant \"{element.GetVariant()}\".");
             }
             else
             {
-                elements.Add(position, element);
+                Elements.Add(position, element);
             }
         }
 
@@ -86,11 +90,11 @@ namespace Labrys.Generation
         {
             switch ((int)Mathf.Repeat(rot, 4))
             {
-                case 0: return Rotate(new Vector2Int(minX, minY), rot);
-                case 1: return Rotate(new Vector2Int(maxX, minY), rot);
-                case 2: return Rotate(new Vector2Int(maxX, maxY), rot);
-                case 3: return Rotate(new Vector2Int(minX, maxY), rot);
-                default: return Rotate(new Vector2Int(minX, minY), rot);
+                case 0: return Rotate(new Vector2Int(MinX, MinY), rot);
+                case 1: return Rotate(new Vector2Int(MaxX, MinY), rot);
+                case 2: return Rotate(new Vector2Int(MaxX, MaxY), rot);
+                case 3: return Rotate(new Vector2Int(MinX, MaxY), rot);
+                default: return Rotate(new Vector2Int(MinX, MinY), rot);
             }
         }
 
@@ -184,7 +188,7 @@ namespace Labrys.Generation
                 }
 
                 // Else try every possible local position.
-                foreach (KeyValuePair<Vector2Int, Section> element in elements)
+                foreach (KeyValuePair<Vector2Int, Section> element in Elements)
                 {
                     // And every possible rotational variant for each.
                     for (int rot = 0; rot < 4; rot++)
@@ -229,10 +233,10 @@ namespace Labrys.Generation
         /// <param name="placedSections">The grid, containing all the Sections we wish to avoid.</param>
         /// <param name="gridPosition">The grid position we want to place the Feature at.</param>
         /// <param name="localPosition">The location of the Section we want to place at "gridPosition".</param>
-        /// <param name="rot">Rotation.</param>
+        /// <param name="rotation">Rotation.</param>
         public bool CanPlace(Grid placedSections, Vector2Int gridPosition, Vector2Int localPosition, int rotation)
         {
-            foreach (Vector2Int sectionPosition in elements.Keys)
+            foreach (Vector2Int sectionPosition in Elements.Keys)
             {
                 // Shift this Section's position over by the offset, "localPosition". 
                 // This places "localPosition" at (0, 0). 
@@ -266,7 +270,7 @@ namespace Labrys.Generation
         public Dictionary<Vector2Int, Section> GetConfiguration(Configuration configuration) 
         {
             Dictionary<Vector2Int, Section> toReturn = new Dictionary<Vector2Int, Section>();
-            foreach (KeyValuePair<Vector2Int, Section> keyValuePair in elements) 
+            foreach (KeyValuePair<Vector2Int, Section> keyValuePair in Elements) 
             {
                 toReturn.Add(
                     configuration.gridPosition + Rotate(keyValuePair.Key - configuration.localPosition, configuration.rotation),
