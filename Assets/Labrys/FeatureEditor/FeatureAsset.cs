@@ -97,11 +97,37 @@ namespace Labrys.FeatureEditor
 				Connection.Southeast
 		};
 
+#if UNITY_EDITOR
 		public static FeatureAsset FromFeature(Feature f)
 		{
-			//TODO how to get section data out of feature?
-			return null;
+			FeatureAsset asset = CreateInstance<FeatureAsset>();
+
+			//make sections and assign variants
+			foreach (KeyValuePair<Vector2Int, Generation.Section> section in f.Elements)
+			{
+				asset.AddSection(section.Key * (int)GRID_DENSITY);
+				if(asset.TryGetSection(section.Key, out Section s))
+				{
+					s.Variant = section.Value.GetVariant();
+				}
+			}
+
+			//set links open/closed and internal/external
+			foreach (KeyValuePair<Vector2Int, Generation.Section> section in f.Elements)
+			{
+				for(int i = 0; i < dirVectors.Length; i++)
+				{
+					if(asset.TryGetLink(section.Key + dirVectors[i], out Link link))
+					{
+						link.Open = (section.Value.internalConnections | dirConnections[i]) == dirConnections[i];
+						link.External = (section.Value.externalConnections | dirConnections[i]) == dirConnections[i];
+					}
+				}
+			}
+
+			return asset;
 		}
+#endif
 
 		private Dictionary<Vector2Int, Section> sections;
 		private Dictionary<Vector2Int, Link> links;
@@ -316,7 +342,7 @@ namespace Labrys.FeatureEditor
 		public Feature ToFeature()
 		{
 			Feature feature = new Feature();
-			foreach(KeyValuePair<Vector2Int, FeatureAsset.Section> section in sections)
+			foreach(KeyValuePair<Vector2Int, Section> section in sections)
 			{
 				Connection internalConnections = Connection.None;
 				Connection externalConnections = Connection.None;
@@ -337,6 +363,7 @@ namespace Labrys.FeatureEditor
 					}
 				}
 
+				Vector2Int position = new Vector2Int(section.Key.x / (int)GRID_DENSITY, section.Key.y / (int)GRID_DENSITY);
 				feature.Add(section.Key, internalConnections, section.Value.Variant, externalConnections);
 			}
 			return feature;
