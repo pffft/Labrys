@@ -27,10 +27,10 @@ namespace Tests
             feature.Add(3, 4);
 
             // Basic true statements
-            Assert.AreEqual(1, feature.minX);
-            Assert.AreEqual(2, feature.minY);
-            Assert.AreEqual(3, feature.maxX);
-            Assert.AreEqual(4, feature.maxY);
+            Assert.AreEqual(1, feature.MinX);
+            Assert.AreEqual(2, feature.MinY);
+            Assert.AreEqual(3, feature.MaxX);
+            Assert.AreEqual(4, feature.MaxY);
 
             /* 
              * Note the four bounding corners are as follows:
@@ -51,7 +51,7 @@ namespace Tests
             Vector2Int topRight     = new Vector2Int(3, 4);
 
             // Check the 0 rotation case
-            Assert.AreEqual(bottomLeft, Feature.Rotate(new Vector2Int(feature.minX, feature.minY), 0));
+            Assert.AreEqual(bottomLeft, Feature.Rotate(new Vector2Int(feature.MinX, feature.MinY), 0));
             Assert.AreEqual(bottomLeft, feature.RotatedMin(0));
             Assert.AreEqual(Feature.Rotate(bottomLeft, 0), feature.RotatedMin(0));
 
