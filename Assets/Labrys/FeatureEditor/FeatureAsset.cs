@@ -106,7 +106,7 @@ namespace Labrys.FeatureEditor
 			foreach (KeyValuePair<Vector2Int, Generation.Section> section in f.Elements)
 			{
 				asset.AddSection(section.Key * (int)GRID_DENSITY);
-				if(asset.TryGetSection(section.Key, out Section s))
+				if(asset.TryGetSection(section.Key * (int)GRID_DENSITY, out Section s))
 				{
 					s.Variant = section.Value.GetVariant();
 				}
@@ -117,7 +117,7 @@ namespace Labrys.FeatureEditor
 			{
 				for(int i = 0; i < dirVectors.Length; i++)
 				{
-					if(asset.TryGetLink(section.Key + dirVectors[i], out Link link))
+                    if(asset.TryGetLink((section.Key + dirVectors[i]) * (int)GRID_DENSITY, out Link link))
 					{
 						link.Open = (section.Value.internalConnections | dirConnections[i]) == dirConnections[i];
 						link.External = (section.Value.externalConnections | dirConnections[i]) == dirConnections[i];
@@ -213,7 +213,7 @@ namespace Labrys.FeatureEditor
 			if(Section.IsValidPosition(gridPosition)
 				&& !sections.ContainsKey(gridPosition))
 			{
-				sections.Add(gridPosition, new Section() { Variant = "Default" });
+				sections.Add(gridPosition, new Section() { Variant = "default" });
 				UpdateLinks(gridPosition);
 			}
 		}
@@ -364,7 +364,7 @@ namespace Labrys.FeatureEditor
 				}
 
 				Vector2Int position = new Vector2Int(section.Key.x / (int)GRID_DENSITY, section.Key.y / (int)GRID_DENSITY);
-				feature.Add(section.Key, internalConnections, section.Value.Variant, externalConnections);
+				feature.Add(position, internalConnections, section.Value.Variant, externalConnections);
 			}
 			return feature;
 		}
