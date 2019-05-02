@@ -10,7 +10,7 @@ namespace Labrys.Editor.FeatureEditor
 
 		protected EditorWindow window;
 
-		public Tool(EditorWindow window)
+		protected Tool(EditorWindow window)
 		{
 			this.window = window;
 		}

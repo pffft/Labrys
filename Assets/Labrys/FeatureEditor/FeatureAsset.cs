@@ -213,6 +213,7 @@ namespace Labrys.FeatureEditor
 			if(Section.IsValidPosition(gridPosition)
 				&& !sections.ContainsKey(gridPosition))
 			{
+				//TODO section variant configuration in editor
 				sections.Add(gridPosition, new Section() { Variant = "default" });
 				UpdateLinks(gridPosition);
 			}
@@ -266,7 +267,7 @@ namespace Labrys.FeatureEditor
 
 		public bool TryGetSection(Vector2Int gridPosition, out Section section)
 		{
-			section = default;
+			section = null;
 			if (Section.IsValidPosition(gridPosition)
 				&& sections.TryGetValue(gridPosition, out Section secRef))
 			{
