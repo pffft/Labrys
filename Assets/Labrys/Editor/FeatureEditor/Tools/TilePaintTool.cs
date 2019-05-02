@@ -23,24 +23,16 @@ namespace Labrys.Editor.FeatureEditor.Tools
 		{
 			//draw tile previews
 			base.Draw();
-			foreach(Vector2Int position in manipPositions)
+			foreach (Vector2Int position in manipPositions)
 			{
 				Vector2 screenPos = EditorGrid.GetInstance().GridToScreenPos(position);
-				Rect r = new Rect(screenPos, EditorGrid.GetInstance().GetScaledTileSize());
-				r.center = screenPos;
-				GUI.color = previewColor;
+                Rect r = new Rect(screenPos, EditorGrid.GetInstance().GetScaledTileSize())
+                {
+                    center = screenPos
+                };
+                GUI.color = previewColor;
 				GUI.Box(r, "");
 			}
-		}
-
-		private bool isPrimaryControl(Event e)
-		{
-			return (e.isMouse && e.button == 0);
-		}
-
-		private bool isSecondaryControl(Event e)
-		{
-			return (e.isMouse && e.button == 1);
 		}
 
 		public override bool HandleEvent(Event e)
@@ -49,18 +41,18 @@ namespace Labrys.Editor.FeatureEditor.Tools
 			{
 			case EventType.MouseDown:
 			case EventType.MouseDrag:
-				if (isPrimaryControl(e) || isSecondaryControl(e))
+				if (IsPrimaryControl(e) || IsSecondaryControl(e))
 				{
 					Vector2Int position = EditorGrid.GetInstance().ScreenToGridPos(e.mousePosition, true);
 					bool posHasTile = FeatureEditorWindow.GetInstance().Feature.HasSectionAt(position);
-					if ((isPrimaryControl(e) && !posHasTile) || (isSecondaryControl(e) && posHasTile))
+					if ((IsPrimaryControl(e) && !posHasTile) || (IsSecondaryControl(e) && posHasTile))
 					{
 						manipPositions.Add(position);
-						if (isPrimaryControl(e))
+						if (IsPrimaryControl(e))
 						{
 							previewColor = Color.green;
 						}
-						else if (isSecondaryControl(e))
+						else if (IsSecondaryControl(e))
 						{
 							previewColor = Color.red;
 						}
@@ -69,7 +61,7 @@ namespace Labrys.Editor.FeatureEditor.Tools
 				}
 				break;
 			case EventType.MouseUp:
-				if(isPrimaryControl(e) || isSecondaryControl(e))
+				if(IsPrimaryControl(e) || IsSecondaryControl(e))
 				{
 					//attempt to place a tile in accumpulated positions
 					FeatureAsset feature = FeatureEditorWindow.GetInstance().Feature;
@@ -77,7 +69,7 @@ namespace Labrys.Editor.FeatureEditor.Tools
 					UnityAction action;
 
 					//add sections
-					if (isPrimaryControl(e))
+					if (IsPrimaryControl(e))
 					{
 						description = "Add section(s)";
 						action = () => {
@@ -88,7 +80,7 @@ namespace Labrys.Editor.FeatureEditor.Tools
 						};
 					}
 					//remove sections
-					else if (isSecondaryControl(e))
+					else if (IsSecondaryControl(e))
 					{
 						description = "Remove section(s)";
 						action = () => {
