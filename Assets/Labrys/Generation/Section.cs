@@ -62,5 +62,10 @@ namespace Labrys.Generation
         {
             return Variant.IDToVariant[variantID];
         }
+
+        public override string ToString() 
+        {
+            return "(internal: " + internalConnections + "; external: " + externalConnections + "; variant: " + GetVariant() + ")";
+        }
     }
 }

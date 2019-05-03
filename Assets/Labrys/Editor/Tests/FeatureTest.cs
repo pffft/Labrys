@@ -68,7 +68,7 @@ namespace Tests
         {
             Labrys.Generation.Grid grid = new Labrys.Generation.Grid();
 
-            grid[0, 0] = new Section();
+            grid[0, 0] = Section.Default();
 
             // Basic 2x2 feature
             Feature feature = new Feature();
@@ -122,7 +122,7 @@ namespace Tests
         public void CanPlaceWithRotation()
         {
             Labrys.Generation.Grid grid = new Labrys.Generation.Grid();
-            grid[0, 0] = new Section();
+            grid[0, 0] = Section.Default();
 
             // 3x1 feature
             Feature feature = new Feature();
@@ -215,7 +215,7 @@ namespace Tests
         public void CanPlaceWithRotationAndOffset()
         {
             Labrys.Generation.Grid grid = new Labrys.Generation.Grid();
-            grid[0, 0] = new Section();
+            grid[0, 0] = Section.Default();
 
             // 3x1 feature, but offset.
             // With normalization, should be same as CanPlaceWithRotation; the only difference is  
@@ -256,7 +256,7 @@ namespace Tests
         public void CanConnectBasic()
         {
             Labrys.Generation.Grid grid = new Labrys.Generation.Grid();
-            grid[0, 0] = new Section();
+            grid[0, 0] = Section.Default();
 
             // 3x1 feature
             Feature feature = new Feature();

@@ -8,7 +8,7 @@ using Labrys.Tiles;
 namespace Labrys.Generation
 {
     [CustomEditor(typeof(Tile))]
-    public class TileInspector : Editor
+    public class TileInspector : UnityEditor.Editor
     {
         public override void OnInspectorGUI()
         {
