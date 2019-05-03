@@ -28,8 +28,6 @@ namespace Labrys.Editor.FeatureEditor.Panels
 
 		public override bool HandleEvent(Event e)
 		{
-			bool guiChanged = false;
-
 			switch(e.type)
 			{
 			case EventType.KeyDown:
@@ -38,23 +36,20 @@ namespace Labrys.Editor.FeatureEditor.Panels
 					if(e.keyCode == KeyCode.Alpha1)
 					{
 						selectedTool = 0;
-						guiChanged = true;
 					}
 					else if (e.keyCode == KeyCode.Alpha2)
 					{
 						selectedTool = 1;
-						guiChanged = true;
 					}
 					else if (e.keyCode == KeyCode.Alpha3)
 					{
 						selectedTool = 2;
-						guiChanged = true;
 					}
 				}
 				break;
 			}
 
-			return guiChanged;
+			return bounds.Contains(e.mousePosition);
 		}
 
 		public void AddTool(Tool t)

@@ -65,14 +65,14 @@ namespace Labrys.Editor.FeatureEditor
 			for (int i = 0; i < xLineCount + 1; i++)
 			{
 				int xGridLine = ScreenToGridPos(new Vector2(scaledSpacing * i + wrappedOffset.x, 0f)).x;
-                if (xGridLine % 10 == 0)
-                {
-                    Handles.color = xGridLine == 0 ? Color.black : lineColor;
-                }
-                else
-                {
-                    Handles.color = lightLineColor;
-                }
+				if (xGridLine % 10 == 0)
+				{
+					Handles.color = xGridLine == 0 ? Color.black : lineColor;
+				}
+				else
+				{
+					Handles.color = lightLineColor;
+				}
 				Handles.DrawLine (
 					new Vector2 (scaledSpacing * i, -scaledSpacing) + wrappedOffset, 
 					new Vector2 (scaledSpacing * i, viewport.height + scaledSpacing) + wrappedOffset);
@@ -81,14 +81,14 @@ namespace Labrys.Editor.FeatureEditor
 			for (int i = 0; i < yLineCount + 1; i++)
 			{
 				int yGridLine = ScreenToGridPos(new Vector2(0f, scaledSpacing * i + wrappedOffset.y)).y;
-                if (yGridLine % 10 == 0)
-                {
-                    Handles.color = yGridLine == 0 ? Color.black : lineColor;
-                }
-                else
-                {
-                    Handles.color = lightLineColor;
-                }
+				if (yGridLine % 10 == 0)
+				{
+					Handles.color = yGridLine == 0 ? Color.black : lineColor;
+				}
+				else
+				{
+					Handles.color = lightLineColor;
+				}
 				Handles.DrawLine (
 					new Vector2 (-scaledSpacing, scaledSpacing * i) + wrappedOffset, 
 					new Vector2 (viewport.width + scaledSpacing, scaledSpacing * i) + wrappedOffset);
@@ -115,7 +115,7 @@ namespace Labrys.Editor.FeatureEditor
 				bounds.center = screenPosition;
 				Color temp = GUI.color;
 				GUI.color = feature.IsSelected(section.Key) ? sectionSelectedColor : Color.white;
-				GUI.Box(bounds, "");
+				GUI.Box(bounds, section.Value.Variant);
 				GUI.color = temp;
 			}
 

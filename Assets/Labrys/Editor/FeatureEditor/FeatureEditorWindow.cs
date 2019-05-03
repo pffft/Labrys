@@ -49,7 +49,7 @@ namespace Labrys.Editor.FeatureEditor
 
 		public FeatureEditorWindow()
 		{
-			toolBox = new ToolBox(this, InternalPanel.DockPosition.left, 150f);
+			toolBox = new ToolBox(this, InternalPanel.DockPosition.left, 125f);
 			toolBox.AddTool(new SelectionTool(this));
 			toolBox.AddTool(new TilePaintTool(this));
 			toolBox.AddTool(new ConnectionEditorTool(this));
