@@ -40,16 +40,6 @@ namespace Labrys.Editor.FeatureEditor.Tools
 			panel.Draw();
 		}
 
-		private bool isPrimaryControl(Event e)
-		{
-			return (e.isMouse && e.button == 0);
-		}
-
-		private bool isSecondaryControl(Event e)
-		{
-			return (e.isMouse && e.button == 1);
-		}
-
 		public override bool HandleEvent(Event e)
 		{
 			if (panel.HandleEvent(e))
@@ -58,10 +48,10 @@ namespace Labrys.Editor.FeatureEditor.Tools
 			switch (e.type)
 			{
 			case EventType.MouseDown:
-				settingExternal = (isPrimaryControl(e) || isSecondaryControl(e)) && e.control;
+				settingExternal = (IsPrimaryControl(e) || IsSecondaryControl(e)) && e.control;
 				goto case EventType.MouseDrag;
 			case EventType.MouseDrag:
-				if (isPrimaryControl(e) || isSecondaryControl(e))
+				if (IsPrimaryControl(e) || IsSecondaryControl(e))
 				{
 					Vector2Int position = EditorGrid.GetInstance().ScreenToGridPos(e.mousePosition);
 					if (FeatureEditorWindow.GetInstance().Feature.HasLinkAt(position))
@@ -71,11 +61,11 @@ namespace Labrys.Editor.FeatureEditor.Tools
 						{
 							previewColor = Color.yellow;
 						}
-						else if (isPrimaryControl(e))
+						else if (IsPrimaryControl(e))
 						{
 							previewColor = Color.green;
 						}
-						else if (isSecondaryControl(e))
+						else if (IsSecondaryControl(e))
 						{
 							previewColor = Color.red;
 						}
@@ -84,13 +74,13 @@ namespace Labrys.Editor.FeatureEditor.Tools
 				}
 				break;
 			case EventType.MouseUp:
-				if (isPrimaryControl(e) || isSecondaryControl(e))
+				if (IsPrimaryControl(e) || IsSecondaryControl(e))
 				{
 					FeatureAsset feature = FeatureEditorWindow.GetInstance().Feature;
 					string description;
 					UnityAction action;
 
-					bool targetState = isPrimaryControl(e) ? true : isSecondaryControl(e) ? false : false;
+					bool targetState = IsPrimaryControl(e) ? true : IsSecondaryControl(e) ? false : false;
 					if (settingExternal)
 					{
 						description = targetState ? "Set connection(s) to external" : "Set connections(s) to internal";

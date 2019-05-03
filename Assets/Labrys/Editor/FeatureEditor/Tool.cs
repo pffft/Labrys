@@ -10,13 +10,26 @@ namespace Labrys.Editor.FeatureEditor
 
 		protected EditorWindow window;
 
-		public Tool(EditorWindow window)
+		protected Tool(EditorWindow window)
 		{
 			this.window = window;
 		}
 
 		public virtual void Draw() { }
-		public abstract bool HandleEvent(Event e);
+
+        // Used to tell if the left mouse button is down
+        protected bool IsPrimaryControl(Event e)
+        {
+            return e.isMouse && e.button == 0;
+        }
+
+        // Used to tell if the right mouse button is down
+        protected bool IsSecondaryControl(Event e)
+        {
+            return e.isMouse && e.button == 1;
+        }
+
+        public abstract bool HandleEvent(Event e);
 
 		protected void ChangeAsset(Object asset, string actionDesc, UnityAction action)
 		{

@@ -7,12 +7,10 @@ namespace Labrys.Generation
     /// <summary>
     /// A logical collection of Section objects. A Feature contains a list of
     /// Section objects, their positions, information about the variations they
-    /// can take on (either hard-coded, or algorithmically determined), how this
-    /// feature can connect externally.
+    /// can take on (either hard-coded, or algorithmically determined), and how 
+    /// this feature can connect internally or externally.
     /// </summary>
-    //[CreateAssetMenu(fileName = "NewFeature", menuName = "Labrys/RoomFeature")]
-    //[System.Serializable]
-    public class Feature// : ScriptableObject
+    public class Feature
     {
         /// <summary>
         /// Dictionary representing the Sections in this Feature. 
@@ -193,12 +191,7 @@ namespace Labrys.Generation
                     // And every possible rotational variant for each.
                     for (int rot = 0; rot < 4; rot++)
                     {
-                        Configuration configuration = new Configuration
-                        {
-                            gridPosition = pos,
-                            localPosition = element.Key,
-                            rotation = rot
-                        };
+                        Configuration configuration = new Configuration(pos, element.Key, rot);
 
                         // Have we already tried this configuration? Check the cache.
                         if (!cache.TryGetValue(configuration, out bool canPlace))
@@ -284,13 +277,22 @@ namespace Labrys.Generation
         public struct Configuration
         {
             // These 3 variables are needed to uniquely identify this configuration
-            public Vector2Int gridPosition;
-            public Vector2Int localPosition;
-            public int rotation;
+            public readonly Vector2Int gridPosition;
+            public readonly Vector2Int localPosition;
+            public readonly int rotation;
 
             // Any other variables are useful, but not necessary.
 
+            public Configuration(Vector2Int gridPosition, Vector2Int localPosition, int rotation) 
+            {
+                this.gridPosition = gridPosition;
+                this.localPosition = localPosition;
+                this.rotation = rotation;
+            }
+
             // Hashcode to determine unique configurations
+            // (gridPosition + localPosition) uniquely determines the world position,
+            // so they're treated as one variable in the hashcode.
             public override int GetHashCode()
             {
                 return ((gridPosition + localPosition).GetHashCode() << 2) | rotation;

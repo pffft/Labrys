@@ -15,7 +15,7 @@ namespace Labrys.Editor.FeatureEditor
 
 		public static FeatureEditorWindow GetInstance()
 		{
-			if(instance == null)
+			if (instance == null)
 			{
 				instance = OpenWindow();
 			}
@@ -33,7 +33,7 @@ namespace Labrys.Editor.FeatureEditor
 		[OnOpenAsset(1)]
 		private static bool OnOpenAsset(int instanceId, int line)
 		{
-			if(Selection.activeObject != null && Selection.activeObject is FeatureAsset)
+			if (Selection.activeObject != null && Selection.activeObject is FeatureAsset)
 			{
 				GetInstance().feature = (FeatureAsset)Selection.activeObject;
 
@@ -80,8 +80,10 @@ namespace Labrys.Editor.FeatureEditor
 
 			HandleEvent(Event.current);
 
-			if (GUI.changed)
-				Repaint ();
+            if (GUI.changed)
+            {
+                Repaint();
+            }
 		}
 
 		private void HandleEvent(Event e)
