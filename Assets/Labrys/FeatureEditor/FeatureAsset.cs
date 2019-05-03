@@ -54,10 +54,10 @@ namespace Labrys.FeatureEditor
 			{
 				HashSet<Vector2Int> uniquePositions = new HashSet<Vector2Int>();
 
-				int lowerX = Mathf.FloorToInt(gridPos.x / GRID_DENSITY) * GRID_DENSITY;
-				int upperX = Mathf.FloorToInt((gridPos.x / GRID_DENSITY) + 0.5f) * GRID_DENSITY;
-				int lowerY = Mathf.FloorToInt(gridPos.y / GRID_DENSITY) * GRID_DENSITY;
-				int upperY = Mathf.FloorToInt((gridPos.y / GRID_DENSITY) + 0.5f) * GRID_DENSITY;
+				int lowerX = Mathf.FloorToInt(gridPos.x / (float)GRID_DENSITY) * GRID_DENSITY;
+				int upperX = Mathf.FloorToInt((gridPos.x / (float)GRID_DENSITY) + 0.5f) * GRID_DENSITY;
+				int lowerY = Mathf.FloorToInt(gridPos.y / (float)GRID_DENSITY) * GRID_DENSITY;
+				int upperY = Mathf.FloorToInt((gridPos.y / (float)GRID_DENSITY) + 0.5f) * GRID_DENSITY;
 
 				uniquePositions.Add(new Vector2Int(lowerX, lowerY));
 				uniquePositions.Add(new Vector2Int(lowerX, upperY));
