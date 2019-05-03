@@ -13,7 +13,7 @@ namespace Labrys.Editor.FeatureEditor
 		public float Width { get { return bounds.width; } set { bounds.width = value; } }
 		public float Height { get { return bounds.height; } set { bounds.height = value; } }
 
-		public InternalPanel(EditorWindow window, DockPosition alignment, float scale)
+		protected InternalPanel(EditorWindow window, DockPosition alignment, float scale)
 		{
 			this.window = window;
 			this.alignment = alignment;

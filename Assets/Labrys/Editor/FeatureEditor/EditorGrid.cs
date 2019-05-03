@@ -33,7 +33,7 @@ namespace Labrys.Editor.FeatureEditor
 
 		public static EditorGrid GetInstance()
 		{
-			if(instance == null)
+			if (instance == null)
 			{
 				instance = new EditorGrid();
 			}
@@ -65,10 +65,14 @@ namespace Labrys.Editor.FeatureEditor
 			for (int i = 0; i < xLineCount + 1; i++)
 			{
 				int xGridLine = ScreenToGridPos(new Vector2(scaledSpacing * i + wrappedOffset.x, 0f)).x;
-				if (xGridLine % 10 == 0)
-					Handles.color = xGridLine == 0 ? Color.black : lineColor;
-				else
-					Handles.color = lightLineColor;
+                if (xGridLine % 10 == 0)
+                {
+                    Handles.color = xGridLine == 0 ? Color.black : lineColor;
+                }
+                else
+                {
+                    Handles.color = lightLineColor;
+                }
 				Handles.DrawLine (
 					new Vector2 (scaledSpacing * i, -scaledSpacing) + wrappedOffset, 
 					new Vector2 (scaledSpacing * i, viewport.height + scaledSpacing) + wrappedOffset);
@@ -77,10 +81,14 @@ namespace Labrys.Editor.FeatureEditor
 			for (int i = 0; i < yLineCount + 1; i++)
 			{
 				int yGridLine = ScreenToGridPos(new Vector2(0f, scaledSpacing * i + wrappedOffset.y)).y;
-				if (yGridLine % 10 == 0)
-					Handles.color = yGridLine == 0 ? Color.black : lineColor;
-				else
-					Handles.color = lightLineColor;
+                if (yGridLine % 10 == 0)
+                {
+                    Handles.color = yGridLine == 0 ? Color.black : lineColor;
+                }
+                else
+                {
+                    Handles.color = lightLineColor;
+                }
 				Handles.DrawLine (
 					new Vector2 (-scaledSpacing, scaledSpacing * i) + wrappedOffset, 
 					new Vector2 (viewport.width + scaledSpacing, scaledSpacing * i) + wrappedOffset);
@@ -100,7 +108,7 @@ namespace Labrys.Editor.FeatureEditor
 			Rect bounds = new Rect(screenPosition, GetScaledTileSize());
 
 			// Draw Sections
-			foreach(KeyValuePair<Vector2Int, FeatureAsset.Section> section in feature.GetSections())
+			foreach (KeyValuePair<Vector2Int, FeatureAsset.Section> section in feature.GetSections())
 			{
 				screenPosition = GridToScreenPos(section.Key);
 				bounds.position = screenPosition;
@@ -112,7 +120,7 @@ namespace Labrys.Editor.FeatureEditor
 			}
 
 			// Draw Links
-			foreach(KeyValuePair<Vector2Int, FeatureAsset.Link> link in feature.GetLinks())
+			foreach (KeyValuePair<Vector2Int, FeatureAsset.Link> link in feature.GetLinks())
 			{
 				screenPosition = GridToScreenPos(link.Key);
 				Handles.color = link.Value.Open ? linkOpenColor : linkClosedColor;
@@ -278,8 +286,8 @@ namespace Labrys.Editor.FeatureEditor
 			Vector2Int endingGridPos = ScreenToGridPos(r.max, evenOnly);
 
 			Vector2Int selectionAreaDimen = endingGridPos - startingGridPos;
-			int xIncr = (evenOnly ? (int)FeatureAsset.GRID_DENSITY : 1) * (int)Mathf.Sign(selectionAreaDimen.x);
-			int yIncr = (evenOnly ? (int)FeatureAsset.GRID_DENSITY : 1) * (int)Mathf.Sign(selectionAreaDimen.y);
+			int xIncr = (evenOnly ? FeatureAsset.GRID_DENSITY : 1) * (int)Mathf.Sign(selectionAreaDimen.x);
+			int yIncr = (evenOnly ? FeatureAsset.GRID_DENSITY : 1) * (int)Mathf.Sign(selectionAreaDimen.y);
 
 			List<Vector2Int> gridPositons = new List<Vector2Int>();
 			for (int x = startingGridPos.x; x != endingGridPos.x + xIncr; x += xIncr)

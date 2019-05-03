@@ -30,22 +30,12 @@ namespace Labrys.Editor.FeatureEditor.Tools
 			GUI.color = temp;
 		}
 
-		private bool isPrimaryControl(Event e)
-		{
-			return (e.isMouse && e.button == 0);
-		}
-
-		private bool isSecondaryControl(Event e)
-		{
-			return (e.isMouse && e.button == 1);
-		}
-
 		public override bool HandleEvent(Event e)
 		{
 			switch(e.type)
 			{
 			case EventType.MouseDown:
-				if(isPrimaryControl(e))
+				if(IsPrimaryControl(e))
 				{
 					//start selection box
 					selectionRect.position = e.mousePosition;
@@ -53,7 +43,7 @@ namespace Labrys.Editor.FeatureEditor.Tools
 					selectionMode = SELECT_MODE_SELECT;
 					return true;
 				}
-				else if (isSecondaryControl(e))
+				else if (IsSecondaryControl(e))
 				{
 					//start selection box
 					selectionRect.position = e.mousePosition;
@@ -63,7 +53,7 @@ namespace Labrys.Editor.FeatureEditor.Tools
 				}
 				break;
 			case EventType.MouseDrag:
-				if(isPrimaryControl(e) || isSecondaryControl(e))
+				if(IsPrimaryControl(e) || IsSecondaryControl(e))
 				{
 					//update selection box
 					selectionRect.max = e.mousePosition;
@@ -72,7 +62,7 @@ namespace Labrys.Editor.FeatureEditor.Tools
 				}
 				break;
 			case EventType.MouseUp:
-				if(isPrimaryControl(e) || isSecondaryControl(e))
+				if(IsPrimaryControl(e) || IsSecondaryControl(e))
 				{
 					//select all tiles within selection box
 					string description;
