@@ -1,4 +1,5 @@
 ﻿using Labrys.FeatureEditor;
+using System.IO;
 using UnityEditor;
 using UnityEngine;
 
@@ -9,10 +10,12 @@ namespace Labrys.Editor.FeatureEditor.Panels
 		private const string MIXED_VARIANTS = "-";
 
 		private string variant;
+		private string lastSelectedFolder;
 
 		public TileEditorPanel(EditorWindow window, DockPosition alignment, float scale) : base(window, alignment, scale)
 		{
 			variant = "";
+			lastSelectedFolder = "";
 		}
 
 		public override bool HandleEvent(Event e)
@@ -20,6 +23,7 @@ namespace Labrys.Editor.FeatureEditor.Panels
 			const float padding = 5;
 			FeatureAsset feature = FeatureEditorWindow.GetInstance().Feature;
 
+			//selected section number
 			Rect internalBounds = new Rect(bounds);
 			internalBounds.width -= 10;
 			internalBounds.x += padding;
@@ -30,12 +34,30 @@ namespace Labrys.Editor.FeatureEditor.Panels
 
 			internalBounds.y += 25;
 
+			//variant field label
 			internalBounds.width /= 4;
 			internalBounds.x = bounds.xMin + padding;
 			GUI.Box(internalBounds, "Variant");
 
-			internalBounds.width *= 3;
+			//variant field select button
 			internalBounds.x = bounds.xMax - padding - internalBounds.width;
+			if (GUI.Button(internalBounds, "Select"))
+			{
+				string fullPath = EditorUtility.OpenFolderPanel("Select Variant Folder", lastSelectedFolder != "" ? lastSelectedFolder : Application.dataPath, "");
+				string[] splitFullPath = fullPath.Split(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar);
+				variant = splitFullPath[splitFullPath.Length - 1];
+				SetVariant(variant);
+
+				//save parent of selected folder
+				lastSelectedFolder = fullPath.Substring(0, 
+					Mathf.Max(
+						fullPath.LastIndexOf(Path.AltDirectorySeparatorChar), 
+						fullPath.LastIndexOf(Path.DirectorySeparatorChar)));
+			}
+
+			//variant field text box
+			internalBounds.width *= 2;
+			internalBounds.x = bounds.xMax - padding - (internalBounds.width * 3/2);
 			string compoundV = GetVariant();
 			if (compoundV == null)
 			{
