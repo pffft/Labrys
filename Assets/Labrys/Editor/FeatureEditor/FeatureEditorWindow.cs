@@ -53,6 +53,8 @@ namespace Labrys.Editor.FeatureEditor
 			toolBox.AddTool(new SelectionTool(this));
 			toolBox.AddTool(new TilePaintTool(this));
 			toolBox.AddTool(new ConnectionEditorTool(this));
+
+			Undo.undoRedoPerformed += () => { Repaint(); };
 		}
 
 		private void OnEnable()

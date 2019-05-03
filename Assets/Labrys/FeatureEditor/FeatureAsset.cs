@@ -19,7 +19,7 @@ namespace Labrys.FeatureEditor
 				return gridPosition.x % GRID_DENSITY == 0 && gridPosition.y % GRID_DENSITY == 0;
 			}
 
-			public string Variant { get; set; }
+			public string variant;
 		}
 
 		[Serializable]
@@ -69,8 +69,8 @@ namespace Labrys.FeatureEditor
 				return finalPositions;
 			}
 
-			public bool Open { get; set; } 
-			public bool External { get; set; }
+			public bool open;
+			public bool external;
 		}
 
 		public const int GRID_DENSITY = 2;
@@ -99,16 +99,19 @@ namespace Labrys.FeatureEditor
 				|| linkPositions.Count != linkData.Count)
 				throw new ArgumentException("Malformed feature data");
 
+			sections.Clear();
 			for(int i = 0; i < sectionPositions.Count; i++)
 			{
 				sections.Add(sectionPositions[i], sectionData[i]);
 			}
 
+			links.Clear();
 			for (int i = 0; i < linkPositions.Count; i++)
 			{
 				links.Add(linkPositions[i], linkData[i]);
 			}
 
+			selected.Clear();
 			for(int i = 0; i < selectionPositions.Count; i++)
 			{
 				selected.Add(selectionPositions[i]);
@@ -160,7 +163,7 @@ namespace Labrys.FeatureEditor
 				&& !sections.ContainsKey(gridPosition))
 			{
 				//TODO section variant configuration in editor
-				sections.Add(gridPosition, new Section() { Variant = "default" });
+				sections.Add(gridPosition, new Section() { variant = "default" });
 				UpdateLinks(gridPosition);
 			}
 		}
@@ -295,7 +298,7 @@ namespace Labrys.FeatureEditor
 
 				if (!links.TryGetValue(linkPos, out Link existingLink))
 				{
-					Link newLink = new Link() { Open = true, External = canBeExternal };
+					Link newLink = new Link() { open = true, external = canBeExternal };
 					if(isValid)
 					{
 						links.Add(linkPos, newLink);
@@ -309,7 +312,7 @@ namespace Labrys.FeatureEditor
 					}
 
 					// If we can't be external, then set the External flag to false.
-					existingLink.External &= canBeExternal;
+					existingLink.external &= canBeExternal;
 				}
 			}
 		}
@@ -360,7 +363,7 @@ namespace Labrys.FeatureEditor
 				asset.AddSection(section.Key * GRID_DENSITY);
 				if (asset.TryGetSection(section.Key * GRID_DENSITY, out Section s))
 				{
-					s.Variant = section.Value.GetVariant();
+					s.variant = section.Value.GetVariant();
 				}
 			}
 
@@ -371,8 +374,8 @@ namespace Labrys.FeatureEditor
 				{
 					if (asset.TryGetLink((section.Key + dirVectors[i]) * GRID_DENSITY, out Link link))
 					{
-						link.Open = (section.Value.internalConnections | dirConnections[i]) == dirConnections[i];
-						link.External = (section.Value.externalConnections | dirConnections[i]) == dirConnections[i];
+						link.open = (section.Value.internalConnections | dirConnections[i]) == dirConnections[i];
+						link.external = (section.Value.externalConnections | dirConnections[i]) == dirConnections[i];
 					}
 				}
 			}
@@ -401,12 +404,12 @@ namespace Labrys.FeatureEditor
 					Vector2Int adjPos = section.Key + dirVectors[i];
 					if(TryGetLink(adjPos, out Link link))
 					{
-						if(link.Open)
+						if(link.open)
 						{
 							internalConnections |= dirConnections[i];
 						}
 
-						if(link.External)
+						if(link.external)
 						{
 							externalConnections |= dirConnections[i];
 						}
@@ -414,7 +417,7 @@ namespace Labrys.FeatureEditor
 				}
 
 				Vector2Int position = new Vector2Int(section.Key.x / GRID_DENSITY, section.Key.y / GRID_DENSITY);
-				feature.Add(position, internalConnections, section.Value.Variant, externalConnections);
+				feature.Add(position, internalConnections, section.Value.variant, externalConnections);
 			}
 			return feature;
 		}

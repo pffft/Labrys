@@ -81,7 +81,7 @@ namespace Labrys.Editor.FeatureEditor.Tools
 							{
 								if (feature.TryGetLink(position, out FeatureAsset.Link link))
 								{
-									link.External = targetState;
+									link.external = targetState;
 								}
 							}
 						};
@@ -94,7 +94,7 @@ namespace Labrys.Editor.FeatureEditor.Tools
 							{
 								if (feature.TryGetLink(position, out FeatureAsset.Link link))
 								{
-									link.Open = targetState;
+									link.open = targetState;
 								}
 							}
 						};

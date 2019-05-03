@@ -6,6 +6,8 @@ namespace Labrys.Editor.FeatureEditor.Panels
 {
 	public class TileEditorPanel : InternalPanel
 	{
+		private const string MIXED_VARIANTS = "-";
+
 		private string variant;
 
 		public TileEditorPanel(EditorWindow window, DockPosition alignment, float scale) : base(window, alignment, scale)
@@ -37,17 +39,17 @@ namespace Labrys.Editor.FeatureEditor.Panels
 			string compoundV = GetVariant();
 			if (compoundV == null)
 			{
-				variant = "-";
+				variant = MIXED_VARIANTS;
 			}
 			else
 			{
 				variant = compoundV;
 			}
-			variant = EditorGUI.TextField(internalBounds, variant);
-			if (variant != "-")
+			string newVariant = EditorGUI.TextField(internalBounds, variant);
+			if (newVariant != MIXED_VARIANTS && newVariant != variant)
 			{
 				Undo.RegisterCompleteObjectUndo(feature, "Change variant");
-				SetVariant(variant);
+				SetVariant(variant = newVariant);
 				EditorUtility.SetDirty(feature);
 			}
 
@@ -66,9 +68,9 @@ namespace Labrys.Editor.FeatureEditor.Panels
 					if (compoundVariant == null)
 					{
 						//first variant found
-						compoundVariant = section.Variant;
+						compoundVariant = section.variant;
 					}
-					else if (compoundVariant != section.Variant)
+					else if (compoundVariant != section.variant)
 					{
 						//variant names are not uniform
 						return null;
@@ -87,7 +89,7 @@ namespace Labrys.Editor.FeatureEditor.Panels
 			{
 				if (feature.TryGetSection(position, out FeatureAsset.Section section))
 				{
-					section.Variant = variant;
+					section.variant = variant;
 				}
 			}
 		}
