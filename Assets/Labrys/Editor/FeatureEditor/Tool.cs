@@ -34,7 +34,7 @@ namespace Labrys.Editor.FeatureEditor
 		protected void ChangeAsset(Object asset, string actionDesc, UnityAction action)
 		{
 			Undo.RegisterCompleteObjectUndo(asset, actionDesc);
-			action.Invoke();
+			action?.Invoke();
 			EditorUtility.SetDirty(asset);
 		}
 	}

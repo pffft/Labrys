@@ -12,14 +12,18 @@ namespace Labrys.Editor.FeatureEditor.Tools
 		private const int SELECT_MODE_DESELECT = 2;
 
 		private Rect selectionRect;
-		private bool isDragging;
 		private int selectionMode;
+
+		private Panels.TileEditorPanel tileEditorPanel;
 
 		public SelectionTool(EditorWindow window) : base(window)
 		{
 			selectionRect = new Rect();
+			selectionMode = SELECT_MODE_NONE;
 
-			Name = "Select";
+			tileEditorPanel = new Panels.TileEditorPanel(window, InternalPanel.DockPosition.right, 250f);
+
+			Name = "Tile Inspector";
 		}
 
 		public override void Draw()
@@ -28,10 +32,15 @@ namespace Labrys.Editor.FeatureEditor.Tools
 			GUI.color = new Color(0.5f, 0.5f, 0.8f, 0.5f);
 			GUI.Box(selectionRect, "");
 			GUI.color = temp;
+
+			tileEditorPanel.Draw();
 		}
 
 		public override bool HandleEvent(Event e)
 		{
+			if (tileEditorPanel.HandleEvent(e))
+				return true;
+
 			switch(e.type)
 			{
 			case EventType.MouseDown:
@@ -73,8 +82,14 @@ namespace Labrys.Editor.FeatureEditor.Tools
 					{
 						description = "Select section(s)";
 						action = () => {
+							if (!e.shift)
+							{
+								//not additive
+								feature.DeselectAllSections();
+							}
 							foreach (Vector2Int gp in positions)
 							{
+								//additive
 								feature.SelectSection(gp);
 							}
 						};
@@ -83,9 +98,18 @@ namespace Labrys.Editor.FeatureEditor.Tools
 					{
 						description = "Deselect section(s)";
 						action = () => {
-							foreach (Vector2Int gp in positions)
+							if (!e.shift)
 							{
-								feature.DeselectSection(gp);
+								//not additive
+								feature.DeselectAllSections();
+							}
+							else
+							{
+								//additive
+								foreach (Vector2Int gp in positions)
+								{
+									feature.DeselectSection(gp);
+								}
 							}
 						};
 					}
