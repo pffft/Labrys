@@ -229,7 +229,7 @@ namespace Labrys.Editor.FeatureEditor
 
 		public Vector2 GetScaledTileSize()
 		{
-			return new Vector2(lineSpacing, lineSpacing) * scale;
+			return new Vector2(lineSpacing, lineSpacing) * 0.8f * scale;
 		}
 
 		/// <summary>
