@@ -1,4 +1,5 @@
 ﻿using Labrys.FeatureEditor;
+using System.Collections.Generic;
 using System.IO;
 using UnityEditor;
 using UnityEngine;
@@ -107,7 +108,7 @@ namespace Labrys.Editor.FeatureEditor.Panels
 			Vector2Int[] selectedPositions = feature.GetSelectedSections();
 			foreach (Vector2Int position in selectedPositions)
 			{
-				if (feature.TryGetSection(position, out FeatureAsset.Section section))
+				if (feature.TryGetSection(position, out Section section))
 				{
 					if (compoundVariant == null)
 					{
@@ -131,11 +132,45 @@ namespace Labrys.Editor.FeatureEditor.Panels
 			Vector2Int[] selectedPositions = feature.GetSelectedSections();
 			foreach (Vector2Int position in selectedPositions)
 			{
-				if (feature.TryGetSection(position, out FeatureAsset.Section section))
+				if (feature.TryGetSection(position, out Section section))
 				{
 					section.variant = variant;
 				}
 			}
+		}
+
+		private Section.Field[] GetFields()
+		{
+			//TODO need to get a list of all fields common amongst all selected sections
+			/*
+			HashSet<string> commonUniqueFieldNames = new HashSet<string>();
+			HashSet<Section.Field> commonUniqueFields = new HashSet<Section.Field>();
+			FeatureAsset feature = FeatureEditorWindow.GetInstance().Feature;
+			Vector2Int[] selectedPositions = feature.GetSelectedSections();
+			bool firstSection = true;
+			foreach (Vector2Int position in selectedPositions)
+			{
+				if (feature.TryGetSection(position, out Section section))
+				{
+					foreach(Section.Field field in section)
+					{
+						if (firstSection)
+						{
+							commonUniqueFieldNames.Add(field.name);
+							commonUniqueFields.Add(field);
+						}
+						else if (commonUniqueFieldNames.Contains(field.name))
+						{
+
+						}
+						else
+					}
+				}
+
+				firstSection = false;
+			}
+			*/
+			return null;
 		}
 	}
 }

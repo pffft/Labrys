@@ -108,7 +108,7 @@ namespace Labrys.Editor.FeatureEditor
 			Rect bounds = new Rect(screenPosition, GetScaledTileSize());
 
 			// Draw Sections
-			foreach (KeyValuePair<Vector2Int, FeatureAsset.Section> section in feature.GetSections())
+			foreach (KeyValuePair<Vector2Int, Section> section in feature.GetSections())
 			{
 				screenPosition = GridToScreenPos(section.Key);
 				bounds.position = screenPosition;
@@ -120,7 +120,7 @@ namespace Labrys.Editor.FeatureEditor
 			}
 
 			// Draw Links
-			foreach (KeyValuePair<Vector2Int, FeatureAsset.Link> link in feature.GetLinks())
+			foreach (KeyValuePair<Vector2Int, Link> link in feature.GetLinks())
 			{
 				screenPosition = GridToScreenPos(link.Key);
 				Handles.color = link.Value.open ? linkOpenColor : linkClosedColor;

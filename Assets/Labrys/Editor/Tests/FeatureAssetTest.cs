@@ -1,9 +1,6 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using NUnit.Framework;
 using UnityEngine;
-using UnityEngine.TestTools;
-
 using Labrys.Generation;
 using Labrys.FeatureEditor;
 
@@ -41,10 +38,10 @@ namespace Tests
             // Thus, we test FeatureAsset retention rules separately, and ensure that
             // FeatureAfter.connections & FeatureBefore.connections == FeatureAfter.connections
             // to be sure that no connections are ever dropped.
-            foreach (KeyValuePair<Vector2Int, Section> kvp in testFeature1.Elements)
+            foreach (KeyValuePair<Vector2Int, Labrys.Generation.Section> kvp in testFeature1.Elements)
             {
-                Section orig = feature1.Elements[kvp.Key];
-                Section conv = kvp.Value;
+				Labrys.Generation.Section orig = feature1.Elements[kvp.Key];
+				Labrys.Generation.Section conv = kvp.Value;
 
                 // Some connections may be lost. Ensure no new ones are added.
                 Assert.AreEqual(orig.externalConnections & conv.externalConnections, conv.externalConnections);
@@ -58,14 +55,14 @@ namespace Tests
         // Confirms a given section exists at a position.
         private void ValidateSection(FeatureAsset feature, Vector2Int featurePos)
         {
-            feature.TryGetSection(featurePos * 2, out FeatureAsset.Section section);
+            feature.TryGetSection(featurePos * 2, out Labrys.FeatureEditor.Section section);
             Assert.IsNotNull(section, "Section expected to exist at position: " + (featurePos * 2));
         }
 
         // Check for valid external links
         void ValidateExternalLink(FeatureAsset feature, Vector2Int featureAssetPos)
         {
-            feature.TryGetLink(featureAssetPos, out FeatureAsset.Link link);
+            feature.TryGetLink(featureAssetPos, out Link link);
 
             Assert.IsNotNull(link, "External link expected to exist at position: " + featureAssetPos);
             Assert.True(link.open, "Link was expected to be open (found closed) at position: " + featureAssetPos);
@@ -75,7 +72,7 @@ namespace Tests
         // Check for valid internal links
         void ValidateInternalLink(FeatureAsset feature, Vector2Int featureAssetPos)
         {
-            feature.TryGetLink(featureAssetPos, out FeatureAsset.Link link);
+            feature.TryGetLink(featureAssetPos, out Link link);
 
             Assert.IsNotNull(link, "Internal link expected to exist at position: " + featureAssetPos);
             Assert.True(link.open, "Link was expected to be open (found closed) at position: " + featureAssetPos);
@@ -85,7 +82,7 @@ namespace Tests
         // Check for invalid links
         void ValidateMissingLink(FeatureAsset feature, Vector2Int featureAssetPos)
         {
-            feature.TryGetLink(featureAssetPos, out FeatureAsset.Link link);
+            feature.TryGetLink(featureAssetPos, out Link link);
 
             Assert.IsNull(link, "Link expected to be missing at position: " + featureAssetPos);
         }
