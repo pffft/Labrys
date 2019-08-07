@@ -245,7 +245,7 @@ namespace Labrys.Generation
                 Profiler.BeginSample("Getting physical adjacencies");
                 // Find all the Sections that neighbor this one ("physical adjacency").
                 // Cached + optimized algorithm
-                Connection physicalAdjacencies = grid.GetPhysicalAdjacencies2(position); 
+                Connection physicalAdjacencies = grid.GetPhysicalAdjacencies(position); 
                 Profiler.EndSample();
 
                 Profiler.BeginSample("Resolving TileType");

@@ -8,7 +8,7 @@ namespace Labrys.Generation
     /// <summary>
     /// A Dictionary mapping Vector2Int positions to Section objects.
     /// </summary>
-    public class Grid
+    public class Grid : IReadOnlyGrid
     {
         private List<Feature> features;
 
@@ -134,7 +134,7 @@ namespace Labrys.Generation
         /// </summary>
         /// <returns>The physical adjacencies.</returns>
         /// <param name="position">Position.</param>
-        public Connection GetPhysicalAdjacencies(Vector2Int position)
+        public Connection GetPhysicalAdjacencies_OLD(Vector2Int position)
         {
             Connection physicalAdjacent = Connection.None;
 
@@ -431,7 +431,7 @@ namespace Labrys.Generation
         /// </summary>
         /// <returns>The physical adjacencies.</returns>
         /// <param name="position">Position.</param>
-        public Connection GetPhysicalAdjacencies2(Vector2Int position)
+        public Connection GetPhysicalAdjacencies(Vector2Int position)
         {
             Connection physicalAdjacent2 = Connection.None;
 
