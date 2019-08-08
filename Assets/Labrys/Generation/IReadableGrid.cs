@@ -6,7 +6,7 @@ using UnityEngine;
 /// <summary>
 /// An interface for a Grid that can be read from, but not modified.
 /// </summary>
-public interface IReadOnlyGrid
+public interface IReadableGrid
 {
     /// <summary>
     /// Getter for Sections in this Grid by Vector2Int.
@@ -25,10 +25,10 @@ public interface IReadOnlyGrid
     /// Gets an array of every single nonempty cell in this Grid.
     /// </summary>
     /// <returns>The full cells.</returns>
-    Vector2Int[] GetFullCells();
+    Vector2Int[] GetOccupiedCells();
 
     /// <summary>
-    /// Gets an array of every nonempty cell in this Grid that is connected to
+    /// Gets an array of every occupied cell in this Grid that is connected to
     /// the outside. In other words, every nonempty cell that is not completely
     /// enclosed by other nonempty cells.
     /// </summary>

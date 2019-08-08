@@ -8,7 +8,7 @@ namespace Labrys.Generation
     /// <summary>
     /// A Dictionary mapping Vector2Int positions to Section objects.
     /// </summary>
-    public class Grid : IReadOnlyGrid
+    public class Grid : IReadableGrid
     {
         private List<Feature> features;
 
@@ -110,7 +110,7 @@ namespace Labrys.Generation
             set => this[new Vector2Int(x, y)] = value;
         }
 
-        public Vector2Int[] GetFullCells()
+        public Vector2Int[] GetOccupiedCells()
         {
             Vector2Int[] toReturn = new Vector2Int[globalGrid.Count];
             globalGrid.Keys.CopyTo(toReturn, 0);
