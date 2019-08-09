@@ -15,6 +15,9 @@ public class Controller : MonoBehaviour
     [Tooltip("How fast does the controller move, in meters per second?")]
     public float movementScale = 5f;
 
+    [Tooltip("How fast does the controller move when sprinting?")]
+    public float sprintingSpeed = 10f;
+
     [Tooltip("How sensitive is the mouse?")]
     public float rotationScale = 5f;
 
@@ -70,6 +73,9 @@ public class Controller : MonoBehaviour
     // The camera isn't at the exact center of the gameobject- it's a bit up
     private Vector3 cameraOffset;
 
+    // Are we currently sprinting?
+    private bool sprinting = false;
+
     #endregion
 
     // Use this for initialization
@@ -120,6 +126,16 @@ public class Controller : MonoBehaviour
         #endregion
 
         #region Movement
+        // Sprinting status
+        if (Input.GetKeyDown(KeyCode.LeftShift))
+        {
+            this.sprinting = true;
+        } 
+        else if (!Input.GetKey(KeyCode.LeftShift)) 
+        {
+            this.sprinting = false;
+        }
+
         // Create a vector in the direction of where we're looking
         Vector3 viewVector = viewRotation * Vector3.forward;
 
@@ -138,7 +154,15 @@ public class Controller : MonoBehaviour
         // Left/right motion (strafe)
         float horizontal = Input.GetAxis("Horizontal");
 
-        Vector3 movementVector = (movementScale * vertical * forwardVector) + (movementScale * horizontal * rightVector);
+        Vector3 movementVector;
+        if (sprinting) 
+        {
+            movementVector = (sprintingSpeed * vertical * forwardVector) + (sprintingSpeed * horizontal * rightVector);
+        } 
+        else 
+        {
+            movementVector = (movementScale * vertical * forwardVector) + (movementScale * horizontal * rightVector);
+        }
         #endregion
 
         // Try to scoot the player in the intended direction. Physics can stop this

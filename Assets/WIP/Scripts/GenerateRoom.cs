@@ -10,7 +10,7 @@ public class GenerateRoom : MonoBehaviour
 
     public GameObject[] torches;
 
-    private const int diameter = 16;
+    private const int diameter = 12;
     private const int height = 3;
 
     private const float scale = 1f;

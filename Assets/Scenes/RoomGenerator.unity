@@ -372,7 +372,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   AttachedCamera: {fileID: 1995326147}
   playerHeight: 1.628
-  movementScale: 5
+  movementScale: 4
+  sprintingSpeed: 6
   rotationScale: 5
   jumpHeight: 1
   MaxZoom: 1.5
