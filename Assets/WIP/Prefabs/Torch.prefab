@@ -26,7 +26,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2670877546808855579}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -0.662, y: 0, z: 0}
+  m_LocalPosition: {x: -0.3333, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 7232252696368294295}
@@ -4779,7 +4779,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 3690511070403553359}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -0.7, y: 0.2, z: 0}
+  m_LocalPosition: {x: -0.35, y: 0.1, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 7232252696368294295}
@@ -4797,7 +4797,7 @@ Light:
   m_Type: 2
   m_Color: {r: 1, g: 0.47596157, b: 0, a: 1}
   m_Intensity: 1
-  m_Range: 15
+  m_Range: 25
   m_SpotAngle: 30
   m_InnerSpotAngle: 21.80208
   m_CookieSize: 10
@@ -4901,20 +4901,15 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 7232252696368294295}
     m_Modifications:
-    - target: {fileID: -927199367670048503, guid: c5ce289aca5a045378f9e28b181350f9,
-        type: 3}
-      propertyPath: m_Name
-      value: Torch
-      objectReference: {fileID: 0}
     - target: {fileID: -4216859302048453862, guid: c5ce289aca5a045378f9e28b181350f9,
         type: 3}
       propertyPath: m_LocalPosition.x
-      value: -0.5
+      value: -0.25
       objectReference: {fileID: 0}
     - target: {fileID: -4216859302048453862, guid: c5ce289aca5a045378f9e28b181350f9,
         type: 3}
       propertyPath: m_LocalPosition.y
-      value: -0.5
+      value: -0.25
       objectReference: {fileID: 0}
     - target: {fileID: -4216859302048453862, guid: c5ce289aca5a045378f9e28b181350f9,
         type: 3}
@@ -4960,6 +4955,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: -927199367670048503, guid: c5ce289aca5a045378f9e28b181350f9,
+        type: 3}
+      propertyPath: m_Name
+      value: Torch
       objectReference: {fileID: 0}
     - target: {fileID: 1135241130115838235, guid: c5ce289aca5a045378f9e28b181350f9,
         type: 3}

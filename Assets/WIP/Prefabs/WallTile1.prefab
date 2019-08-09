@@ -24,7 +24,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1990086158981841686}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 1, z: 0}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 2902911679329236736}
@@ -66,7 +66,7 @@ Transform:
   m_GameObject: {fileID: 8591925407651486496}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 0.4, y: 2, z: 2}
+  m_LocalScale: {x: 0.2, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 5215303978294583666}
   m_RootOrder: 0
@@ -137,10 +137,29 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 5215303978294583666}
     m_Modifications:
-    - target: {fileID: -927199367670048503, guid: 4f573312535b9504982bf638fed0f9c5,
-        type: 3}
-      propertyPath: m_Name
-      value: Brick_1x1_Deformed (1)
+    - target: {fileID: 400000, guid: 4f573312535b9504982bf638fed0f9c5, type: 3}
+      propertyPath: m_RootOrder
+      value: 7
+      objectReference: {fileID: 0}
+    - target: {fileID: 400000, guid: 4f573312535b9504982bf638fed0f9c5, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: -0.337
+      objectReference: {fileID: 0}
+    - target: {fileID: 400000, guid: 4f573312535b9504982bf638fed0f9c5, type: 3}
+      propertyPath: m_LocalScale.x
+      value: 1.05
+      objectReference: {fileID: 0}
+    - target: {fileID: 400000, guid: 4f573312535b9504982bf638fed0f9c5, type: 3}
+      propertyPath: m_LocalScale.y
+      value: 1.05
+      objectReference: {fileID: 0}
+    - target: {fileID: 400000, guid: 4f573312535b9504982bf638fed0f9c5, type: 3}
+      propertyPath: m_LocalScale.z
+      value: 1.05
+      objectReference: {fileID: 0}
+    - target: {fileID: 400000, guid: 4f573312535b9504982bf638fed0f9c5, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0.005
       objectReference: {fileID: 0}
     - target: {fileID: -4216859302048453862, guid: 4f573312535b9504982bf638fed0f9c5,
         type: 3}
@@ -212,35 +231,16 @@ PrefabInstance:
       propertyPath: m_LocalScale.z
       value: 1.05
       objectReference: {fileID: 0}
+    - target: {fileID: -927199367670048503, guid: 4f573312535b9504982bf638fed0f9c5,
+        type: 3}
+      propertyPath: m_Name
+      value: Brick_1x1_Deformed (1)
+      objectReference: {fileID: 0}
     - target: {fileID: -2416733968201007103, guid: 4f573312535b9504982bf638fed0f9c5,
         type: 3}
       propertyPath: m_Materials.Array.data[0]
       value: 
       objectReference: {fileID: 2100000, guid: fd015d6f89dd9ee40b202b9fd06e3519, type: 2}
-    - target: {fileID: 400000, guid: 4f573312535b9504982bf638fed0f9c5, type: 3}
-      propertyPath: m_RootOrder
-      value: 7
-      objectReference: {fileID: 0}
-    - target: {fileID: 400000, guid: 4f573312535b9504982bf638fed0f9c5, type: 3}
-      propertyPath: m_LocalPosition.z
-      value: -0.674
-      objectReference: {fileID: 0}
-    - target: {fileID: 400000, guid: 4f573312535b9504982bf638fed0f9c5, type: 3}
-      propertyPath: m_LocalScale.x
-      value: 1.05
-      objectReference: {fileID: 0}
-    - target: {fileID: 400000, guid: 4f573312535b9504982bf638fed0f9c5, type: 3}
-      propertyPath: m_LocalScale.y
-      value: 1.05
-      objectReference: {fileID: 0}
-    - target: {fileID: 400000, guid: 4f573312535b9504982bf638fed0f9c5, type: 3}
-      propertyPath: m_LocalScale.z
-      value: 1.05
-      objectReference: {fileID: 0}
-    - target: {fileID: 400000, guid: 4f573312535b9504982bf638fed0f9c5, type: 3}
-      propertyPath: m_LocalPosition.y
-      value: 0.01
-      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 4f573312535b9504982bf638fed0f9c5, type: 3}
 --- !u!4 &2067372481892094496 stripped
@@ -256,6 +256,14 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 5215303978294583666}
     m_Modifications:
+    - target: {fileID: 100000, guid: 3d5aabfe0a8a34d9ba303fd2b9604eb4, type: 3}
+      propertyPath: m_Name
+      value: Brick_1x1_Normal (1)
+      objectReference: {fileID: 0}
+    - target: {fileID: 100000, guid: 3d5aabfe0a8a34d9ba303fd2b9604eb4, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 400000, guid: 3d5aabfe0a8a34d9ba303fd2b9604eb4, type: 3}
       propertyPath: m_LocalPosition.x
       value: 0
@@ -312,14 +320,6 @@ PrefabInstance:
       propertyPath: m_LocalScale.z
       value: 1.05
       objectReference: {fileID: 0}
-    - target: {fileID: 100000, guid: 3d5aabfe0a8a34d9ba303fd2b9604eb4, type: 3}
-      propertyPath: m_Name
-      value: Brick_1x1_Normal (1)
-      objectReference: {fileID: 0}
-    - target: {fileID: 100000, guid: 3d5aabfe0a8a34d9ba303fd2b9604eb4, type: 3}
-      propertyPath: m_IsActive
-      value: 0
-      objectReference: {fileID: 0}
     - target: {fileID: 2300000, guid: 3d5aabfe0a8a34d9ba303fd2b9604eb4, type: 3}
       propertyPath: m_Materials.Array.data[0]
       value: 
@@ -339,17 +339,21 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 5215303978294583666}
     m_Modifications:
+    - target: {fileID: 100000, guid: 3d5aabfe0a8a34d9ba303fd2b9604eb4, type: 3}
+      propertyPath: m_Name
+      value: Brick_1x1_Normal
+      objectReference: {fileID: 0}
     - target: {fileID: 400000, guid: 3d5aabfe0a8a34d9ba303fd2b9604eb4, type: 3}
       propertyPath: m_LocalPosition.x
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 400000, guid: 3d5aabfe0a8a34d9ba303fd2b9604eb4, type: 3}
       propertyPath: m_LocalPosition.y
-      value: -0.677
+      value: -0.3385
       objectReference: {fileID: 0}
     - target: {fileID: 400000, guid: 3d5aabfe0a8a34d9ba303fd2b9604eb4, type: 3}
       propertyPath: m_LocalPosition.z
-      value: 0.678
+      value: 0.339
       objectReference: {fileID: 0}
     - target: {fileID: 400000, guid: 3d5aabfe0a8a34d9ba303fd2b9604eb4, type: 3}
       propertyPath: m_LocalRotation.x
@@ -395,10 +399,6 @@ PrefabInstance:
       propertyPath: m_LocalScale.z
       value: 1.04
       objectReference: {fileID: 0}
-    - target: {fileID: 100000, guid: 3d5aabfe0a8a34d9ba303fd2b9604eb4, type: 3}
-      propertyPath: m_Name
-      value: Brick_1x1_Normal
-      objectReference: {fileID: 0}
     - target: {fileID: 2300000, guid: 3d5aabfe0a8a34d9ba303fd2b9604eb4, type: 3}
       propertyPath: m_Materials.Array.data[0]
       value: 
@@ -418,6 +418,14 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 5215303978294583666}
     m_Modifications:
+    - target: {fileID: 100000, guid: 3d5aabfe0a8a34d9ba303fd2b9604eb4, type: 3}
+      propertyPath: m_Name
+      value: Brick_1x1_Normal (3)
+      objectReference: {fileID: 0}
+    - target: {fileID: 100000, guid: 3d5aabfe0a8a34d9ba303fd2b9604eb4, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 400000, guid: 3d5aabfe0a8a34d9ba303fd2b9604eb4, type: 3}
       propertyPath: m_LocalPosition.x
       value: 0
@@ -474,14 +482,6 @@ PrefabInstance:
       propertyPath: m_LocalScale.z
       value: 2.2
       objectReference: {fileID: 0}
-    - target: {fileID: 100000, guid: 3d5aabfe0a8a34d9ba303fd2b9604eb4, type: 3}
-      propertyPath: m_Name
-      value: Brick_1x1_Normal (3)
-      objectReference: {fileID: 0}
-    - target: {fileID: 100000, guid: 3d5aabfe0a8a34d9ba303fd2b9604eb4, type: 3}
-      propertyPath: m_IsActive
-      value: 0
-      objectReference: {fileID: 0}
     - target: {fileID: 2300000, guid: 3d5aabfe0a8a34d9ba303fd2b9604eb4, type: 3}
       propertyPath: m_Materials.Array.data[0]
       value: 
@@ -501,17 +501,21 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 5215303978294583666}
     m_Modifications:
+    - target: {fileID: 100000, guid: 128cd9c15e3ab4d10bcaa12007e1c40e, type: 3}
+      propertyPath: m_Name
+      value: Brick_1x2_Deformed_Top
+      objectReference: {fileID: 0}
     - target: {fileID: 400000, guid: 128cd9c15e3ab4d10bcaa12007e1c40e, type: 3}
       propertyPath: m_LocalPosition.x
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 400000, guid: 128cd9c15e3ab4d10bcaa12007e1c40e, type: 3}
       propertyPath: m_LocalPosition.y
-      value: -0.667
+      value: -0.333
       objectReference: {fileID: 0}
     - target: {fileID: 400000, guid: 128cd9c15e3ab4d10bcaa12007e1c40e, type: 3}
       propertyPath: m_LocalPosition.z
-      value: -0.33200005
+      value: -0.16666
       objectReference: {fileID: 0}
     - target: {fileID: 400000, guid: 128cd9c15e3ab4d10bcaa12007e1c40e, type: 3}
       propertyPath: m_LocalRotation.x
@@ -557,10 +561,6 @@ PrefabInstance:
       propertyPath: m_LocalScale.z
       value: 1.04
       objectReference: {fileID: 0}
-    - target: {fileID: 100000, guid: 128cd9c15e3ab4d10bcaa12007e1c40e, type: 3}
-      propertyPath: m_Name
-      value: Brick_1x2_Deformed_Top
-      objectReference: {fileID: 0}
     - target: {fileID: 2300000, guid: 128cd9c15e3ab4d10bcaa12007e1c40e, type: 3}
       propertyPath: m_Materials.Array.data[0]
       value: 
@@ -580,17 +580,21 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 5215303978294583666}
     m_Modifications:
+    - target: {fileID: 100000, guid: 3d5aabfe0a8a34d9ba303fd2b9604eb4, type: 3}
+      propertyPath: m_Name
+      value: Brick_1x1_Normal (2)
+      objectReference: {fileID: 0}
     - target: {fileID: 400000, guid: 3d5aabfe0a8a34d9ba303fd2b9604eb4, type: 3}
       propertyPath: m_LocalPosition.x
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 400000, guid: 3d5aabfe0a8a34d9ba303fd2b9604eb4, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 0.684
+      value: 0.342
       objectReference: {fileID: 0}
     - target: {fileID: 400000, guid: 3d5aabfe0a8a34d9ba303fd2b9604eb4, type: 3}
       propertyPath: m_LocalPosition.z
-      value: -0.666
+      value: -0.333333
       objectReference: {fileID: 0}
     - target: {fileID: 400000, guid: 3d5aabfe0a8a34d9ba303fd2b9604eb4, type: 3}
       propertyPath: m_LocalRotation.x
@@ -636,10 +640,6 @@ PrefabInstance:
       propertyPath: m_LocalScale.z
       value: 1.05
       objectReference: {fileID: 0}
-    - target: {fileID: 100000, guid: 3d5aabfe0a8a34d9ba303fd2b9604eb4, type: 3}
-      propertyPath: m_Name
-      value: Brick_1x1_Normal (2)
-      objectReference: {fileID: 0}
     - target: {fileID: 2300000, guid: 3d5aabfe0a8a34d9ba303fd2b9604eb4, type: 3}
       propertyPath: m_Materials.Array.data[0]
       value: 
@@ -659,15 +659,49 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 5215303978294583666}
     m_Modifications:
-    - target: {fileID: -927199367670048503, guid: 4f573312535b9504982bf638fed0f9c5,
-        type: 3}
-      propertyPath: m_Name
-      value: Brick_1x1_Deformed
+    - target: {fileID: 400000, guid: 4f573312535b9504982bf638fed0f9c5, type: 3}
+      propertyPath: m_RootOrder
+      value: 6
       objectReference: {fileID: 0}
-    - target: {fileID: -927199367670048503, guid: 4f573312535b9504982bf638fed0f9c5,
-        type: 3}
-      propertyPath: m_IsActive
-      value: 1
+    - target: {fileID: 400000, guid: 4f573312535b9504982bf638fed0f9c5, type: 3}
+      propertyPath: m_LocalScale.y
+      value: 2.15
+      objectReference: {fileID: 0}
+    - target: {fileID: 400000, guid: 4f573312535b9504982bf638fed0f9c5, type: 3}
+      propertyPath: m_LocalScale.z
+      value: 2.15
+      objectReference: {fileID: 0}
+    - target: {fileID: 400000, guid: 4f573312535b9504982bf638fed0f9c5, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0.169
+      objectReference: {fileID: 0}
+    - target: {fileID: 400000, guid: 4f573312535b9504982bf638fed0f9c5, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0.1725
+      objectReference: {fileID: 0}
+    - target: {fileID: 400000, guid: 4f573312535b9504982bf638fed0f9c5, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: -0.707107
+      objectReference: {fileID: 0}
+    - target: {fileID: 400000, guid: 4f573312535b9504982bf638fed0f9c5, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 400000, guid: 4f573312535b9504982bf638fed0f9c5, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 0.7071066
+      objectReference: {fileID: 0}
+    - target: {fileID: 400000, guid: 4f573312535b9504982bf638fed0f9c5, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: -90.00001
+      objectReference: {fileID: 0}
+    - target: {fileID: 400000, guid: 4f573312535b9504982bf638fed0f9c5, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 400000, guid: 4f573312535b9504982bf638fed0f9c5, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: -4216859302048453862, guid: 4f573312535b9504982bf638fed0f9c5,
         type: 3}
@@ -734,49 +768,15 @@ PrefabInstance:
       propertyPath: m_LocalScale.z
       value: 2.1
       objectReference: {fileID: 0}
-    - target: {fileID: 400000, guid: 4f573312535b9504982bf638fed0f9c5, type: 3}
-      propertyPath: m_RootOrder
-      value: 6
+    - target: {fileID: -927199367670048503, guid: 4f573312535b9504982bf638fed0f9c5,
+        type: 3}
+      propertyPath: m_Name
+      value: Brick_1x1_Deformed
       objectReference: {fileID: 0}
-    - target: {fileID: 400000, guid: 4f573312535b9504982bf638fed0f9c5, type: 3}
-      propertyPath: m_LocalScale.y
-      value: 2.15
-      objectReference: {fileID: 0}
-    - target: {fileID: 400000, guid: 4f573312535b9504982bf638fed0f9c5, type: 3}
-      propertyPath: m_LocalScale.z
-      value: 2.15
-      objectReference: {fileID: 0}
-    - target: {fileID: 400000, guid: 4f573312535b9504982bf638fed0f9c5, type: 3}
-      propertyPath: m_LocalPosition.y
-      value: 0.338
-      objectReference: {fileID: 0}
-    - target: {fileID: 400000, guid: 4f573312535b9504982bf638fed0f9c5, type: 3}
-      propertyPath: m_LocalPosition.z
-      value: 0.34499997
-      objectReference: {fileID: 0}
-    - target: {fileID: 400000, guid: 4f573312535b9504982bf638fed0f9c5, type: 3}
-      propertyPath: m_LocalRotation.x
-      value: -0.707107
-      objectReference: {fileID: 0}
-    - target: {fileID: 400000, guid: 4f573312535b9504982bf638fed0f9c5, type: 3}
-      propertyPath: m_LocalPosition.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 400000, guid: 4f573312535b9504982bf638fed0f9c5, type: 3}
-      propertyPath: m_LocalRotation.w
-      value: 0.7071066
-      objectReference: {fileID: 0}
-    - target: {fileID: 400000, guid: 4f573312535b9504982bf638fed0f9c5, type: 3}
-      propertyPath: m_LocalEulerAnglesHint.x
-      value: -90.00001
-      objectReference: {fileID: 0}
-    - target: {fileID: 400000, guid: 4f573312535b9504982bf638fed0f9c5, type: 3}
-      propertyPath: m_LocalEulerAnglesHint.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 400000, guid: 4f573312535b9504982bf638fed0f9c5, type: 3}
-      propertyPath: m_LocalEulerAnglesHint.z
-      value: 0
+    - target: {fileID: -927199367670048503, guid: 4f573312535b9504982bf638fed0f9c5,
+        type: 3}
+      propertyPath: m_IsActive
+      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 4f573312535b9504982bf638fed0f9c5, type: 3}
