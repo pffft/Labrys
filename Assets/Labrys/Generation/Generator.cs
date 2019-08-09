@@ -185,7 +185,8 @@ namespace Labrys.Generation
 
             // Initialize with a single starting room
             // Later, this can be e.g. a specific starting chamber.
-            grid[0, 0] = Section.Default();
+            //grid[0, 0] = Section.Default();
+            grid[0, 0] = new Section(variant: "concrete");
 
             // Pick some ending condition. For now it's just "try 100 times".
             int count = 0;
@@ -229,7 +230,7 @@ namespace Labrys.Generation
         private void PlaceTiles()
         {
             TileSet.VariantKey searchKey = new TileSet.VariantKey();
-            searchKey.variant = "default";
+            searchKey.variant = "concrete";
 
             List<Tile> searchResult = new List<Tile>();
 

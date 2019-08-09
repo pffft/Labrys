@@ -8,6 +8,8 @@ public class GenerateRoom : MonoBehaviour
 
     public GameObject[] wallTiles;
 
+    public GameObject[] torches;
+
     private const int diameter = 8;
     private const int height = 2;
 
@@ -59,6 +61,28 @@ public class GenerateRoom : MonoBehaviour
                 randomRotation = Quaternion.AngleAxis(Random.Range(0, 3) * 90, Vector3.left);
                 instantiated = GameObject.Instantiate(wallTemplate, new Vector3(i * 2, j * 2, (2 * diameter) - 1), Quaternion.AngleAxis(270, Vector3.up) * randomRotation);
             }
+        }
+
+        // Torches
+        for (int i = 0; i <= diameter / 8; i++)
+        {
+            GameObject torchTemplate;
+
+            // -X
+            torchTemplate = torches[Random.Range(0, torches.Length)];
+            GameObject.Instantiate(torchTemplate, new Vector3(-1, 2, (i + 1) * 3 + 1f), Quaternion.AngleAxis(180, Vector3.up));
+
+            // +X
+            torchTemplate = torches[Random.Range(0, torches.Length)];
+            GameObject.Instantiate(torchTemplate, new Vector3((2 * diameter) - 1, 2, (i + 1) * 3 + 1f), Quaternion.AngleAxis(0, Vector3.up));
+
+            // -Z
+            torchTemplate = torches[Random.Range(0, torches.Length)];
+            GameObject.Instantiate(torchTemplate, new Vector3((i + 1) * 3 + 1f,  2, -1), Quaternion.AngleAxis(90, Vector3.up));
+
+            // +Z
+            torchTemplate = torches[Random.Range(0, torches.Length)];
+            GameObject.Instantiate(torchTemplate, new Vector3((i + 1) * 3 + 1f, 2, (2 * diameter) - 1), Quaternion.AngleAxis(270, Vector3.up));
         }
     }
 

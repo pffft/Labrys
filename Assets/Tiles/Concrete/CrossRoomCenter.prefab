@@ -1,6 +1,6 @@
 %YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
---- !u!1 &1659749496659924182
+--- !u!1 &4820398271244546886
 GameObject:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -8,9 +8,9 @@ GameObject:
   m_PrefabAsset: {fileID: 0}
   serializedVersion: 6
   m_Component:
-  - component: {fileID: 8951433280898204937}
-  - component: {fileID: 4160639283027859047}
-  - component: {fileID: 8424738948492056758}
+  - component: {fileID: 3842761166597119162}
+  - component: {fileID: 4203591839163664014}
+  - component: {fileID: 433248562510590771}
   m_Layer: 0
   m_Name: default
   m_TagString: Untagged
@@ -18,35 +18,35 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!4 &8951433280898204937
+--- !u!4 &3842761166597119162
 Transform:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1659749496659924182}
+  m_GameObject: {fileID: 4820398271244546886}
   m_LocalRotation: {x: 0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: -0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
-  m_Father: {fileID: 6120079896404210748}
+  m_Father: {fileID: 6420549879166280577}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!33 &4160639283027859047
+--- !u!33 &4203591839163664014
 MeshFilter:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1659749496659924182}
-  m_Mesh: {fileID: 4300000, guid: 7fc32a32846de48e486f6864c012d350, type: 3}
---- !u!23 &8424738948492056758
+  m_GameObject: {fileID: 4820398271244546886}
+  m_Mesh: {fileID: 4300000, guid: caf8b1f28b8a23448a53ced41a6070dc, type: 3}
+--- !u!23 &433248562510590771
 MeshRenderer:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1659749496659924182}
+  m_GameObject: {fileID: 4820398271244546886}
   m_Enabled: 1
   m_CastShadows: 1
   m_ReceiveShadows: 1
@@ -57,7 +57,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: 7fc32a32846de48e486f6864c012d350, type: 3}
+  - {fileID: 2100000, guid: 06cdfc03c2d1f4204bd4b070a0fd0b3c, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -78,7 +78,7 @@ MeshRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
---- !u!1 &7360679024727831559
+--- !u!1 &6474625952288302965
 GameObject:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -86,48 +86,48 @@ GameObject:
   m_PrefabAsset: {fileID: 0}
   serializedVersion: 6
   m_Component:
-  - component: {fileID: 6120079896404210748}
-  - component: {fileID: 3155180077141219554}
+  - component: {fileID: 6420549879166280577}
+  - component: {fileID: 8096782423904603398}
   m_Layer: 0
-  m_Name: CrossCorridor
+  m_Name: CrossRoomCenter
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!4 &6120079896404210748
+--- !u!4 &6420549879166280577
 Transform:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7360679024727831559}
+  m_GameObject: {fileID: 6474625952288302965}
   m_LocalRotation: {x: 0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: -0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
-  - {fileID: 8951433280898204937}
+  - {fileID: 3842761166597119162}
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &3155180077141219554
+--- !u!114 &8096782423904603398
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7360679024727831559}
+  m_GameObject: {fileID: 6474625952288302965}
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 592e1c4835bdd4c23b4d31efa92c1808, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   type:
-    Name: CROSS_CORRIDOR
+    Name: CROSS_ROOM_CENTER
     numRotations: 1
-    tileBlueprint: 85
+    tileBlueprint: 255
     importanceMask: 255
-  variant: frozen
+  variant: concrete
   section:
     internalConnections: 0
     externalConnections: 0
