@@ -76,7 +76,7 @@ public class Controller : MonoBehaviour
     private Vector3 cameraOffset;
 
     // Are we currently sprinting?
-    public bool sprinting = false;
+    private bool sprinting = false;
 
     #endregion
 
