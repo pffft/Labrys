@@ -9,20 +9,22 @@ public class Controller : MonoBehaviour
     [Tooltip("The camera that this controller will control.")]
     public Camera AttachedCamera;
 
+    // Note: this default is the height 5'8.5" (=1.75m), minus the correction for
+    // standard top of head to eye level (=11.2cm = 0.112m).
     [Tooltip("How tall is the player, in meters?")]
-    public float playerHeight = 1.74f;
+    public float playerHeight = 1.628f;
 
-    [Tooltip("How fast does the controller move, in meters per second?")]
-    public float movementScale = 5f;
+    [Tooltip("How fast does the controller move when walking, in meters per second?")]
+    public float movementSpeed = 4f;
 
     [Tooltip("How fast does the controller move when sprinting?")]
-    public float sprintingSpeed = 10f;
+    public float sprintingSpeed = 6f;
 
     [Tooltip("How sensitive is the mouse?")]
     public float rotationScale = 5f;
 
     [Tooltip("How high can the player jump, in meters?")]
-    public float jumpHeight = 2f;
+    public float jumpHeight = 1f;
 
     [Tooltip("How zoomed in can the screen be? E.g., 2 = 2x max zoom.")]
     public float MaxZoom = 1.5f;
@@ -74,7 +76,7 @@ public class Controller : MonoBehaviour
     private Vector3 cameraOffset;
 
     // Are we currently sprinting?
-    private bool sprinting = false;
+    public bool sprinting = false;
 
     #endregion
 
@@ -113,7 +115,7 @@ public class Controller : MonoBehaviour
         float mouseX = Input.GetAxis("Mouse X");
         float mouseY = Input.GetAxis("Mouse Y");
 
-        // Contrain pitch and yaw
+        // Constrain pitch and yaw
         pitch = Mathf.Clamp(pitch + (rotationScale * mouseY), -90, 90);
         yaw = Mathf.Repeat(yaw + (rotationScale * mouseX), 360);
 
@@ -127,14 +129,7 @@ public class Controller : MonoBehaviour
 
         #region Movement
         // Sprinting status
-        if (Input.GetKeyDown(KeyCode.LeftShift))
-        {
-            this.sprinting = true;
-        } 
-        else if (!Input.GetKey(KeyCode.LeftShift)) 
-        {
-            this.sprinting = false;
-        }
+        this.sprinting = Input.GetKey(KeyCode.LeftShift);
 
         // Create a vector in the direction of where we're looking
         Vector3 viewVector = viewRotation * Vector3.forward;
@@ -161,12 +156,16 @@ public class Controller : MonoBehaviour
         } 
         else 
         {
-            movementVector = (movementScale * vertical * forwardVector) + (movementScale * horizontal * rightVector);
+            movementVector = (movementSpeed * vertical * forwardVector) + (movementSpeed * horizontal * rightVector);
         }
         #endregion
 
         // Try to scoot the player in the intended direction. Physics can stop this
         // due to either collisions or slopes.
+        // TODO MovePosition isn't accurate. Can jump into walls and stall falling,
+        // due to this script and physics computations not agreeing.
+        // Idea: have a target max velocity, and apply force in that direction until
+        // that velocity is (roughly) attained. Constrain to a max acceleration.
         body.MovePosition(transform.position + (Time.deltaTime * movementVector));
 
         // Apply the new changes to the camera.
