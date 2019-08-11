@@ -78,6 +78,8 @@ public class Controller : MonoBehaviour
     // Are we currently sprinting?
     private bool sprinting = false;
 
+    private Vector3 movementVector;
+
     #endregion
 
     // Use this for initialization
@@ -149,15 +151,14 @@ public class Controller : MonoBehaviour
         // Left/right motion (strafe)
         float horizontal = Input.GetAxis("Horizontal");
 
-        Vector3 movementVector;
-        if (sprinting) 
-        {
-            movementVector = (sprintingSpeed * vertical * forwardVector) + (sprintingSpeed * horizontal * rightVector);
-        } 
-        else 
-        {
-            movementVector = (movementSpeed * vertical * forwardVector) + (movementSpeed * horizontal * rightVector);
-        }
+        // Vectors for movement in the respective directions
+        Vector3 verticalVector = vertical * forwardVector;
+        Vector3 horizontalVector = horizontal * rightVector;
+
+        float movementStrength = Mathf.Sqrt(verticalVector.sqrMagnitude + horizontalVector.sqrMagnitude);
+
+        // Prevent diagonal movement being faster; adjust based on sprinting bool
+        this.movementVector = (sprinting ? sprintingSpeed : movementSpeed) * movementStrength * (verticalVector + horizontalVector).normalized;
         #endregion
 
         // Try to scoot the player in the intended direction. Physics can stop this
@@ -166,7 +167,10 @@ public class Controller : MonoBehaviour
         // due to this script and physics computations not agreeing.
         // Idea: have a target max velocity, and apply force in that direction until
         // that velocity is (roughly) attained. Constrain to a max acceleration.
-        body.MovePosition(transform.position + (Time.deltaTime * movementVector));
+        //body.MovePosition(transform.position + (Time.deltaTime * movementVector));
+        //body.MovePosition(transform.position + (Time.deltaTime * movementVector));
+        //Debug.Log("Delta time: " + Time.deltaTime);
+
 
         // Apply the new changes to the camera.
         AttachedCamera.transform.rotation = viewRotation;
@@ -243,5 +247,9 @@ public class Controller : MonoBehaviour
             // Add 0.5 seconds to the cooldown so we avoid double jumping
             jumpCooldown = (int)(0.5f / Time.fixedDeltaTime);
         }
+
+        // We compute this value in Update (user input is not frame dependent), but apply it here
+        // (physics only updates on fixed update).
+        body.MovePosition(transform.position + (Time.fixedDeltaTime * movementVector));
     }
 }

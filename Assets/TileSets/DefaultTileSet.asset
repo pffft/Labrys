@@ -14,6 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   allTiles:
   - {fileID: 1201798191442521615, guid: 15243ad93aa57194690f2dc357062b78, type: 3}
+  - {fileID: 750112210006391854, guid: 140851bbb7624b04c944e4ab396b1fba, type: 3}
   - {fileID: 8096782423904603398, guid: c04597ac7bf96084ba34f69514d68e8b, type: 3}
   - {fileID: 7966731278930253873, guid: 591b3e5dc8d214638b3865ef7a995eab, type: 3}
   - {fileID: 6423399656086466277, guid: 34aef4ae77b404b08b0216249a9dc4f7, type: 3}
