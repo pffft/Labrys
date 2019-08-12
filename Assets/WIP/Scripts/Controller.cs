@@ -12,7 +12,9 @@ public class Controller : MonoBehaviour
     // Note: this default is the height 5'8.5" (=1.75m), minus the correction for
     // standard top of head to eye level (=11.2cm = 0.112m).
     [Tooltip("How tall is the player, in meters?")]
-    public float playerHeight = 1.628f;
+    public float playerHeight = 1.75f;
+
+    private float eyeHeightOffset = 0.112f;
 
     [Tooltip("How fast does the controller move when walking, in meters per second?")]
     public float movementSpeed = 4f;
@@ -92,7 +94,7 @@ public class Controller : MonoBehaviour
         body.collisionDetectionMode = CollisionDetectionMode.ContinuousDynamic;
 
         gameObject.transform.localScale = playerHeight / 2f * Vector3.one;
-        cameraOffset = playerHeight / 2f * Vector3.up;
+        cameraOffset = (playerHeight - eyeHeightOffset) / 2f * Vector3.up;
     }
 
     // Update is called once per frame

@@ -150,7 +150,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   floorTiles:
-  - {fileID: 786812139973927760, guid: 780dd3fca46defe4794942837bbe3d7a, type: 3}
+  - {fileID: 7684816053811809830, guid: 00d8e3d7cccb546bb85852d6abe41ae4, type: 3}
   wallTiles:
   - {fileID: 8151911750352893043, guid: d4ce1425196da3048891c7540174222e, type: 3}
   - {fileID: 5820039887265896041, guid: 284b43f051027554bbc2f4f56003324a, type: 3}
@@ -370,7 +370,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   AttachedCamera: {fileID: 1995326147}
-  playerHeight: 1.628
+  playerHeight: 1.75
   movementSpeed: 3
   sprintingSpeed: 5
   rotationScale: 5
