@@ -36,15 +36,16 @@ public class GenerateRoom : MonoBehaviour
                         // Random rotation
                         Quaternion randomRotation = Quaternion.AngleAxis(Random.Range(0, 3) * 90, Vector3.up);
 
-                        GameObject instantiated = GameObject.Instantiate(floorTemplate, offset + scale * new Vector3(localX + (4 * i), 0, localZ + (4 * j)), randomRotation);
+                        GameObject instantiated = GameObject.Instantiate(floorTemplate, offset + scale * new Vector3(localX + (4 * i), -0.5f, localZ + (4 * j)), randomRotation);
                         instantiated.transform.parent = floorPart.transform;
 
                         // Random flip on both x and z axes (todo this breaks colliders)
                         //instantiated.transform.localScale = new Vector3(Random.value < 0.5f ? 1 : -1, 1, Random.value < 0.5f ? 1 : -1);
                     }
                 }
-                floorPart = Optimize(floorPart);
-                floorPart.transform.parent = floor.transform;
+                GameObject optimizedFloorPart = Optimize(floorPart);
+                optimizedFloorPart.transform.parent = floor.transform;
+                GameObject.Destroy(floorPart); // Destroy the unoptimized one
             }
         }
 
@@ -175,12 +176,26 @@ public class GenerateRoom : MonoBehaviour
             CombineInstance[] combines = new CombineInstance[meshes.Count];
             for (int i = 0; i < meshes.Count; i++)
             {
+                if (!meshes[i].mesh.isReadable)
+                {
+                    Debug.Log("Unreadable mesh: " + meshes[i].gameObject.name + ". Making duplicate mesh.");
+                    Mesh meshCopy = new Mesh();
+                    meshCopy.vertices = meshes[i].mesh.vertices;
+                    meshCopy.triangles = meshes[i].mesh.triangles;
+                    meshCopy.RecalculateNormals();
+
+                    combines[i].mesh = meshCopy;
+                    combines[i].transform = meshes[i].transform.localToWorldMatrix;
+
+                    continue;
+                }
                 combines[i].mesh = meshes[i].mesh;
                 combines[i].transform = meshes[i].transform.localToWorldMatrix;
             }
 
             // Create a new GameObject with the combined mesh + a copy of the material
             GameObject meshObj = new GameObject(materialName);
+            meshObj.isStatic = true;
             meshObj.transform.parent = newObject.transform;
 
             Mesh combinedMesh = new Mesh();
@@ -193,6 +208,7 @@ public class GenerateRoom : MonoBehaviour
             newMeshRenderer.material = GameObject.Instantiate<Material>(nameToMaterial[materialName]);
         }
 
+        newObject.isStatic = true;
         return newObject;
     }
 
