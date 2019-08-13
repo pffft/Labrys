@@ -79,21 +79,36 @@ namespace Labrys.Editor.FeatureEditor.Panels
 
 			currY += defControlHeight + padding;
 
+			//kvp add new 
+			Rect addNewKvpRect = new Rect(minX, currY, maxWidth, defControlHeight);
+			if (GUI.Button(addNewKvpRect, "Add New Value"))
+			{
+				feature.ForAllSelectedSections((Section s) => { s.AddField("New Field"); });
+			}
+
+			currY += defControlHeight + padding;
+
 			//kvp scroll view
+			Section.Field[] fields = GetFields();
+			const float fieldRectHeight = 20;
+
 			Rect scrollViewRect = new Rect(minX, currY, maxWidth, bounds.yMax - currY);
 			Rect scrollBoundsRect = new Rect(scrollViewRect);
-			scrollBoundsRect.height = 250;
+			scrollBoundsRect.height = (fieldRectHeight + padding) * fields.Length;
 			scrollBoundsRect.width -= 20;
 
 			kvpFieldScrollPos = GUI.BeginScrollView(scrollViewRect, kvpFieldScrollPos, scrollBoundsRect, false, true);
 
 			Rect r = new Rect(scrollBoundsRect);
 			float startY = r.y;
-			r.height = 20;
-			for (int i = 0; i < 10; i++)
+			r.height = fieldRectHeight;
+			for (int i = 0; i < fields.Length; i++)
 			{
 				r.y = startY + (20 + padding) * i;
-				GUI.Button(r, "test " + i);
+				if (GUI.Button(r, $"{fields[i]?.name} : {fields[i]?.value}"))
+				{
+					feature.ForAllSelectedSections((Section s) => { s.RemoveField(fields[i].name); });
+				}
 			}
 
 			GUI.EndScrollView(handleScrollWheel: true);
@@ -130,21 +145,14 @@ namespace Labrys.Editor.FeatureEditor.Panels
 		{
 			FeatureAsset feature = FeatureEditorWindow.GetInstance().Feature;
 			Vector2Int[] selectedPositions = feature.GetSelectedSections();
-			foreach (Vector2Int position in selectedPositions)
-			{
-				if (feature.TryGetSection(position, out Section section))
-				{
-					section.variant = variant;
-				}
-			}
+			feature.ForAllSelectedSections((Section s) => { s.variant = variant; });
 		}
 
 		private Section.Field[] GetFields()
 		{
-			//TODO need to get a list of all fields common amongst all selected sections
-			/*
-			HashSet<string> commonUniqueFieldNames = new HashSet<string>();
+			// Find intersection of all fields of all selected sections
 			HashSet<Section.Field> commonUniqueFields = new HashSet<Section.Field>();
+			HashSet<Section.Field> nextSectionFields = new HashSet<Section.Field>();
 			FeatureAsset feature = FeatureEditorWindow.GetInstance().Feature;
 			Vector2Int[] selectedPositions = feature.GetSelectedSections();
 			bool firstSection = true;
@@ -152,25 +160,35 @@ namespace Labrys.Editor.FeatureEditor.Panels
 			{
 				if (feature.TryGetSection(position, out Section section))
 				{
-					foreach(Section.Field field in section)
+					if (firstSection)
 					{
-						if (firstSection)
-						{
-							commonUniqueFieldNames.Add(field.name);
-							commonUniqueFields.Add(field);
-						}
-						else if (commonUniqueFieldNames.Contains(field.name))
-						{
-
-						}
-						else
+						commonUniqueFields = new HashSet<Section.Field>(section);
+					}
+					else
+					{
+						commonUniqueFields.IntersectWith(section);
 					}
 				}
 
 				firstSection = false;
 			}
-			*/
-			return null;
+
+			// Use list of unique field names to aggregate all matching fields
+			List<Section.Field> fields = new List<Section.Field>();
+			foreach (Vector2Int position in selectedPositions)
+			{
+				if (feature.TryGetSection(position, out Section section))
+				{
+					foreach (Section.Field f in section)
+					{
+						if (commonUniqueFields.Contains(f))
+						{
+							fields.Add(f);
+						}
+					}
+				}
+			}
+			return fields.ToArray();
 		}
 	}
 }

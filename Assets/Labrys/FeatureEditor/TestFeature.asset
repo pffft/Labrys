@@ -12,8 +12,104 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f132721a9c505654498a40770d09b4af, type: 3}
   m_Name: TestFeature
   m_EditorClassIdentifier: 
-  sectionPositions: []
-  sectionData: []
-  linkPositions: []
-  linkData: []
+  sectionPositions:
+  - {x: -2, y: -2}
+  - {x: -2, y: 0}
+  - {x: -2, y: 2}
+  - {x: 0, y: 2}
+  - {x: 2, y: 2}
+  - {x: 2, y: 0}
+  - {x: 2, y: -2}
+  - {x: 0, y: -2}
+  sectionData:
+  - variant: default
+    fields: []
+  - variant: default
+    fields: []
+  - variant: default
+    fields: []
+  - variant: default
+    fields: []
+  - variant: default
+    fields: []
+  - variant: default
+    fields: []
+  - variant: Frozen
+    fields: []
+  - variant: default
+    fields: []
+  linkPositions:
+  - {x: -1, y: -2}
+  - {x: -2, y: -1}
+  - {x: -3, y: -2}
+  - {x: -2, y: -3}
+  - {x: -1, y: 0}
+  - {x: -2, y: 1}
+  - {x: -3, y: 0}
+  - {x: -1, y: 2}
+  - {x: -2, y: 3}
+  - {x: -3, y: 2}
+  - {x: 1, y: 2}
+  - {x: 0, y: 3}
+  - {x: 0, y: 1}
+  - {x: 3, y: 2}
+  - {x: 2, y: 3}
+  - {x: 2, y: 1}
+  - {x: 3, y: 0}
+  - {x: 1, y: 0}
+  - {x: 2, y: -1}
+  - {x: 3, y: -2}
+  - {x: 1, y: -2}
+  - {x: 2, y: -3}
+  - {x: 0, y: -1}
+  - {x: 0, y: -3}
+  linkData:
+  - open: 1
+    external: 0
+  - open: 1
+    external: 0
+  - open: 1
+    external: 1
+  - open: 1
+    external: 1
+  - open: 1
+    external: 1
+  - open: 1
+    external: 0
+  - open: 1
+    external: 1
+  - open: 1
+    external: 0
+  - open: 1
+    external: 1
+  - open: 1
+    external: 1
+  - open: 1
+    external: 0
+  - open: 1
+    external: 1
+  - open: 1
+    external: 1
+  - open: 1
+    external: 1
+  - open: 1
+    external: 1
+  - open: 1
+    external: 0
+  - open: 1
+    external: 1
+  - open: 1
+    external: 1
+  - open: 1
+    external: 0
+  - open: 1
+    external: 1
+  - open: 1
+    external: 0
+  - open: 1
+    external: 1
+  - open: 1
+    external: 1
+  - open: 1
+    external: 1
   selectionPositions: []

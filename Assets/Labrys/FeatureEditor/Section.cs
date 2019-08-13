@@ -13,6 +13,8 @@ namespace Labrys.FeatureEditor
 		{
 			public static bool operator==(Field left, Field right)
 			{
+				if (ReferenceEquals(left, right))
+					return true;
 				if (left == null)
 					return false;
 				return left.Equals(right);
@@ -20,17 +22,10 @@ namespace Labrys.FeatureEditor
 
 			public static bool operator !=(Field left, Field right)
 			{
-				if (left == null)
-				{
-					if (right == null)
-						return true;
-					return false;
-				}
-				return !left.Equals(right);
+				return !(left == right);
 			}
 
 			public string name;
-			public Type type;
 			public string value;
 
 			public override bool Equals(object obj)
@@ -40,15 +35,12 @@ namespace Labrys.FeatureEditor
 
 				Field other = (Field)obj;
 
-				if (other.type != type)
-					return false;
-
-				return other.value == value;
+				return other.name == name;
 			}
 
 			public override int GetHashCode()
 			{
-				return (type.ToString() + value).GetHashCode();
+				return name.GetHashCode();
 			}
 		}
 
@@ -69,7 +61,7 @@ namespace Labrys.FeatureEditor
 
 			if (!fields.Exists((Field f) => { return f.name == name; }))
 			{
-				fields.Add(new Field() { name = name, type = null, value = null });
+				fields.Add(new Field() { name = name, value = null });
 				return true;
 			}
 			return false;
@@ -88,7 +80,6 @@ namespace Labrys.FeatureEditor
 			Field f = fields.Find((Field q) => { return q.name == name; });
 			if (!f.Equals(default(Field)))
 			{
-				f.type = typeof(T);
 				f.value = value.ToString();
 			}
 		}
@@ -115,42 +106,44 @@ namespace Labrys.FeatureEditor
 
 		public int GetInt(string name)
 		{
-			Field f = fields.Find((Field q) => { return q.name == name; });
-			if (f.type == typeof(int))
+			try
 			{
-				return int.Parse(f.value);
+				return int.Parse(GetString(name));
 			}
-			throw new InvalidOperationException(name + " is not a integer value");
+			catch (Exception e) when (e is ArgumentException || e is NullReferenceException)
+			{
+				throw new ArgumentException($"{name} is not an int", e);
+			}
 		}
 
 		public float GetFloat(string name)
 		{
-			Field f = fields.Find((Field q) => { return q.name == name; });
-			if (f.type == typeof(float))
+			try
 			{
-				return float.Parse(f.value);
+				return float.Parse(GetString(name));
 			}
-			throw new InvalidOperationException(name + " is not a floating point value");
+			catch (Exception e) when (e is ArgumentException || e is NullReferenceException)
+			{
+				throw new ArgumentException($"{name} is not a float", e);
+			}
 		}
 
 		public bool GetBool(string name)
 		{
-			Field f = fields.Find((Field q) => { return q.name == name; });
-			if (f.type == typeof(bool))
+			try
 			{
-				return bool.Parse(f.value);
+				return bool.Parse(GetString(name));
 			}
-			throw new InvalidOperationException(name + " is not a boolean value");
+			catch(Exception e) when (e is ArgumentException || e is NullReferenceException)
+			{
+				throw new ArgumentException($"{name} is not a boolean", e);
+			}
 		}
 
 		public string GetString(string name)
 		{
 			Field f = fields.Find((Field q) => { return q.name == name; });
-			if (f.type == typeof(string))
-			{
-				return f.value;
-			}
-			throw new InvalidOperationException(name + " is not a string value");
+			return f.value;
 		}
 
 		public IEnumerator<Field> GetEnumerator()

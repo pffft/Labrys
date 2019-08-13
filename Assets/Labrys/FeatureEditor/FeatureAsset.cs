@@ -11,6 +11,8 @@ namespace Labrys.FeatureEditor
 	[CreateAssetMenu(menuName = "Labrys/Feature", fileName = "New Feature")]
 	public class FeatureAsset : ScriptableObject, ISerializationCallbackReceiver
 	{
+		public const int GRID_DENSITY = 2;
+
 		/// <summary>
 		/// A set of direction vectors in unit circle order used in Feature/FeatureAsset conversions.
 		/// </summary>
@@ -78,8 +80,6 @@ namespace Labrys.FeatureEditor
 		}
 #endif
 
-		public const int GRID_DENSITY = 2;
-
 		private Dictionary<Vector2Int, Section> sections;
 		private Dictionary<Vector2Int, Link> links;
 		private HashSet<Vector2Int> selected;
@@ -105,7 +105,7 @@ namespace Labrys.FeatureEditor
 				throw new ArgumentException("Malformed feature data");
 
 			sections.Clear();
-			for(int i = 0; i < sectionPositions.Count; i++)
+			for (int i = 0; i < sectionPositions.Count; i++)
 			{
 				sections.Add(sectionPositions[i], sectionData[i]);
 			}
@@ -117,7 +117,7 @@ namespace Labrys.FeatureEditor
 			}
 
 			selected.Clear();
-			for(int i = 0; i < selectionPositions.Count; i++)
+			for (int i = 0; i < selectionPositions.Count; i++)
 			{
 				selected.Add(selectionPositions[i]);
 			}
@@ -142,7 +142,7 @@ namespace Labrys.FeatureEditor
 			}
 
 			selectionPositions.Clear();
-			foreach(Vector2Int position in selected)
+			foreach (Vector2Int position in selected)
 			{
 				selectionPositions.Add(position);
 			}
@@ -167,7 +167,6 @@ namespace Labrys.FeatureEditor
 			if (Section.IsValidPosition(gridPosition)
 				&& !sections.ContainsKey(gridPosition))
 			{
-				//TODO section variant configuration in editor
 				sections.Add(gridPosition, new Section() { variant = "default" });
 				UpdateLinks(gridPosition);
 			}
@@ -230,6 +229,18 @@ namespace Labrys.FeatureEditor
 			Vector2Int[] sel = new Vector2Int[selected.Count];
 			selected.CopyTo(sel);
 			return sel;
+		}
+
+		public delegate void SectionOperation(Section s);
+		public void ForAllSelectedSections(SectionOperation operation)
+		{
+			foreach (Vector2Int pos in GetSelectedSections())
+			{
+				if (TryGetSection(pos, out Section s))
+				{
+					operation.Invoke(s);
+				}
+			}
 		}
 
 		public bool HasSectionAt(Vector2Int gridPosition)
@@ -304,7 +315,7 @@ namespace Labrys.FeatureEditor
 				if (!links.TryGetValue(linkPos, out Link existingLink))
 				{
 					Link newLink = new Link() { open = true, external = canBeExternal };
-					if(isValid)
+					if (isValid)
 					{
 						links.Add(linkPos, newLink);
 					}
@@ -316,7 +327,6 @@ namespace Labrys.FeatureEditor
 						links.Remove(linkPos);
 					}
 
-					// If we can't be external, then set the External flag to false.
 					existingLink.external &= canBeExternal;
 				}
 			}
@@ -333,21 +343,21 @@ namespace Labrys.FeatureEditor
 		public Feature ToFeature()
 		{
 			Feature feature = new Feature();
-			foreach(KeyValuePair<Vector2Int, Section> section in sections)
+			foreach (KeyValuePair<Vector2Int, Section> section in sections)
 			{
 				Connection internalConnections = Connection.None;
 				Connection externalConnections = Connection.None;
-				for(int i = 0; i < dirVectors.Length; i++)
+				for (int i = 0; i < dirVectors.Length; i++)
 				{
 					Vector2Int adjPos = section.Key + dirVectors[i];
-					if(TryGetLink(adjPos, out Link link))
+					if (TryGetLink(adjPos, out Link link))
 					{
-						if(link.open)
+						if (link.open)
 						{
 							internalConnections |= dirConnections[i];
 						}
 
-						if(link.external)
+						if (link.external)
 						{
 							externalConnections |= dirConnections[i];
 						}
