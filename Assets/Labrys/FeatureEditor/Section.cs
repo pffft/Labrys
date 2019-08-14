@@ -6,44 +6,8 @@ using UnityEngine;
 namespace Labrys.FeatureEditor
 {
 	[Serializable]
-	public class Section : IEnumerable<Section.Field>
+	public class Section : IEnumerable<SectionField>
 	{
-		[Serializable]
-		public class Field
-		{
-			public static bool operator==(Field left, Field right)
-			{
-				if (ReferenceEquals(left, right))
-					return true;
-				if (left == null)
-					return false;
-				return left.Equals(right);
-			}
-
-			public static bool operator !=(Field left, Field right)
-			{
-				return !(left == right);
-			}
-
-			public string name;
-			public string value;
-
-			public override bool Equals(object obj)
-			{
-				if (obj == null)
-					return false;
-
-				Field other = (Field)obj;
-
-				return other.name == name;
-			}
-
-			public override int GetHashCode()
-			{
-				return name.GetHashCode();
-			}
-		}
-
 		public static bool IsValidPosition(Vector2Int gridPosition)
 		{
 			return gridPosition.x % FeatureAsset.GRID_DENSITY == 0 && gridPosition.y % FeatureAsset.GRID_DENSITY == 0;
@@ -52,16 +16,21 @@ namespace Labrys.FeatureEditor
 		public string variant;
 
 		[SerializeField]
-		private List<Field> fields;
+		private List<SectionField> fields;
+
+		public Section()
+		{
+			fields = new List<SectionField>();
+		}
 
 		public bool AddField(string name)
 		{
 			if (name == null)
 				return false;
 
-			if (!fields.Exists((Field f) => { return f.name == name; }))
+			if (!fields.Exists((SectionField f) => { return f.Name == name; }))
 			{
-				fields.Add(new Field() { name = name, value = null });
+				fields.Add(new SectionField() { Name = name, Value = null });
 				return true;
 			}
 			return false;
@@ -72,15 +41,15 @@ namespace Labrys.FeatureEditor
 			if (name == null)
 				return false;
 
-			return fields.Remove(fields.Find((Field f) => { return f.name == name; }));
+			return fields.Remove(fields.Find((SectionField f) => { return f.Name == name; }));
 		}
 
 		private void Set<T>(string name, T value)
 		{
-			Field f = fields.Find((Field q) => { return q.name == name; });
-			if (!f.Equals(default(Field)))
+			SectionField f = fields.Find((SectionField q) => { return q.Name == name; });
+			if (!f.Equals(default(SectionField)))
 			{
-				f.value = value.ToString();
+				f.Value = value.ToString();
 			}
 		}
 
@@ -142,18 +111,18 @@ namespace Labrys.FeatureEditor
 
 		public string GetString(string name)
 		{
-			Field f = fields.Find((Field q) => { return q.name == name; });
-			return f.value;
+			SectionField f = fields.Find((SectionField q) => { return q.Name == name; });
+			return f.Value;
 		}
 
-		public IEnumerator<Field> GetEnumerator()
+		public IEnumerator<SectionField> GetEnumerator()
 		{
-			return ((IEnumerable<Field>)fields).GetEnumerator();
+			return fields.GetEnumerator();
 		}
 
 		IEnumerator IEnumerable.GetEnumerator()
 		{
-			return ((IEnumerable<Field>)fields).GetEnumerator();
+			return fields.GetEnumerator();
 		}
 	}
 }

@@ -22,21 +22,23 @@ MonoBehaviour:
   - {x: 2, y: -2}
   - {x: 0, y: -2}
   sectionData:
-  - variant: default
+  - variant: Dumb
     fields: []
-  - variant: default
+  - variant: Dumb
     fields: []
-  - variant: default
+  - variant: Dumb
     fields: []
-  - variant: default
+  - variant: Dumb
     fields: []
-  - variant: default
+  - variant: Dumb
     fields: []
-  - variant: default
+  - variant: Dumb
     fields: []
-  - variant: Frozen
-    fields: []
-  - variant: default
+  - variant: Dumb
+    fields:
+    - <Name>k__BackingField: this is a field
+      <Value>k__BackingField: value
+  - variant: Dumb
     fields: []
   linkPositions:
   - {x: -1, y: -2}
@@ -112,4 +114,5 @@ MonoBehaviour:
     external: 1
   - open: 1
     external: 1
-  selectionPositions: []
+  selectionPositions:
+  - {x: 2, y: -2}

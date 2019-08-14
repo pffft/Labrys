@@ -8,7 +8,7 @@ namespace Labrys.Editor.FeatureEditor.Panels
 {
 	public class TileEditorPanel : InternalPanel
 	{
-		private const string MIXED_VARIANTS = "-";
+		private const string MIXED_VALUES = "-";
 
 		private string variant;
 		private string lastSelectedFolder;
@@ -60,20 +60,20 @@ namespace Labrys.Editor.FeatureEditor.Panels
 
 			//variant field text box
 			Rect variantTextRect = new Rect(minX + (maxWidth / 4), currY, maxWidth / 2, defControlHeight);
-			string compoundV = GetVariant();
-			if (compoundV == null)
+			string initialVariant = GetVariant();
+			if (initialVariant == null)
 			{
-				variant = MIXED_VARIANTS;
+				variant = MIXED_VALUES;
 			}
 			else
 			{
-				variant = compoundV;
+				variant = initialVariant;
 			}
 			string newVariant = EditorGUI.TextField(variantTextRect, variant);
-			if (newVariant != MIXED_VARIANTS && newVariant != variant)
+			if (newVariant != MIXED_VALUES && newVariant != variant)
 			{
 				Undo.RegisterCompleteObjectUndo(feature, "Change variant");
-				SetVariant(variant = newVariant);
+				feature.ForAllSelectedSections((Section s) => { s.variant = variant = newVariant; });
 				EditorUtility.SetDirty(feature);
 			}
 
@@ -81,15 +81,19 @@ namespace Labrys.Editor.FeatureEditor.Panels
 
 			//kvp add new 
 			Rect addNewKvpRect = new Rect(minX, currY, maxWidth, defControlHeight);
-			if (GUI.Button(addNewKvpRect, "Add New Value"))
+			if (GUI.Button(addNewKvpRect, "Add New Field"))
 			{
-				feature.ForAllSelectedSections((Section s) => { s.AddField("New Field"); });
+				TextDialogWindow.Create((string text) => {
+					Undo.RegisterCompleteObjectUndo(feature, "Add New Field");
+					feature.ForAllSelectedSections((Section s) => { s.AddField(text); });
+					EditorUtility.SetDirty(feature);
+				});
 			}
 
 			currY += defControlHeight + padding;
 
 			//kvp scroll view
-			Section.Field[] fields = GetFields();
+			IField[] fields = GetFields();
 			const float fieldRectHeight = 20;
 
 			Rect scrollViewRect = new Rect(minX, currY, maxWidth, bounds.yMax - currY);
@@ -99,15 +103,32 @@ namespace Labrys.Editor.FeatureEditor.Panels
 
 			kvpFieldScrollPos = GUI.BeginScrollView(scrollViewRect, kvpFieldScrollPos, scrollBoundsRect, false, true);
 
-			Rect r = new Rect(scrollBoundsRect);
-			float startY = r.y;
-			r.height = fieldRectHeight;
+			Rect fieldRect = new Rect(scrollBoundsRect);
+			float startY = fieldRect.y;
+			fieldRect.height = fieldRectHeight;
 			for (int i = 0; i < fields.Length; i++)
 			{
-				r.y = startY + (20 + padding) * i;
-				if (GUI.Button(r, $"{fields[i]?.name} : {fields[i]?.value}"))
+				fieldRect.y = startY + (20 + padding) * i;
+
+				Rect fieldRectPartial = new Rect(fieldRect);
+				fieldRectPartial.width = fieldRect.width / 2;
+				GUI.Box(fieldRectPartial, fields[i].Name);
+
+				fieldRectPartial.x += fieldRect.width / 2;
+				fieldRectPartial.width /= 2;
+				string initalValue = fields[i].Value;
+				string modifiValue = EditorGUI.TextField(fieldRectPartial, initalValue);
+				if (modifiValue != initalValue)
 				{
-					feature.ForAllSelectedSections((Section s) => { s.RemoveField(fields[i].name); });
+					Undo.RegisterCompleteObjectUndo(feature, $"Modified {fields[i].Name}");
+					feature.ForAllSelectedSections((Section s) => { s.SetString(fields[i].Name, modifiValue); });
+					EditorUtility.SetDirty(feature);
+				}
+
+				fieldRectPartial.x += fieldRect.width / 4;
+				if (GUI.Button(fieldRectPartial, "Remove"))
+				{
+					feature.ForAllSelectedSections((Section s) => { s.RemoveField(fields[i].Name); });
 				}
 			}
 
@@ -143,52 +164,44 @@ namespace Labrys.Editor.FeatureEditor.Panels
 
 		private void SetVariant(string variant)
 		{
-			FeatureAsset feature = FeatureEditorWindow.GetInstance().Feature;
-			Vector2Int[] selectedPositions = feature.GetSelectedSections();
-			feature.ForAllSelectedSections((Section s) => { s.variant = variant; });
+			
 		}
 
-		private Section.Field[] GetFields()
+		private IField[] GetFields()
 		{
-			// Find intersection of all fields of all selected sections
-			HashSet<Section.Field> commonUniqueFields = new HashSet<Section.Field>();
-			HashSet<Section.Field> nextSectionFields = new HashSet<Section.Field>();
+			Dictionary<string, AggSectionField> aggregatedFields = new Dictionary<string, AggSectionField>();
 			FeatureAsset feature = FeatureEditorWindow.GetInstance().Feature;
-			Vector2Int[] selectedPositions = feature.GetSelectedSections();
-			bool firstSection = true;
-			foreach (Vector2Int position in selectedPositions)
-			{
-				if (feature.TryGetSection(position, out Section section))
+
+			int count = 0;
+
+			// Create aggregate field objects containing all fields in the enumerated sections, common or not
+			feature.ForAllSelectedSections((Section s) => {
+				count++;
+				foreach (SectionField sf in s)
 				{
-					if (firstSection)
+					if (aggregatedFields.TryGetValue(sf.Name, out AggSectionField aggregate))
 					{
-						commonUniqueFields = new HashSet<Section.Field>(section);
+						aggregate.Fields.Add(sf);
 					}
 					else
 					{
-						commonUniqueFields.IntersectWith(section);
+						aggregatedFields.Add(sf.Name, new AggSectionField() { Fields = { sf } });
 					}
 				}
+			});
 
-				firstSection = false;
-			}
-
-			// Use list of unique field names to aggregate all matching fields
-			List<Section.Field> fields = new List<Section.Field>();
-			foreach (Vector2Int position in selectedPositions)
+			// If an aggregate contains a field for every enumerated section, then add it to the return list;
+			// this can be done because fields are guaranteed to be unique per section
+			List<AggSectionField> commonAggregates = new List<AggSectionField>();
+			foreach (AggSectionField aggregate in aggregatedFields.Values)
 			{
-				if (feature.TryGetSection(position, out Section section))
+				if (aggregate.Fields.Count == count)
 				{
-					foreach (Section.Field f in section)
-					{
-						if (commonUniqueFields.Contains(f))
-						{
-							fields.Add(f);
-						}
-					}
+					commonAggregates.Add(aggregate);
 				}
 			}
-			return fields.ToArray();
+
+			return commonAggregates.ToArray();
 		}
 	}
 }
