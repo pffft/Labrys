@@ -8,7 +8,7 @@ namespace Labrys.Generation
     /// <summary>
     /// A decorator around a Grid object that enforces readonly access.
     /// </summary>
-    public class ReadOnlyGrid : IReadableGrid
+    public class ReadOnlyGrid
     {
         private readonly Grid backingGrid;
 

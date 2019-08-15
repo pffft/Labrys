@@ -8,7 +8,7 @@ namespace Labrys.Generation
     /// <summary>
     /// A Dictionary mapping Vector2Int positions to Section objects.
     /// </summary>
-    public class Grid : IReadableGrid
+    public class Grid
     {
         private List<Feature> features;
 

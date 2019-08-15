@@ -66,9 +66,12 @@ namespace Tests
         [Test]
         public void CanPlaceBasic() 
         {
-            Labrys.Generation.Grid grid = new Labrys.Generation.Grid();
+            Labrys.Generation.Grid rawGrid = new Labrys.Generation.Grid();
 
-            grid[0, 0] = Section.Default();
+            rawGrid[0, 0] = Section.Default();
+
+            // Wrap the raw grid in a readonly version
+            ReadOnlyGrid grid = new ReadOnlyGrid(rawGrid);
 
             // Basic 2x2 feature
             Feature feature = new Feature();
@@ -121,8 +124,11 @@ namespace Tests
         [Test]
         public void CanPlaceWithRotation()
         {
-            Labrys.Generation.Grid grid = new Labrys.Generation.Grid();
-            grid[0, 0] = Section.Default();
+            Labrys.Generation.Grid rawGrid = new Labrys.Generation.Grid();
+            rawGrid[0, 0] = Section.Default();
+
+            // Wrap the raw grid in a readonly version
+            ReadOnlyGrid grid = new ReadOnlyGrid(rawGrid);
 
             // 3x1 feature
             Feature feature = new Feature();
@@ -214,8 +220,11 @@ namespace Tests
         [Test]
         public void CanPlaceWithRotationAndOffset()
         {
-            Labrys.Generation.Grid grid = new Labrys.Generation.Grid();
-            grid[0, 0] = Section.Default();
+            Labrys.Generation.Grid rawGrid = new Labrys.Generation.Grid();
+            rawGrid[0, 0] = Section.Default();
+
+            // Wrap the raw grid in a readonly version
+            ReadOnlyGrid grid = new ReadOnlyGrid(rawGrid);
 
             // 3x1 feature, but offset.
             // With normalization, should be same as CanPlaceWithRotation; the only difference is  
@@ -255,8 +264,11 @@ namespace Tests
         [Test]
         public void CanConnectBasic()
         {
-            Labrys.Generation.Grid grid = new Labrys.Generation.Grid();
-            grid[0, 0] = Section.Default();
+            Labrys.Generation.Grid rawGrid = new Labrys.Generation.Grid();
+            rawGrid[0, 0] = Section.Default();
+
+            // Wrap the raw grid in a readonly version
+            ReadOnlyGrid grid = new ReadOnlyGrid(rawGrid);
 
             // 3x1 feature
             Feature feature = new Feature();
