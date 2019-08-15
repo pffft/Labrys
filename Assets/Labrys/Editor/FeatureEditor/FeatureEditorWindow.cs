@@ -25,8 +25,8 @@ namespace Labrys.Editor.FeatureEditor
 		[MenuItem("Window/Labrys Feature Editor")]
 		private static FeatureEditorWindow OpenWindow()
 		{
-			FeatureEditorWindow window = GetWindow<FeatureEditorWindow> ();
-			window.titleContent = new GUIContent ("Labrys Feature Editor");
+			FeatureEditorWindow window = GetWindow<FeatureEditorWindow>();
+			window.titleContent = new GUIContent("Labrys Feature Editor");
 			return window;
 		}
 
@@ -82,17 +82,17 @@ namespace Labrys.Editor.FeatureEditor
 		private void OnGUI()
 		{
 			EditorGrid.GetInstance().viewport = position;
-			EditorGrid.GetInstance().Draw ();
+			EditorGrid.GetInstance().Draw();
 			toolBox.ActiveTool.Draw();
 
 			toolBox.Draw();
 
 			HandleEvent(Event.current);
 
-            if (GUI.changed)
-            {
-                Repaint();
-            }
+			if (GUI.changed)
+			{
+				Repaint();
+			}
 		}
 
 		private void HandleEvent(Event e)

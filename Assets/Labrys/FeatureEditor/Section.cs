@@ -53,60 +53,9 @@ namespace Labrys.FeatureEditor
 			}
 		}
 
-		public void SetInt(string name, int value)
+		public void SetField(string name, string value)
 		{
 			Set(name, value);
-		}
-
-		public void SetFloat(string name, float value)
-		{
-			Set(name, value);
-		}
-
-		public void SetBool(string name, bool value)
-		{
-			Set(name, value);
-		}
-
-		public void SetString(string name, string value)
-		{
-			Set(name, value);
-		}
-
-		public int GetInt(string name)
-		{
-			try
-			{
-				return int.Parse(GetString(name));
-			}
-			catch (Exception e) when (e is ArgumentException || e is NullReferenceException)
-			{
-				throw new ArgumentException($"{name} is not an int", e);
-			}
-		}
-
-		public float GetFloat(string name)
-		{
-			try
-			{
-				return float.Parse(GetString(name));
-			}
-			catch (Exception e) when (e is ArgumentException || e is NullReferenceException)
-			{
-				throw new ArgumentException($"{name} is not a float", e);
-			}
-		}
-
-		public bool GetBool(string name)
-		{
-			try
-			{
-				return bool.Parse(GetString(name));
-			}
-			catch(Exception e) when (e is ArgumentException || e is NullReferenceException)
-			{
-				throw new ArgumentException($"{name} is not a boolean", e);
-			}
 		}
 
 		public string GetString(string name)

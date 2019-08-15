@@ -121,7 +121,7 @@ namespace Labrys.Editor.FeatureEditor.Panels
 				if (modifiValue != initalValue)
 				{
 					Undo.RegisterCompleteObjectUndo(feature, $"Modified {fields[i].Name}");
-					feature.ForAllSelectedSections((Section s) => { s.SetString(fields[i].Name, modifiValue); });
+					feature.ForAllSelectedSections((Section s) => { s.SetField(fields[i].Name, modifiValue); });
 					EditorUtility.SetDirty(feature);
 				}
 
@@ -164,7 +164,7 @@ namespace Labrys.Editor.FeatureEditor.Panels
 
 		private void SetVariant(string variant)
 		{
-			
+
 		}
 
 		private IField[] GetFields()

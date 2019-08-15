@@ -45,7 +45,7 @@ namespace Labrys.Generation
             Add(position, new Section(allowedConnections, externalConnections, variant));
         }
 
-        private void Add(Vector2Int position, Section element)
+        public void Add(Vector2Int position, Section element)
         {
             // Update the boundaries
             MinX = Mathf.Min(position.x, MinX);

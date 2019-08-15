@@ -54,12 +54,17 @@ namespace Labrys.FeatureEditor
 			FeatureAsset asset = CreateInstance<FeatureAsset>();
 
 			//make sections and assign variants
-			foreach (KeyValuePair<Vector2Int, Generation.Section> section in f.Elements)
+			foreach (KeyValuePair<Vector2Int, Generation.Section> gSection in f.Elements)
 			{
-				asset.AddSection(section.Key * GRID_DENSITY);
-				if (asset.TryGetSection(section.Key * GRID_DENSITY, out Section s))
+				asset.AddSection(gSection.Key * GRID_DENSITY);
+				if (asset.TryGetSection(gSection.Key * GRID_DENSITY, out Section feSection))
 				{
-					s.variant = section.Value.GetVariant();
+					feSection.variant = gSection.Value.GetVariant();
+					foreach (string key in gSection.Value.GetMetadataNames())
+					{
+						feSection.AddField(key);
+						feSection.SetField(key, gSection.Value.GetString(key));
+					}
 				}
 			}
 
@@ -109,25 +114,30 @@ namespace Labrys.FeatureEditor
 			{
 				sections.Add(sectionPositions[i], sectionData[i]);
 			}
+			sectionPositions.Clear();
+			sectionData.Clear();
 
 			links.Clear();
 			for (int i = 0; i < linkPositions.Count; i++)
 			{
 				links.Add(linkPositions[i], linkData[i]);
 			}
+			linkPositions.Clear();
+			linkData.Clear();
 
 			selected.Clear();
 			for (int i = 0; i < selectionPositions.Count; i++)
 			{
 				selected.Add(selectionPositions[i]);
 			}
+			selectionPositions.Clear();
 		}
 
 		public void OnBeforeSerialize()
 		{
 			sectionPositions.Clear();
 			sectionData.Clear();
-			foreach(KeyValuePair<Vector2Int, Section> kvp in sections)
+			foreach (KeyValuePair<Vector2Int, Section> kvp in sections)
 			{
 				sectionPositions.Add(kvp.Key);
 				sectionData.Add(kvp.Value);
@@ -197,7 +207,7 @@ namespace Labrys.FeatureEditor
 
 		public void SelectAllSections()
 		{
-			foreach(Vector2Int position in sections.Keys)
+			foreach (Vector2Int position in sections.Keys)
 			{
 				selected.Add(position);
 			}
@@ -205,7 +215,7 @@ namespace Labrys.FeatureEditor
 
 		public bool IsSelected(Vector2Int gridPosition)
 		{
-			return Section.IsValidPosition(gridPosition) 
+			return Section.IsValidPosition(gridPosition)
 				&& selected.Contains(gridPosition);
 		}
 
@@ -245,13 +255,13 @@ namespace Labrys.FeatureEditor
 
 		public bool HasSectionAt(Vector2Int gridPosition)
 		{
-			return Section.IsValidPosition(gridPosition) 
+			return Section.IsValidPosition(gridPosition)
 				&& sections.ContainsKey(gridPosition);
 		}
 
 		public bool HasLinkAt(Vector2Int gridPosition)
 		{
-			return !Section.IsValidPosition(gridPosition) 
+			return !Section.IsValidPosition(gridPosition)
 				&& links.ContainsKey(gridPosition);
 		}
 
@@ -343,13 +353,13 @@ namespace Labrys.FeatureEditor
 		public Feature ToFeature()
 		{
 			Feature feature = new Feature();
-			foreach (KeyValuePair<Vector2Int, Section> section in sections)
+			foreach (KeyValuePair<Vector2Int, Section> feSection in sections)
 			{
 				Connection internalConnections = Connection.None;
 				Connection externalConnections = Connection.None;
 				for (int i = 0; i < dirVectors.Length; i++)
 				{
-					Vector2Int adjPos = section.Key + dirVectors[i];
+					Vector2Int adjPos = feSection.Key + dirVectors[i];
 					if (TryGetLink(adjPos, out Link link))
 					{
 						if (link.open)
@@ -364,8 +374,17 @@ namespace Labrys.FeatureEditor
 					}
 				}
 
-				Vector2Int position = new Vector2Int(section.Key.x / GRID_DENSITY, section.Key.y / GRID_DENSITY);
-				feature.Add(position, internalConnections, section.Value.variant, externalConnections);
+				Vector2Int position = new Vector2Int(feSection.Key.x / GRID_DENSITY, feSection.Key.y / GRID_DENSITY);
+				Generation.Section gSection = new Generation.Section(internalConnections, externalConnections, feSection.Value.variant);
+
+				IDictionary<string, string> metadata = new Dictionary<string, string>();
+				foreach (SectionField sf in feSection.Value)
+				{
+					metadata.Add(sf.Name, sf.Value);
+				}
+				gSection.SetMetadata(metadata);
+
+				feature.Add(position, gSection);
 			}
 			return feature;
 		}

@@ -22,24 +22,38 @@ MonoBehaviour:
   - {x: 2, y: -2}
   - {x: 0, y: -2}
   sectionData:
-  - variant: Dumb
-    fields: []
-  - variant: Dumb
-    fields: []
-  - variant: Dumb
-    fields: []
-  - variant: Dumb
-    fields: []
-  - variant: Dumb
-    fields: []
-  - variant: Dumb
-    fields: []
-  - variant: Dumb
+  - variant: Regular
     fields:
-    - <Name>k__BackingField: this is a field
-      <Value>k__BackingField: value
-  - variant: Dumb
-    fields: []
+    - <Name>k__BackingField: hasChest
+      <Value>k__BackingField: false
+  - variant: Regular
+    fields:
+    - <Name>k__BackingField: hasChest
+      <Value>k__BackingField: false
+  - variant: Regular
+    fields:
+    - <Name>k__BackingField: hasChest
+      <Value>k__BackingField: false
+  - variant: Regular
+    fields:
+    - <Name>k__BackingField: hasChest
+      <Value>k__BackingField: false
+  - variant: Regular
+    fields:
+    - <Name>k__BackingField: hasChest
+      <Value>k__BackingField: false
+  - variant: Regular
+    fields:
+    - <Name>k__BackingField: hasChest
+      <Value>k__BackingField: false
+  - variant: ChestRoom
+    fields:
+    - <Name>k__BackingField: hasChest
+      <Value>k__BackingField: true
+  - variant: Regular
+    fields:
+    - <Name>k__BackingField: hasChest
+      <Value>k__BackingField: false
   linkPositions:
   - {x: -1, y: -2}
   - {x: -2, y: -1}

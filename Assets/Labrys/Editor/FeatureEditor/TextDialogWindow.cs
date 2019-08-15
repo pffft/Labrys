@@ -20,13 +20,22 @@ namespace Labrys.Editor.FeatureEditor
 
 		public void OnGUI()
 		{
+			GUILayout.BeginHorizontal();
+			EditorGUILayout.PrefixLabel("Field Name");
 			UserText = EditorGUILayout.TextField(Label, UserText);
+			GUILayout.EndHorizontal();
 
+			GUILayout.BeginHorizontal();
 			if (GUILayout.Button("Accept"))
 			{
 				onClose?.Invoke(UserText);
 				Close();
 			}
+			else if (GUILayout.Button("Cancel"))
+			{
+				Close();
+			}
+			GUILayout.EndHorizontal();
 		}
 	}
 }
