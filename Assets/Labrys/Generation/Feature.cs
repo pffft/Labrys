@@ -141,7 +141,7 @@ namespace Labrys.Generation
         /// <returns>A List containing all valid configurations found.</returns>
         /// <param name="placedSections">The grid, containing the positions of Sections already placed.</param>
         /// <param name="gridPosition">The position in the grid we want to place the Feature at.</param>
-        public List<Configuration> CanConnect(IReadableGrid placedSections, Vector2Int gridPosition) 
+        public List<Configuration> CanConnect(ReadOnlyGrid placedSections, Vector2Int gridPosition) 
         {
             Section? maybeGridSection = placedSections[gridPosition];
             if (maybeGridSection == null)
@@ -213,7 +213,7 @@ namespace Labrys.Generation
             }
         }
 
-        public bool CanPlace(IReadableGrid placedSections, Configuration configuration)
+        public bool CanPlace(ReadOnlyGrid placedSections, Configuration configuration)
         {
             return CanPlace(placedSections, configuration.gridPosition, configuration.localPosition, configuration.rotation);
         }
@@ -227,7 +227,7 @@ namespace Labrys.Generation
         /// <param name="gridPosition">The grid position we want to place the Feature at.</param>
         /// <param name="localPosition">The location of the Section we want to place at "gridPosition".</param>
         /// <param name="rotation">Rotation.</param>
-        public bool CanPlace(IReadableGrid placedSections, Vector2Int gridPosition, Vector2Int localPosition, int rotation)
+        public bool CanPlace(ReadOnlyGrid placedSections, Vector2Int gridPosition, Vector2Int localPosition, int rotation)
         {
             foreach (Vector2Int sectionPosition in Elements.Keys)
             {

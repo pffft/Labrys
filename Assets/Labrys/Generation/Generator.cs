@@ -201,7 +201,7 @@ namespace Labrys.Generation
                 Vector2Int nextPosition = positionSelector.Select(new ReadOnlyGrid(grid));
 
                 // Get all valid placements
-                List<Feature.Configuration> configurations = nextFeature.CanConnect(grid, nextPosition);
+                List<Feature.Configuration> configurations = nextFeature.CanConnect(new ReadOnlyGrid(grid), nextPosition);
 
                 if (configurations.Count == 0) 
                 {
