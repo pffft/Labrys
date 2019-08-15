@@ -199,7 +199,7 @@ namespace Labrys.Generation
                     continue;
                 }
 
-                Vector2Int nextPosition = positionSelector.Select(grid);
+                Vector2Int nextPosition = positionSelector.Select(new ReadOnlyGrid(grid));
 
                 // Get all valid placements
                 List<Feature.Configuration> configurations = nextFeature.CanConnect(grid, nextPosition);
@@ -234,7 +234,7 @@ namespace Labrys.Generation
 
             List<Tile> searchResult = new List<Tile>();
 
-            foreach (Vector2Int position in grid.GetFullCells())
+            foreach (Vector2Int position in grid.GetOccupiedCells())
             {
                 Profiler.BeginSample("Calculating tile information");
 
@@ -246,7 +246,7 @@ namespace Labrys.Generation
                 Profiler.BeginSample("Getting physical adjacencies");
                 // Find all the Sections that neighbor this one ("physical adjacency").
                 // Cached + optimized algorithm
-                Connection physicalAdjacencies = grid.GetPhysicalAdjacencies2(position); 
+                Connection physicalAdjacencies = grid.GetPhysicalAdjacencies(position); 
                 Profiler.EndSample();
 
                 Profiler.BeginSample("Resolving TileType");

@@ -12,15 +12,12 @@ namespace Labrys.Editor.FeatureEditor.Tools
 		private HashSet<Vector2Int> manipPositions;
 		private Color previewColor;
 
-		private ConnectionEditorPanel panel;
-
 		private bool settingExternal = false;
 
 		public ConnectionEditorTool(EditorWindow window) : base(window)
 		{
 			manipPositions = new HashSet<Vector2Int>();
 			previewColor = Color.white;
-			panel = new ConnectionEditorPanel(window, InternalPanel.DockPosition.right, 150f);
 
 			Name = "Connection Editor";
 		}
@@ -36,15 +33,10 @@ namespace Labrys.Editor.FeatureEditor.Tools
 				Handles.DrawSolidArc(new Vector3(screenPos.x, screenPos.y), Vector3.forward, rotStartDir, 180f, EditorGrid.GetInstance().scale * EditorGrid.LINK_SIZE);
 			}
 			Handles.EndGUI();
-
-			panel.Draw();
 		}
 
 		public override bool HandleEvent(Event e)
 		{
-			if (panel.HandleEvent(e))
-				return true;
-
 			switch (e.type)
 			{
 			case EventType.MouseDown:
@@ -89,7 +81,7 @@ namespace Labrys.Editor.FeatureEditor.Tools
 							{
 								if (feature.TryGetLink(position, out FeatureAsset.Link link))
 								{
-									link.External = targetState;
+									link.external = targetState;
 								}
 							}
 						};
@@ -102,7 +94,7 @@ namespace Labrys.Editor.FeatureEditor.Tools
 							{
 								if (feature.TryGetLink(position, out FeatureAsset.Link link))
 								{
-									link.Open = targetState;
+									link.open = targetState;
 								}
 							}
 						};

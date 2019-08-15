@@ -65,14 +65,14 @@ namespace Labrys.Editor.FeatureEditor
 			for (int i = 0; i < xLineCount + 1; i++)
 			{
 				int xGridLine = ScreenToGridPos(new Vector2(scaledSpacing * i + wrappedOffset.x, 0f)).x;
-                if (xGridLine % 10 == 0)
-                {
-                    Handles.color = xGridLine == 0 ? Color.black : lineColor;
-                }
-                else
-                {
-                    Handles.color = lightLineColor;
-                }
+				if (xGridLine % 10 == 0)
+				{
+					Handles.color = xGridLine == 0 ? Color.black : lineColor;
+				}
+				else
+				{
+					Handles.color = lightLineColor;
+				}
 				Handles.DrawLine (
 					new Vector2 (scaledSpacing * i, -scaledSpacing) + wrappedOffset, 
 					new Vector2 (scaledSpacing * i, viewport.height + scaledSpacing) + wrappedOffset);
@@ -81,14 +81,14 @@ namespace Labrys.Editor.FeatureEditor
 			for (int i = 0; i < yLineCount + 1; i++)
 			{
 				int yGridLine = ScreenToGridPos(new Vector2(0f, scaledSpacing * i + wrappedOffset.y)).y;
-                if (yGridLine % 10 == 0)
-                {
-                    Handles.color = yGridLine == 0 ? Color.black : lineColor;
-                }
-                else
-                {
-                    Handles.color = lightLineColor;
-                }
+				if (yGridLine % 10 == 0)
+				{
+					Handles.color = yGridLine == 0 ? Color.black : lineColor;
+				}
+				else
+				{
+					Handles.color = lightLineColor;
+				}
 				Handles.DrawLine (
 					new Vector2 (-scaledSpacing, scaledSpacing * i) + wrappedOffset, 
 					new Vector2 (viewport.width + scaledSpacing, scaledSpacing * i) + wrappedOffset);
@@ -115,7 +115,7 @@ namespace Labrys.Editor.FeatureEditor
 				bounds.center = screenPosition;
 				Color temp = GUI.color;
 				GUI.color = feature.IsSelected(section.Key) ? sectionSelectedColor : Color.white;
-				GUI.Box(bounds, "");
+				GUI.Box(bounds, section.Value.variant);
 				GUI.color = temp;
 			}
 
@@ -123,10 +123,10 @@ namespace Labrys.Editor.FeatureEditor
 			foreach (KeyValuePair<Vector2Int, FeatureAsset.Link> link in feature.GetLinks())
 			{
 				screenPosition = GridToScreenPos(link.Key);
-				Handles.color = link.Value.Open ? linkOpenColor : linkClosedColor;
+				Handles.color = link.Value.open ? linkOpenColor : linkClosedColor;
 				Handles.BeginGUI();
 				Handles.DrawSolidDisc(new Vector3(screenPosition.x, screenPosition.y), Vector3.forward, scale * LINK_SIZE);
-				if (link.Value.External)
+				if (link.Value.external)
 				{
 					Handles.color = linkExternalColor;
 					Handles.DrawSolidArc(new Vector3(screenPosition.x, screenPosition.y), Vector3.forward, Vector3.left, 180f, scale * LINK_SIZE);

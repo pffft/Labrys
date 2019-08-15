@@ -68,8 +68,8 @@ namespace Tests
             feature.TryGetLink(featureAssetPos, out FeatureAsset.Link link);
 
             Assert.IsNotNull(link, "External link expected to exist at position: " + featureAssetPos);
-            Assert.True(link.Open, "Link was expected to be open (found closed) at position: " + featureAssetPos);
-            Assert.True(link.External, "Link was expected to be external (found internal) at position: " + featureAssetPos);
+            Assert.True(link.open, "Link was expected to be open (found closed) at position: " + featureAssetPos);
+            Assert.True(link.external, "Link was expected to be external (found internal) at position: " + featureAssetPos);
         }
 
         // Check for valid internal links
@@ -78,8 +78,8 @@ namespace Tests
             feature.TryGetLink(featureAssetPos, out FeatureAsset.Link link);
 
             Assert.IsNotNull(link, "Internal link expected to exist at position: " + featureAssetPos);
-            Assert.True(link.Open, "Link was expected to be open (found closed) at position: " + featureAssetPos);
-            Assert.False(link.External, "Link was expected to be internal (found external) at position: " + featureAssetPos);
+            Assert.True(link.open, "Link was expected to be open (found closed) at position: " + featureAssetPos);
+            Assert.False(link.external, "Link was expected to be internal (found external) at position: " + featureAssetPos);
         }
 
         // Check for invalid links

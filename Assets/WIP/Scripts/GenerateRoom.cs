@@ -124,6 +124,11 @@ public class GenerateRoom : MonoBehaviour
         Generate();
     }
 
+    /// <summary>
+    /// TODO: handle LODs
+    /// </summary>
+    /// <returns>The optimize.</returns>
+    /// <param name="rootObject">Root object.</param>
     private GameObject Optimize(GameObject rootObject) 
     {
         List<GameObject> allObjects = GetAllChildren(rootObject);
