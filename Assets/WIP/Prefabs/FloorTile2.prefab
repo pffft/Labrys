@@ -150,10 +150,6 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 3737329536743573444}
     m_Modifications:
-    - target: {fileID: 100000, guid: 128cd9c15e3ab4d10bcaa12007e1c40e, type: 3}
-      propertyPath: m_Name
-      value: Brick_1x2_Deformed_Top (3)
-      objectReference: {fileID: 0}
     - target: {fileID: 400000, guid: 128cd9c15e3ab4d10bcaa12007e1c40e, type: 3}
       propertyPath: m_LocalPosition.x
       value: 1
@@ -198,6 +194,22 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 400000, guid: 128cd9c15e3ab4d10bcaa12007e1c40e, type: 3}
+      propertyPath: m_LocalScale.x
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 400000, guid: 128cd9c15e3ab4d10bcaa12007e1c40e, type: 3}
+      propertyPath: m_LocalScale.y
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 400000, guid: 128cd9c15e3ab4d10bcaa12007e1c40e, type: 3}
+      propertyPath: m_LocalScale.z
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 100000, guid: 128cd9c15e3ab4d10bcaa12007e1c40e, type: 3}
+      propertyPath: m_Name
+      value: Brick_1x2_Deformed_Top (3)
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 128cd9c15e3ab4d10bcaa12007e1c40e, type: 3}
 --- !u!4 &433830531822905241 stripped
@@ -213,10 +225,6 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 3737329536743573444}
     m_Modifications:
-    - target: {fileID: 100000, guid: 4f573312535b9504982bf638fed0f9c5, type: 3}
-      propertyPath: m_Name
-      value: Brick_1x1_Deformed
-      objectReference: {fileID: 0}
     - target: {fileID: 400000, guid: 4f573312535b9504982bf638fed0f9c5, type: 3}
       propertyPath: m_LocalPosition.x
       value: -0.66338193
@@ -261,6 +269,22 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 400000, guid: 4f573312535b9504982bf638fed0f9c5, type: 3}
+      propertyPath: m_LocalScale.x
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 400000, guid: 4f573312535b9504982bf638fed0f9c5, type: 3}
+      propertyPath: m_LocalScale.y
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 400000, guid: 4f573312535b9504982bf638fed0f9c5, type: 3}
+      propertyPath: m_LocalScale.z
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 100000, guid: 4f573312535b9504982bf638fed0f9c5, type: 3}
+      propertyPath: m_Name
+      value: Brick_1x1_Deformed
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 4f573312535b9504982bf638fed0f9c5, type: 3}
 --- !u!4 &1495187226911145210 stripped
@@ -276,10 +300,6 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 3737329536743573444}
     m_Modifications:
-    - target: {fileID: 100000, guid: 128cd9c15e3ab4d10bcaa12007e1c40e, type: 3}
-      propertyPath: m_Name
-      value: Brick_1x2_Deformed_Top (1)
-      objectReference: {fileID: 0}
     - target: {fileID: 400000, guid: 128cd9c15e3ab4d10bcaa12007e1c40e, type: 3}
       propertyPath: m_LocalPosition.x
       value: 0
@@ -324,6 +344,22 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 400000, guid: 128cd9c15e3ab4d10bcaa12007e1c40e, type: 3}
+      propertyPath: m_LocalScale.x
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 400000, guid: 128cd9c15e3ab4d10bcaa12007e1c40e, type: 3}
+      propertyPath: m_LocalScale.y
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 400000, guid: 128cd9c15e3ab4d10bcaa12007e1c40e, type: 3}
+      propertyPath: m_LocalScale.z
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 100000, guid: 128cd9c15e3ab4d10bcaa12007e1c40e, type: 3}
+      propertyPath: m_Name
+      value: Brick_1x2_Deformed_Top (1)
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 128cd9c15e3ab4d10bcaa12007e1c40e, type: 3}
 --- !u!4 &1505690763631816469 stripped
@@ -339,10 +375,6 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 3737329536743573444}
     m_Modifications:
-    - target: {fileID: 100000, guid: 128cd9c15e3ab4d10bcaa12007e1c40e, type: 3}
-      propertyPath: m_Name
-      value: Brick_1x2_Deformed_Top
-      objectReference: {fileID: 0}
     - target: {fileID: 400000, guid: 128cd9c15e3ab4d10bcaa12007e1c40e, type: 3}
       propertyPath: m_LocalPosition.x
       value: -0.65900713
@@ -387,6 +419,22 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 400000, guid: 128cd9c15e3ab4d10bcaa12007e1c40e, type: 3}
+      propertyPath: m_LocalScale.x
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 400000, guid: 128cd9c15e3ab4d10bcaa12007e1c40e, type: 3}
+      propertyPath: m_LocalScale.y
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 400000, guid: 128cd9c15e3ab4d10bcaa12007e1c40e, type: 3}
+      propertyPath: m_LocalScale.z
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 100000, guid: 128cd9c15e3ab4d10bcaa12007e1c40e, type: 3}
+      propertyPath: m_Name
+      value: Brick_1x2_Deformed_Top
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 128cd9c15e3ab4d10bcaa12007e1c40e, type: 3}
 --- !u!4 &5045002732741672319 stripped
@@ -402,10 +450,6 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 3737329536743573444}
     m_Modifications:
-    - target: {fileID: 100000, guid: 4f573312535b9504982bf638fed0f9c5, type: 3}
-      propertyPath: m_Name
-      value: Brick_1x1_Deformed (1)
-      objectReference: {fileID: 0}
     - target: {fileID: 400000, guid: 4f573312535b9504982bf638fed0f9c5, type: 3}
       propertyPath: m_LocalPosition.x
       value: 0.649
@@ -450,6 +494,22 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 400000, guid: 4f573312535b9504982bf638fed0f9c5, type: 3}
+      propertyPath: m_LocalScale.x
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 400000, guid: 4f573312535b9504982bf638fed0f9c5, type: 3}
+      propertyPath: m_LocalScale.y
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 400000, guid: 4f573312535b9504982bf638fed0f9c5, type: 3}
+      propertyPath: m_LocalScale.z
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 100000, guid: 4f573312535b9504982bf638fed0f9c5, type: 3}
+      propertyPath: m_Name
+      value: Brick_1x1_Deformed (1)
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 4f573312535b9504982bf638fed0f9c5, type: 3}
 --- !u!4 &8937745502887919531 stripped
@@ -465,10 +525,6 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 3737329536743573444}
     m_Modifications:
-    - target: {fileID: 100000, guid: 128cd9c15e3ab4d10bcaa12007e1c40e, type: 3}
-      propertyPath: m_Name
-      value: Brick_1x2_Deformed_Top (2)
-      objectReference: {fileID: 0}
     - target: {fileID: 400000, guid: 128cd9c15e3ab4d10bcaa12007e1c40e, type: 3}
       propertyPath: m_LocalPosition.x
       value: 0.326
@@ -512,6 +568,22 @@ PrefabInstance:
     - target: {fileID: 400000, guid: 128cd9c15e3ab4d10bcaa12007e1c40e, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 400000, guid: 128cd9c15e3ab4d10bcaa12007e1c40e, type: 3}
+      propertyPath: m_LocalScale.x
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 400000, guid: 128cd9c15e3ab4d10bcaa12007e1c40e, type: 3}
+      propertyPath: m_LocalScale.y
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 400000, guid: 128cd9c15e3ab4d10bcaa12007e1c40e, type: 3}
+      propertyPath: m_LocalScale.z
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 100000, guid: 128cd9c15e3ab4d10bcaa12007e1c40e, type: 3}
+      propertyPath: m_Name
+      value: Brick_1x2_Deformed_Top (2)
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 128cd9c15e3ab4d10bcaa12007e1c40e, type: 3}
