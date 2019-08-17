@@ -60,11 +60,6 @@ namespace Labrys.FeatureEditor
 				if (asset.TryGetSection(gSection.Key * GRID_DENSITY, out Section feSection))
 				{
 					feSection.variant = gSection.Value.GetVariant();
-					foreach (string key in gSection.Value.GetMetadataNames())
-					{
-						feSection.AddField(key);
-						feSection.SetField(key, gSection.Value.GetString(key));
-					}
 				}
 			}
 
@@ -375,16 +370,7 @@ namespace Labrys.FeatureEditor
 				}
 
 				Vector2Int position = new Vector2Int(feSection.Key.x / GRID_DENSITY, feSection.Key.y / GRID_DENSITY);
-				Generation.Section gSection = new Generation.Section(internalConnections, externalConnections, feSection.Value.variant);
-
-				IDictionary<string, string> metadata = new Dictionary<string, string>();
-				foreach (SectionField sf in feSection.Value)
-				{
-					metadata.Add(sf.Name, sf.Value);
-				}
-				gSection.SetMetadata(metadata);
-
-				feature.Add(position, gSection);
+				feature.Add(position, internalConnections, feSection.Value.variant, externalConnections);
 			}
 			return feature;
 		}
