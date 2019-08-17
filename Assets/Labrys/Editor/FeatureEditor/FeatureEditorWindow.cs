@@ -25,8 +25,8 @@ namespace Labrys.Editor.FeatureEditor
 		[MenuItem("Window/Labrys Feature Editor")]
 		private static FeatureEditorWindow OpenWindow()
 		{
-			FeatureEditorWindow window = GetWindow<FeatureEditorWindow> ();
-			window.titleContent = new GUIContent ("Labrys Feature Editor");
+			FeatureEditorWindow window = GetWindow<FeatureEditorWindow>();
+			window.titleContent = new GUIContent("Labrys Feature Editor");
 			return window;
 		}
 
@@ -53,8 +53,11 @@ namespace Labrys.Editor.FeatureEditor
 			toolBox.AddTool(new SelectionTool(this));
 			toolBox.AddTool(new TilePaintTool(this));
 			toolBox.AddTool(new ConnectionEditorTool(this));
+		}
 
-			Undo.undoRedoPerformed += () => { Repaint(); };
+		private void OnUndoRedo()
+		{
+			Repaint();
 		}
 
 		private void OnEnable()
@@ -64,10 +67,14 @@ namespace Labrys.Editor.FeatureEditor
 
 			string data = EditorPrefs.GetString(EDITOR_PREF_SETTINGS, EditorJsonUtility.ToJson(this));
 			EditorJsonUtility.FromJsonOverwrite(data, this);
+
+			Undo.undoRedoPerformed += OnUndoRedo;
 		}
 
 		private void OnDisable()
 		{
+			Undo.undoRedoPerformed -= OnUndoRedo;
+
 			string data = EditorJsonUtility.ToJson(this);
 			EditorPrefs.SetString(EDITOR_PREF_SETTINGS, data);
 		}
@@ -75,17 +82,17 @@ namespace Labrys.Editor.FeatureEditor
 		private void OnGUI()
 		{
 			EditorGrid.GetInstance().viewport = position;
-			EditorGrid.GetInstance().Draw ();
+			EditorGrid.GetInstance().Draw();
 			toolBox.ActiveTool.Draw();
 
 			toolBox.Draw();
 
 			HandleEvent(Event.current);
 
-            if (GUI.changed)
-            {
-                Repaint();
-            }
+			if (GUI.changed)
+			{
+				Repaint();
+			}
 		}
 
 		private void HandleEvent(Event e)

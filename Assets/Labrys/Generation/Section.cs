@@ -1,7 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
-
+﻿
 namespace Labrys.Generation
 {
     /// <summary>
@@ -13,22 +10,21 @@ namespace Labrys.Generation
     {
         public Connection internalConnections;
         public Connection externalConnections;
-        //public string variant;
-        private short variantID;
+		//TODO: replace with FeatureAssetID after impl of FeatureLibrary
+        private readonly short variantID;
 
         public Section(Connection allowedConnections = Connection.All, Connection externalConnections = Connection.All, string variant = "default")
         {
             this.internalConnections = allowedConnections;
             this.externalConnections = externalConnections;
-            //this.variant = variant;
 
             // Look it up in the lookup table
-            if (Variant.VariantToID.TryGetValue(variant, out short id)) 
+            if (Variant.VariantToID.TryGetValue(variant, out short id))
             {
                 this.variantID = id;
             }
             // Failed to find; add it to the table and get the new ID
-            else 
+            else
             {
                 short nextID = (short)Variant.IDToVariant.Count;
                 Variant.IDToVariant.Add(nextID, variant);
@@ -65,7 +61,7 @@ namespace Labrys.Generation
 
         public override string ToString() 
         {
-            return "(internal: " + internalConnections + "; external: " + externalConnections + "; variant: " + GetVariant() + ")";
+            return $"(internal: {internalConnections}; external: {externalConnections}; variant: {GetVariant()})";
         }
     }
 }

@@ -23,7 +23,12 @@ namespace Labrys.Editor.FeatureEditor.Panels
 		public override void Draw()
 		{
 			base.Draw();
-			selectedTool = GUI.SelectionGrid(bounds, selectedTool, GetToolNames(), 1);
+			Rect r = new Rect(bounds);
+			r.height = tools.Count * 30;
+			r.width -= 10;
+			r.x += 5;
+			r.y += 5;
+			selectedTool = GUI.SelectionGrid(r, selectedTool, GetToolNames(), 1);
 		}
 
 		public override bool HandleEvent(Event e)

@@ -49,19 +49,19 @@ namespace Labrys.Editor.FeatureEditor
 
 		public void Draw()
 		{
-			Color lightLineColor = new Color (lineColor.r, lineColor.g, lineColor.b, lineColor.a * 0.5f);
+			Color lightLineColor = new Color(lineColor.r, lineColor.g, lineColor.b, lineColor.a * 0.5f);
 
 			float scaledSpacing = lineSpacing * scale;
 
 			int xLineCount = Mathf.CeilToInt(viewport.width / scaledSpacing);
-			int yLineCount = Mathf.CeilToInt (viewport.height / scaledSpacing);
+			int yLineCount = Mathf.CeilToInt(viewport.height / scaledSpacing);
 
-			Vector2 wrappedOffset = new Vector2 (
-				Mathf.Abs (offset.x) % scaledSpacing * Mathf.Sign (offset.x), 
-				Mathf.Abs (offset.y) % scaledSpacing * Mathf.Sign (offset.y));
-			Vector2Int linesOffset = ScreenToGridPos (offset);
+			Vector2 wrappedOffset = new Vector2(
+				Mathf.Abs(offset.x) % scaledSpacing * Mathf.Sign(offset.x),
+				Mathf.Abs(offset.y) % scaledSpacing * Mathf.Sign(offset.y));
+			Vector2Int linesOffset = ScreenToGridPos(offset);
 
-			Handles.BeginGUI ();
+			Handles.BeginGUI();
 			for (int i = 0; i < xLineCount + 1; i++)
 			{
 				int xGridLine = ScreenToGridPos(new Vector2(scaledSpacing * i + wrappedOffset.x, 0f)).x;
@@ -73,9 +73,9 @@ namespace Labrys.Editor.FeatureEditor
 				{
 					Handles.color = lightLineColor;
 				}
-				Handles.DrawLine (
-					new Vector2 (scaledSpacing * i, -scaledSpacing) + wrappedOffset, 
-					new Vector2 (scaledSpacing * i, viewport.height + scaledSpacing) + wrappedOffset);
+				Handles.DrawLine(
+					new Vector2(scaledSpacing * i, -scaledSpacing) + wrappedOffset,
+					new Vector2(scaledSpacing * i, viewport.height + scaledSpacing) + wrappedOffset);
 			}
 
 			for (int i = 0; i < yLineCount + 1; i++)
@@ -89,13 +89,13 @@ namespace Labrys.Editor.FeatureEditor
 				{
 					Handles.color = lightLineColor;
 				}
-				Handles.DrawLine (
-					new Vector2 (-scaledSpacing, scaledSpacing * i) + wrappedOffset, 
-					new Vector2 (viewport.width + scaledSpacing, scaledSpacing * i) + wrappedOffset);
+				Handles.DrawLine(
+					new Vector2(-scaledSpacing, scaledSpacing * i) + wrappedOffset,
+					new Vector2(viewport.width + scaledSpacing, scaledSpacing * i) + wrappedOffset);
 			}
-			Handles.EndGUI ();
+			Handles.EndGUI();
 
-			DrawObjects ();
+			DrawObjects();
 		}
 
 		private void DrawObjects()
@@ -108,7 +108,7 @@ namespace Labrys.Editor.FeatureEditor
 			Rect bounds = new Rect(screenPosition, GetScaledTileSize());
 
 			// Draw Sections
-			foreach (KeyValuePair<Vector2Int, FeatureAsset.Section> section in feature.GetSections())
+			foreach (KeyValuePair<Vector2Int, Section> section in feature.GetSections())
 			{
 				screenPosition = GridToScreenPos(section.Key);
 				bounds.position = screenPosition;
@@ -120,7 +120,7 @@ namespace Labrys.Editor.FeatureEditor
 			}
 
 			// Draw Links
-			foreach (KeyValuePair<Vector2Int, FeatureAsset.Link> link in feature.GetLinks())
+			foreach (KeyValuePair<Vector2Int, Link> link in feature.GetLinks())
 			{
 				screenPosition = GridToScreenPos(link.Key);
 				Handles.color = link.Value.open ? linkOpenColor : linkClosedColor;
@@ -167,7 +167,7 @@ namespace Labrys.Editor.FeatureEditor
 					guiChanged = true;
 				}
 
-				if(e.keyCode == KeyCode.Equals || e.keyCode == KeyCode.KeypadPlus)
+				if (e.keyCode == KeyCode.Equals || e.keyCode == KeyCode.KeypadPlus)
 				{
 					Resize(scale * ZOOM_FACTOR);
 					guiChanged = true;
@@ -229,7 +229,7 @@ namespace Labrys.Editor.FeatureEditor
 
 		public Vector2 GetScaledTileSize()
 		{
-			return new Vector2(lineSpacing, lineSpacing) * scale;
+			return new Vector2(lineSpacing, lineSpacing) * 0.8f * scale;
 		}
 
 		/// <summary>
@@ -240,7 +240,7 @@ namespace Labrys.Editor.FeatureEditor
 		public Vector2 ScreenToGridSpace(Vector2 screenPos, bool evenOnly = false)
 		{
 			Vector2 gridPos = new Vector2(screenPos.x - offset.x, screenPos.y - offset.y) / (lineSpacing * scale);
-			if(evenOnly)
+			if (evenOnly)
 			{
 				gridPos = new Vector2(Mathf.Round(gridPos.x), Mathf.Round(gridPos.y));
 			}

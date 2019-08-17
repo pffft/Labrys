@@ -79,7 +79,7 @@ namespace Labrys.Editor.FeatureEditor.Tools
 						action = () => {
 							foreach (Vector2Int position in manipPositions)
 							{
-								if (feature.TryGetLink(position, out FeatureAsset.Link link))
+								if (feature.TryGetLink(position, out Link link))
 								{
 									link.external = targetState;
 								}
@@ -92,7 +92,7 @@ namespace Labrys.Editor.FeatureEditor.Tools
 						action = () => {
 							foreach (Vector2Int position in manipPositions)
 							{
-								if (feature.TryGetLink(position, out FeatureAsset.Link link))
+								if (feature.TryGetLink(position, out Link link))
 								{
 									link.open = targetState;
 								}

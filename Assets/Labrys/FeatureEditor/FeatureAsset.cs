@@ -11,69 +11,74 @@ namespace Labrys.FeatureEditor
 	[CreateAssetMenu(menuName = "Labrys/Feature", fileName = "New Feature")]
 	public class FeatureAsset : ScriptableObject, ISerializationCallbackReceiver
 	{
-		[Serializable]
-		public class Section
-		{
-			public static bool IsValidPosition(Vector2Int gridPosition)
-			{
-				return gridPosition.x % GRID_DENSITY == 0 && gridPosition.y % GRID_DENSITY == 0;
-			}
-
-			public string variant;
-		}
-
-		[Serializable]
-		public class Link
-		{
-			public static void GetMinMaxSubjectTileCount(Vector2Int gridPos, out int min, out int max)
-			{
-				if (gridPos.x % 2 != 0)
-				{
-					if (gridPos.y % 2 != 0)
-					{
-						min = max = 4;
-					}
-					else
-					{
-						min = 1;
-						max = 2;
-					}
-				}
-				else if (gridPos.y % 2 != 0)
-				{
-					min = 1;
-					max = 2;
-				}
-				else
-				{
-					min = max = -1;
-				}
-			}
-
-			public static IEnumerable<Vector2Int> GetSubjectTileGridPositions(Vector2Int gridPos)
-			{
-				HashSet<Vector2Int> uniquePositions = new HashSet<Vector2Int>();
-
-				int lowerX = Mathf.FloorToInt(gridPos.x / (float)GRID_DENSITY) * GRID_DENSITY;
-				int upperX = Mathf.FloorToInt((gridPos.x / (float)GRID_DENSITY) + 0.5f) * GRID_DENSITY;
-				int lowerY = Mathf.FloorToInt(gridPos.y / (float)GRID_DENSITY) * GRID_DENSITY;
-				int upperY = Mathf.FloorToInt((gridPos.y / (float)GRID_DENSITY) + 0.5f) * GRID_DENSITY;
-
-				uniquePositions.Add(new Vector2Int(lowerX, lowerY));
-				uniquePositions.Add(new Vector2Int(lowerX, upperY));
-				uniquePositions.Add(new Vector2Int(upperX, lowerY));
-				uniquePositions.Add(new Vector2Int(upperX, upperY));
-
-				Vector2Int[] finalPositions = new Vector2Int[uniquePositions.Count];
-				uniquePositions.CopyTo(finalPositions);
-				return finalPositions;
-			}
-
-			public bool open;
-			public bool external;
-		}
-
 		public const int GRID_DENSITY = 2;
+
+		/// <summary>
+		/// A set of direction vectors in unit circle order used in Feature/FeatureAsset conversions.
+		/// </summary>
+		private static readonly Vector2Int[] dirVectors =
+		{
+				Vector2Int.right,
+				Vector2Int.up + Vector2Int.right,
+				Vector2Int.up,
+				Vector2Int.up + Vector2Int.left,
+				Vector2Int.left,
+				Vector2Int.down + Vector2Int.left,
+				Vector2Int.down,
+				Vector2Int.down + Vector2Int.right
+		};
+
+		/// <summary>
+		/// An array containing all the connections, in unit circle order. Used in Feature/FeatureAsset conversions.
+		/// </summary>
+		private static readonly Connection[] dirConnections =
+		{
+				Connection.East,
+				Connection.Northeast,
+				Connection.North,
+				Connection.Northwest,
+				Connection.West,
+				Connection.Southwest,
+				Connection.South,
+				Connection.Southeast
+		};
+
+#if UNITY_EDITOR
+		/// <summary>
+		/// Converts a Generation Feature into an Editor FeatureAsset.
+		/// </summary>
+		/// <returns>A feature asset.</returns>
+		/// <param name="f">The feature to convert.</param>
+		public static FeatureAsset FromFeature(Feature f)
+		{
+			FeatureAsset asset = CreateInstance<FeatureAsset>();
+
+			//make sections and assign variants
+			foreach (KeyValuePair<Vector2Int, Generation.Section> gSection in f.Elements)
+			{
+				asset.AddSection(gSection.Key * GRID_DENSITY);
+				if (asset.TryGetSection(gSection.Key * GRID_DENSITY, out Section feSection))
+				{
+					feSection.variant = gSection.Value.GetVariant();
+				}
+			}
+
+			//set links open/closed and internal/external
+			foreach (KeyValuePair<Vector2Int, Generation.Section> section in f.Elements)
+			{
+				for (int i = 0; i < dirVectors.Length; i++)
+				{
+					if (asset.TryGetLink((section.Key + dirVectors[i]) * GRID_DENSITY, out Link link))
+					{
+						link.open = (section.Value.internalConnections | dirConnections[i]) == dirConnections[i];
+						link.external = (section.Value.externalConnections | dirConnections[i]) == dirConnections[i];
+					}
+				}
+			}
+
+			return asset;
+		}
+#endif
 
 		private Dictionary<Vector2Int, Section> sections;
 		private Dictionary<Vector2Int, Link> links;
@@ -100,29 +105,34 @@ namespace Labrys.FeatureEditor
 				throw new ArgumentException("Malformed feature data");
 
 			sections.Clear();
-			for(int i = 0; i < sectionPositions.Count; i++)
+			for (int i = 0; i < sectionPositions.Count; i++)
 			{
 				sections.Add(sectionPositions[i], sectionData[i]);
 			}
+			sectionPositions.Clear();
+			sectionData.Clear();
 
 			links.Clear();
 			for (int i = 0; i < linkPositions.Count; i++)
 			{
 				links.Add(linkPositions[i], linkData[i]);
 			}
+			linkPositions.Clear();
+			linkData.Clear();
 
 			selected.Clear();
-			for(int i = 0; i < selectionPositions.Count; i++)
+			for (int i = 0; i < selectionPositions.Count; i++)
 			{
 				selected.Add(selectionPositions[i]);
 			}
+			selectionPositions.Clear();
 		}
 
 		public void OnBeforeSerialize()
 		{
 			sectionPositions.Clear();
 			sectionData.Clear();
-			foreach(KeyValuePair<Vector2Int, Section> kvp in sections)
+			foreach (KeyValuePair<Vector2Int, Section> kvp in sections)
 			{
 				sectionPositions.Add(kvp.Key);
 				sectionData.Add(kvp.Value);
@@ -137,7 +147,7 @@ namespace Labrys.FeatureEditor
 			}
 
 			selectionPositions.Clear();
-			foreach(Vector2Int position in selected)
+			foreach (Vector2Int position in selected)
 			{
 				selectionPositions.Add(position);
 			}
@@ -162,7 +172,6 @@ namespace Labrys.FeatureEditor
 			if (Section.IsValidPosition(gridPosition)
 				&& !sections.ContainsKey(gridPosition))
 			{
-				//TODO section variant configuration in editor
 				sections.Add(gridPosition, new Section() { variant = "default" });
 				UpdateLinks(gridPosition);
 			}
@@ -193,7 +202,7 @@ namespace Labrys.FeatureEditor
 
 		public void SelectAllSections()
 		{
-			foreach(Vector2Int position in sections.Keys)
+			foreach (Vector2Int position in sections.Keys)
 			{
 				selected.Add(position);
 			}
@@ -201,7 +210,7 @@ namespace Labrys.FeatureEditor
 
 		public bool IsSelected(Vector2Int gridPosition)
 		{
-			return Section.IsValidPosition(gridPosition) 
+			return Section.IsValidPosition(gridPosition)
 				&& selected.Contains(gridPosition);
 		}
 
@@ -227,15 +236,27 @@ namespace Labrys.FeatureEditor
 			return sel;
 		}
 
+		public delegate void SectionOperation(Section s);
+		public void ForAllSelectedSections(SectionOperation operation)
+		{
+			foreach (Vector2Int pos in GetSelectedSections())
+			{
+				if (TryGetSection(pos, out Section s))
+				{
+					operation.Invoke(s);
+				}
+			}
+		}
+
 		public bool HasSectionAt(Vector2Int gridPosition)
 		{
-			return Section.IsValidPosition(gridPosition) 
+			return Section.IsValidPosition(gridPosition)
 				&& sections.ContainsKey(gridPosition);
 		}
 
 		public bool HasLinkAt(Vector2Int gridPosition)
 		{
-			return !Section.IsValidPosition(gridPosition) 
+			return !Section.IsValidPosition(gridPosition)
 				&& links.ContainsKey(gridPosition);
 		}
 
@@ -299,7 +320,7 @@ namespace Labrys.FeatureEditor
 				if (!links.TryGetValue(linkPos, out Link existingLink))
 				{
 					Link newLink = new Link() { open = true, external = canBeExternal };
-					if(isValid)
+					if (isValid)
 					{
 						links.Add(linkPos, newLink);
 					}
@@ -311,78 +332,10 @@ namespace Labrys.FeatureEditor
 						links.Remove(linkPos);
 					}
 
-					// If we can't be external, then set the External flag to false.
 					existingLink.external &= canBeExternal;
 				}
 			}
 		}
-
-		/// <summary>
-		/// A set of direction vectors used by "FromFeature".
-		/// </summary>
-		private static readonly Vector2Int[] dirVectors = 
-		{
-				Vector2Int.right,
-				Vector2Int.up + Vector2Int.right,
-				Vector2Int.up,
-				Vector2Int.up + Vector2Int.left,
-				Vector2Int.left,
-				Vector2Int.down + Vector2Int.left,
-				Vector2Int.down,
-				Vector2Int.down + Vector2Int.right
-		};
-
-		/// <summary>
-		/// An array containing all the connections, in order. Used by "FromFeature".
-		/// </summary>
-		private static readonly Connection[] dirConnections = 
-		{
-				Connection.East,
-				Connection.Northeast,
-				Connection.North,
-				Connection.Northwest,
-				Connection.West,
-				Connection.Southwest,
-				Connection.South,
-				Connection.Southeast
-		};
-
-#if UNITY_EDITOR
-		/// <summary>
-		/// Converts a Generation Feature into an Editor FeatureAsset.
-		/// </summary>
-		/// <returns>The feature asset.</returns>
-		/// <param name="f">The feature.</param>
-		public static FeatureAsset FromFeature(Feature f)
-		{
-			FeatureAsset asset = CreateInstance<FeatureAsset>();
-
-			//make sections and assign variants
-			foreach (KeyValuePair<Vector2Int, Generation.Section> section in f.Elements)
-			{
-				asset.AddSection(section.Key * GRID_DENSITY);
-				if (asset.TryGetSection(section.Key * GRID_DENSITY, out Section s))
-				{
-					s.variant = section.Value.GetVariant();
-				}
-			}
-
-			//set links open/closed and internal/external
-			foreach (KeyValuePair<Vector2Int, Generation.Section> section in f.Elements)
-			{
-				for (int i = 0; i < dirVectors.Length; i++)
-				{
-					if (asset.TryGetLink((section.Key + dirVectors[i]) * GRID_DENSITY, out Link link))
-					{
-						link.open = (section.Value.internalConnections | dirConnections[i]) == dirConnections[i];
-						link.external = (section.Value.externalConnections | dirConnections[i]) == dirConnections[i];
-					}
-				}
-			}
-
-			return asset;
-		}
-#endif
 
 		/// <summary>
 		/// Converts this Editor FeatureAsset into a Generation Feature.
@@ -391,33 +344,33 @@ namespace Labrys.FeatureEditor
 		/// FeatureAsset made from an input Feature. This is because FeatureAsset
 		/// aggressively prunes connections that do not exist in the structure.
 		/// </summary>
-		/// <returns>The feature.</returns>
+		/// <returns>A new feature.</returns>
 		public Feature ToFeature()
 		{
 			Feature feature = new Feature();
-			foreach(KeyValuePair<Vector2Int, Section> section in sections)
+			foreach (KeyValuePair<Vector2Int, Section> feSection in sections)
 			{
 				Connection internalConnections = Connection.None;
 				Connection externalConnections = Connection.None;
-				for(int i = 0; i < dirVectors.Length; i++)
+				for (int i = 0; i < dirVectors.Length; i++)
 				{
-					Vector2Int adjPos = section.Key + dirVectors[i];
-					if(TryGetLink(adjPos, out Link link))
+					Vector2Int adjPos = feSection.Key + dirVectors[i];
+					if (TryGetLink(adjPos, out Link link))
 					{
-						if(link.open)
+						if (link.open)
 						{
 							internalConnections |= dirConnections[i];
 						}
 
-						if(link.external)
+						if (link.external)
 						{
 							externalConnections |= dirConnections[i];
 						}
 					}
 				}
 
-				Vector2Int position = new Vector2Int(section.Key.x / GRID_DENSITY, section.Key.y / GRID_DENSITY);
-				feature.Add(position, internalConnections, section.Value.variant, externalConnections);
+				Vector2Int position = new Vector2Int(feSection.Key.x / GRID_DENSITY, feSection.Key.y / GRID_DENSITY);
+				feature.Add(position, internalConnections, feSection.Value.variant, externalConnections);
 			}
 			return feature;
 		}
