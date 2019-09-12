@@ -22,7 +22,7 @@ namespace Labrys.Editor.FeatureEditor
             return instance;
         }
 
-        [MenuItem("Window/Labrys Feature Editor")]
+        [MenuItem("Window/Labrys/Feature Editor")]
         private static FeatureEditorWindow OpenWindow()
         {
             FeatureEditorWindow window = GetWindow<FeatureEditorWindow>();
