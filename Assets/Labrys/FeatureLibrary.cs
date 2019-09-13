@@ -10,7 +10,7 @@ using UnityEngine;
 
 namespace Labrys
 {
-    public class FeatureLibrary : ScriptableObject, IEnumerable<KeyValuePair<string, FeatureAsset>>, ISerializationCallbackReceiver
+    public class FeatureLibrary : ScriptableObject, IEnumerable<FeatureLibrary.Entry>, ISerializationCallbackReceiver, ICloneable
     {
         [field: SerializeField]
         public string TargetDirectory { get; private set; }
@@ -19,11 +19,6 @@ namespace Labrys
         private FeatureAsset[] features;
 
         public int Count => features.Length;
-
-#if UNITY_EDITOR
-        [field: SerializeField]
-        public bool AutoRefresh { get; set; } //TODO figure out how to hook into asset creation process for auto refresh; or maybe auto refresh on playmode start
-#endif
 
         public FeatureAsset this[ushort faid] => Contains(faid) ? features[faid] : null;
 
@@ -35,7 +30,7 @@ namespace Labrys
 
 #if UNITY_EDITOR
         [MenuItem("Assets/Create/Labrys/Feature Library")]
-        private static void FromDirectory()
+        private static void Create()
         {
             string saveDir = AssetDatabase.GetAssetPath(Selection.activeInstanceID);
             if (!File.GetAttributes(saveDir).HasFlag(FileAttributes.Directory))
@@ -52,15 +47,7 @@ namespace Labrys
 
             ProjectWindowUtil.CreateAsset(library, savePath);
         }
-#endif
 
-        private FeatureLibrary()
-        {
-            nameToFAID = new Dictionary<string, ushort>();
-            features = new FeatureAsset[0];
-        }
-
-#if UNITY_EDITOR
         public void Refresh()
         {
             string[] assetGUIDs = AssetDatabase.FindAssets($"t:{nameof(FeatureAsset)}", new string[] { TargetDirectory });
@@ -107,20 +94,52 @@ namespace Labrys
             throw new ArgumentException($"Unknown name: {name}.");
         }
 
-        public IEnumerator<KeyValuePair<string, FeatureAsset>> GetEnumerator()
+        public IEnumerator<Entry> GetEnumerator()
         {
             if (nameToFAID == null)
                 yield break;
 
             foreach(KeyValuePair<string, ushort> entry in nameToFAID)
             {
-                yield return new KeyValuePair<string, FeatureAsset>(entry.Key, this[entry.Value]);
+                yield return new Entry(entry.Value, entry.Key, this[entry.Value]);
             }
         }
 
         IEnumerator IEnumerable.GetEnumerator()
         {
             return GetEnumerator();
+        }
+
+        public object Clone()
+        {
+            FeatureLibrary clone = CreateInstance<FeatureLibrary>();
+
+            clone.TargetDirectory = TargetDirectory;
+
+            clone.features = new FeatureAsset[features.Length];
+            Array.Copy(features, clone.features, features.Length);
+
+            clone.nameToFAID = new Dictionary<string, ushort>();
+            foreach(KeyValuePair<string, ushort> pair in nameToFAID)
+            {
+                clone.nameToFAID.Add(pair.Key, pair.Value);
+            }
+
+            return clone;
+        }
+
+        public struct Entry
+        {
+            public ushort FaID { get; }
+            public string Name { get; }
+            public FeatureAsset Feature { get; }
+
+            public Entry(ushort faid, string name, FeatureAsset feature)
+            {
+                FaID = faid;
+                Name = name;
+                Feature = feature;
+            }
         }
 
         #region SERIALIZATION
@@ -147,8 +166,8 @@ namespace Labrys
 
         public void OnAfterDeserialize()
         {
-            if (serializedNames == null 
-                || serializedFeatures == null 
+            if (serializedNames == null
+                || serializedFeatures == null
                 || serializedNames.Count != serializedFeatures.Count)
                 return;
 
