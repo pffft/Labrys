@@ -6,38 +6,35 @@ namespace Labrys.Editor
     [CustomEditor(typeof(FeatureLibrary))]
     public class FeatureLibraryInspector : UnityEditor.Editor
     {
-        private FeatureLibrary library;
-        private Vector2 scrollPosition;
-
-        private void OnEnable()
-        {
-            library = (FeatureLibrary)target;
-        }
-
         public override void OnInspectorGUI()
         {
             serializedObject.UpdateIfRequiredOrScript();
+            FeatureLibrary library = (FeatureLibrary)serializedObject.targetObject;
             library.OnAfterDeserialize();
+
+            EditorGUILayout.SelectableLabel(library.TargetDirectory);
 
             if (GUILayout.Button("Refresh"))
             {
+                Undo.RegisterCompleteObjectUndo(library, "Feature Library Refresh");
                 library.Refresh();
+                EditorUtility.SetDirty(library);
+                Debug.Log($"[Labrys:FL] Refreshed {library.name}: \n{library.ToString()}");
             }
 
             GUILayout.Space(25);
             GUILayout.Label("Contains:", EditorStyles.boldLabel);
-            scrollPosition = GUILayout.BeginScrollView(scrollPosition);
             foreach(FeatureLibrary.Entry entry in library)
             {
                 EditorGUILayout.BeginHorizontal();
-                EditorGUILayout.SelectableLabel($"{entry.FaID}: {entry.Name}", GUILayout.Height(15));
-                if (GUILayout.Button($"-->"))
+                Debug.Log($"{entry.FaID}: {entry.Name}");
+                EditorGUILayout.SelectableLabel($"{entry.FaID}: {entry.Name}", GUILayout.Height(20));
+                if (GUILayout.Button("-->"))
                 {
                     ProjectWindowUtil.ShowCreatedAsset(entry.Feature);
                 }
                 EditorGUILayout.EndHorizontal();
             }
-            GUILayout.EndScrollView();
         }
     }
 }

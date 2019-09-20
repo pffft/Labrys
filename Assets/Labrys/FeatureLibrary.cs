@@ -39,8 +39,6 @@ namespace Labrys
             string loadPath = $"Assets{EditorUtility.OpenFolderPanel("Select target Feature folder", saveDir, "").Replace(Application.dataPath, "")}";
             string savePath = $"{saveDir}/NewFeatureLibrary.asset";
 
-            string[] assetGUIDs = AssetDatabase.FindAssets($"t:{nameof(FeatureAsset)}", new string[] { loadPath });
-
             FeatureLibrary library = CreateInstance<FeatureLibrary>();
             library.TargetDirectory = loadPath;
             library.Refresh();
@@ -51,20 +49,22 @@ namespace Labrys
         public void Refresh()
         {
             string[] assetGUIDs = AssetDatabase.FindAssets($"t:{nameof(FeatureAsset)}", new string[] { TargetDirectory });
-            if (features != null && assetGUIDs.Length != features.Length)
-            {
-                nameToFAID = new Dictionary<string, ushort>();
-                features = new FeatureAsset[assetGUIDs.Length];
+            nameToFAID = new Dictionary<string, ushort>();
+            features = new FeatureAsset[assetGUIDs.Length];
 
-                foreach (string guid in assetGUIDs)
-                {
-                    string path = AssetDatabase.GUIDToAssetPath(guid);
-                    Add(path.Replace(TargetDirectory, "").Replace(".asset", "").TrimStart('/'),
-                        AssetDatabase.LoadAssetAtPath<FeatureAsset>(path));
-                }
+            foreach (string guid in assetGUIDs)
+            {
+                string path = AssetDatabase.GUIDToAssetPath(guid);
+                Add(path.Replace(TargetDirectory, "").Replace(".asset", "").TrimStart('/'),
+                    AssetDatabase.LoadAssetAtPath<FeatureAsset>(path));
             }
         }
 #endif
+        private FeatureLibrary()
+        {
+            nameToFAID = new Dictionary<string, ushort>();
+            features = new FeatureAsset[0];
+        }
 
         private bool Add(string name, FeatureAsset feature)
         {
@@ -126,6 +126,18 @@ namespace Labrys
             }
 
             return clone;
+        }
+
+        public override string ToString()
+        {
+            string str = "";
+
+            foreach(Entry e in this)
+            {
+                str += $"{{faid: {e.FaID}, name: {e.Name}, feature: {e.Feature.ToString()}}}\n";
+            }
+
+            return $"TargetDirectory: {TargetDirectory}, Contents: [\n{str}\n]";
         }
 
         public struct Entry
