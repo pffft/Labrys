@@ -1,16 +1,23 @@
 ﻿using UnityEngine;
 using UnityEditor;
+using UnityEditor.AnimatedValues;
 
 namespace Labrys.Editor
 {
     [CustomEditor(typeof(FeatureLibrary))]
     public class FeatureLibraryInspector : UnityEditor.Editor
     {
+        private AnimBool fadeGroupVal = new AnimBool(false);
+
+        public void OnEnable()
+        {
+            fadeGroupVal.valueChanged.AddListener(Repaint);
+        }
+
         public override void OnInspectorGUI()
         {
             serializedObject.UpdateIfRequiredOrScript();
             FeatureLibrary library = (FeatureLibrary)serializedObject.targetObject;
-            library.OnAfterDeserialize();
 
             EditorGUILayout.SelectableLabel(library.TargetDirectory);
 
@@ -19,22 +26,26 @@ namespace Labrys.Editor
                 Undo.RegisterCompleteObjectUndo(library, "Feature Library Refresh");
                 library.Refresh();
                 EditorUtility.SetDirty(library);
-                Debug.Log($"[Labrys:FL] Refreshed {library.name}: \n{library.ToString()}");
             }
 
             GUILayout.Space(25);
-            GUILayout.Label("Contains:", EditorStyles.boldLabel);
-            foreach(FeatureLibrary.Entry entry in library)
+            if (GUILayout.Button(fadeGroupVal.value ? "Hide contents" : "Show contents"))
+                fadeGroupVal.target = !fadeGroupVal.value;
+            if (EditorGUILayout.BeginFadeGroup(fadeGroupVal.faded))
             {
-                EditorGUILayout.BeginHorizontal();
-                Debug.Log($"{entry.FaID}: {entry.Name}");
-                EditorGUILayout.SelectableLabel($"{entry.FaID}: {entry.Name}", GUILayout.Height(20));
-                if (GUILayout.Button("-->"))
+                foreach (FeatureLibrary.Entry entry in library)
                 {
-                    ProjectWindowUtil.ShowCreatedAsset(entry.Feature);
+                    EditorGUILayout.BeginHorizontal();
+                    Debug.Log($"{entry.FaID}: {entry.Name}");
+                    EditorGUILayout.SelectableLabel($"{entry.FaID}: {entry.Name}", GUILayout.Height(20));
+                    if (GUILayout.Button("-->"))
+                    {
+                        ProjectWindowUtil.ShowCreatedAsset(entry.Feature);
+                    }
+                    EditorGUILayout.EndHorizontal();
                 }
-                EditorGUILayout.EndHorizontal();
             }
+            EditorGUILayout.EndFadeGroup();
         }
     }
 }

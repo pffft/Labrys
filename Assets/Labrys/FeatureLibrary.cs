@@ -172,8 +172,6 @@ namespace Labrys
                 serializedNames.Add(pair.Key);
                 serializedFeatures.Add(features[pair.Value]);
             }
-            nameToFAID = null;
-            features = null;
         }
 
         public void OnAfterDeserialize()
